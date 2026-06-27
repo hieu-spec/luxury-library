@@ -261,21 +261,21 @@
         japanGrid.innerHTML = '';
 
         books.forEach(book => {
-            const bookHTML = `
-                <div class="book-card">
-                    <div class="book-cover">
-                        <img src="${book.coverUrl}" alt="${book.title}">
-                        <div class="overlay">
-                            <a href="detail.html?bookId=${book._id}" class="read-btn" style="text-decoration: none; display: inline-block;">Xem chi tiết</a>
-                        </div>
-                    </div>
-                    <div class="book-info">
-                        <h3>${book.title}</h3>
-                        <p class="author">${book.author}</p>
-                        <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
-                    </div>
-                </div>
-            `;
+           // TRONG FILE index.html -> Tìm đoạn tạo thẻ bookHTML:
+const bookHTML = `
+    <div class="book-card" data-category="${book.category}" onclick="location.href='detail.html?id=${book._id}'">
+        <img src="${SERVER_URL}${book.coverUrl}?t=${new Date().getTime()}" alt="${book.title}" class="book-cover">
+        <div class="book-info">
+            <h3>${book.title}</h3>
+            <p class="author"><i class="fa-solid fa-feather-pointed"></i> ${book.author}</p>
+            <p class="desc">${book.description}</p>
+            <div class="progress-container">
+                <span class="progress-text">Tiến độ đọc: 0%</span>
+                <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
+            </div>
+        </div>
+    </div>
+`;
 
             if (book.region === 'china') {
                 chinaGrid.innerHTML += bookHTML; 
