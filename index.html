@@ -245,36 +245,46 @@
         <p>&copy; 2026 Thư viện của Hiếu - Không gian đọc cá nhân</p>
     </footer>
 
-    <script>
-    // ✨ BỔ SUNG: Khai báo địa chỉ Server tập trung ở đây để tránh lỗi Crash hệ thống
+   <script>
+    // 1. Định nghĩa địa chỉ Server Backend tập trung ở đầu file
     const SERVER_URL = "https://thuvienbackend.onrender.com";
 
     async function loadBooks() {
         try {
             const response = await fetch(`${SERVER_URL}/api/books`);
+            if (!response.ok) {
+                throw new Error("Không thể kết nối lấy dữ liệu từ Server!");
+            }
             const books = await response.json();
 
+            // Lấy các khu vực hiển thị lưới truyện theo vùng miền
             const chinaGrid = document.querySelector('#china-section .book-grid');
             const koreaGrid = document.querySelector('#korea-section .book-grid');
             const japanGrid = document.querySelector('#japan-section .book-grid');
 
-            chinaGrid.innerHTML = '';
-            koreaGrid.innerHTML = '';
-            japanGrid.innerHTML = '';
+            // Xóa sạch dữ liệu cũ/chữ đang tải trước khi render
+            if (chinaGrid) chinaGrid.innerHTML = '';
+            if (koreaGrid) koreaGrid.innerHTML = '';
+            if (japanGrid) japanGrid.innerHTML = '';
 
             books.forEach(book => {
-                // Tự động kiểm tra xem coverUrl là link upload nội bộ hay link ảnh mạng
-                const fullCoverUrl = book.coverUrl.startsWith('/uploads/') 
+                // Tự động kiểm tra cấu trúc link ảnh: ảnh upload hay link tuyệt đối từ internet
+                const fullCoverUrl = (book.coverUrl && book.coverUrl.startsWith('/uploads/')) 
                     ? `${SERVER_URL}${book.coverUrl}?t=${new Date().getTime()}` 
-                    : `${book.coverUrl}?t=${new Date().getTime()}`;
+                    : `${book.coverUrl || ''}?t=${new Date().getTime()}`;
 
+                // Tạo cấu trúc thẻ truyện (Đã bổ sung class hiển thị phần giới thiệu tóm tắt truyện)
                 const bookHTML = `
-                    <div class="book-card" data-category="${book.category}" onclick="location.href='detail.html?bookId=${book._id}'">
-                        <img src="${fullCoverUrl}" alt="${book.title}" class="book-cover">
+                    <div class="book-card" data-category="${book.category || ''}" onclick="location.href='detail.html?bookId=${book._id}'">
+                        <img src="${fullCoverUrl}" alt="${book.title || 'Chưa có tiêu đề'}" class="book-cover">
                         <div class="book-info">
-                            <h3>${book.title}</h3>
-                            <p class="author"><i class="fa-solid fa-feather-pointed"></i> ${book.author}</p>
-                            <p class="desc">${book.description}</p>
+                            <h3>${book.title || 'Chưa có tiêu đề'}</h3>
+                            <p class="author"><i class="fa-solid fa-feather-pointed"></i> ${book.author || 'Ẩn danh'}</p>
+                            
+                            <p class="book-desc" style="font-size: 13px; color: #a0a0a0; margin: 8px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4;">
+                                ${book.description || 'Chưa có phần giới thiệu nội dung cho tác phẩm này...'}
+                            </p>
+
                             <div class="progress-container">
                                 <span class="progress-text">Tiến độ đọc: 0%</span>
                                 <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
@@ -283,19 +293,22 @@
                     </div>
                 `;
 
-                if (book.region === 'china') {
+                // Phân loại truyện vào đúng khu vực quốc gia tương ứng
+                if (book.region === 'china' && chinaGrid) {
                     chinaGrid.innerHTML += bookHTML; 
-                } else if (book.region === 'korea') {
+                } else if (book.region === 'korea' && koreaGrid) {
                     koreaGrid.innerHTML += bookHTML; 
-                } else if (book.region === 'japan') {
+                } else if (book.region === 'japan' && japanGrid) {
                     japanGrid.innerHTML += bookHTML; 
                 }
             });
             
         } catch (error) {
-            console.error("Lỗi khi tải truyện từ server:", error);
+            console.error("Lỗi crash hệ thống khi tải truyện:", error);
         }
     }
+
+    // Lắng nghe sự kiện trang web sẵn sàng để kích hoạt load dữ liệu
     document.addEventListener('DOMContentLoaded', loadBooks);
 </script>
 </body>
