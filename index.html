@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư viện của Hiếu | Luxury Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* =========================================================
+           THIẾT KẾ RESPONSIVE & UX DI ĐỘNG CAO CẤP (INDEX.HTML)
+           ========================================================= */
+        @media (max-width: 768px) {
+            /* Tối ưu hóa khoảng cách toàn trang */
+            .container {
+                padding: 0 12px;
+                margin: 20px auto;
+            }
+
+            /* TÁI CẤU TRÚC HEADER THÀNH DẠNG APP DASHBOARD */
+            header {
+                padding: 20px 15px;
+                border-radius: 0 0 20px 20px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .logo {
+                font-size: 24px;
+                letter-spacing: 1.5px;
+                font-family: 'Playfair Display', serif;
+            }
+
+            /* Biến khu vực User thành một Grid chứa các nút bấm lớn */
+            .user-info {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                gap: 12px;
+                align-items: center;
+                font-size: 14px;
+            }
+
+            .user-info span {
+                order: -1; /* Đẩy lời chào lên đầu tiên */
+                font-weight: 600;
+                color: #e0e0e0;
+                margin-bottom: 5px;
+            }
+            
+            .user-info i.fa-user-ninja {
+                display: none; /* Ẩn bớt icon thừa để tinh gọn diện tích */
+            }
+
+            /* Biến các nút điều hướng thành các Tab bản to dễ bấm trên Mobile */
+            .user-info .view-all-btn {
+                width: 100%; /* Kéo dài full chiều rộng màn hình */
+                box-sizing: border-box;
+                padding: 12px 16px !important;
+                margin: 0 !important; /* Xóa bỏ margin-right inline cũ gây lệch màn hình */
+                font-size: 14px !important;
+                font-weight: 600;
+                border-radius: 10px;
+                text-align: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                background: rgba(255, 255, 255, 0.02);
+                transition: 0.2s active;
+            }
+            
+            /* Hiệu ứng phản hồi khi ngón tay chạm vào (Touch Feedback) */
+            .user-info .view-all-btn:active {
+                transform: scale(0.98);
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            /* TIÊU ĐỀ KHU VỰC TRUYỆN (TRUNG - HÀN - NHẬT) */
+            .section-header {
+                margin: 30px 0 15px 0;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+                padding-left: 8px;
+                margin: 0;
+            }
+
+            .section-header .view-all-btn {
+                font-size: 12px;
+                padding: 6px 12px;
+                border-radius: 8px;
+            }
+
+            /* LƯỚI TRUYỆN 2 CỘT HIỆN ĐẠI */
+            .book-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            /* THẺ TRUYỆN (BOOK CARD) TỐI ƯU CẢM ỨNG */
+            .book-card {
+                border-radius: 12px;
+                overflow: hidden;
+                background: #161622; /* Đồng bộ màu nền card giống trang review */
+            }
+
+            .book-cover {
+                height: 200px; /* Cân bằng lại tỷ lệ ảnh bìa trên mobile */
+                position: relative;
+            }
+
+            /* GIẢI QUYẾT LỖI HOVER TRÊN MOBILE */
+            /* Trên di động không có chuột, ép overlay luôn xuất hiện mờ hoặc chuyển đổi cơ chế */
+            .book-cover .overlay {
+                opacity: 1 !important; /* Luôn hiển thị overlay */
+                background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%) !important;
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+                padding-bottom: 10px;
+            }
+
+            .read-btn {
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+                width: 85%;
+                text-align: center;
+                padding: 8px 0;
+                font-size: 12px;
+                border-radius: 6px;
+                background: var(--accent-color, #4fc3f7);
+                color: #000 !important;
+                font-weight: 700;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            }
+
+            /* THÔNG TIN CHỮ BÊN DƯỚI CARD */
+            .book-info {
+                padding: 10px;
+            }
+
+            .book-info h3 {
+                font-size: 14px;
+                line-height: 1.3;
+                height: 36px; /* Giới hạn chiều cao 2 dòng tránh lệch khung card */
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                margin-bottom: 4px;
+            }
+
+            .book-info .author {
+                font-size: 11px;
+                margin-bottom: 8px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* Thanh tiến trình đọc truyện tinh gọn */
+            .progress-bar {
+                height: 4px;
+                border-radius: 2px;
+            }
+
+            /* Loại bỏ hoàn toàn các hiệu ứng phóng to hover gây giật lag khung hình di động */
+            .book-card:hover {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            
+            /* Thay thế bằng hiệu ứng chạm nhẹ */
+            .book-card:active {
+                transform: scale(0.98);
+            }
+
+            footer {
+                padding: 25px 15px;
+                font-size: 12px;
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">THƯ VIỆN CỦA HIẾU</div>
+            <div class="user-info">
+                <span>Chào Hiếu, hôm nay đọc gì?</span>
+                <i class="fa-solid fa-user-ninja"></i>
+                
+                <a href="character-rank.html" class="view-all-btn" style="border-color: #ff7675; color: #ff7675;">
+                    <i class="fa-solid fa-crown fa-bounce"></i> Xếp Hạng Nhân Vật (Nam/Nữ)
+                </a>
+                
+                <a href="review.html" class="view-all-btn" style="border-color: #ffcc00; color: #ffcc00;">
+                    <i class="fa-solid fa-trophy"></i> Hội Đồng Đánh Giá & Xếp Hạng
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="china-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-scroll"></i> Tiểu thuyết Trung Quốc</h2>
+                <a href="chinese.html" class="view-all-btn">Vào thư viện <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="book-grid"></div>
+        </section>
+
+        <section id="korea-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-fire-flame-curved"></i> Tiểu thuyết Hàn Quốc</h2>
+                <a href="korea.html" class="view-all-btn">Vào thư viện <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="book-grid"></div>
+        </section>
+
+        <section id="japan-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fa-solid fa-torii-gate"></i> Light Novel Nhật Bản</h2>
+                <a href="japan.html" class="view-all-btn">Vào thư viện <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+            <div class="book-grid"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Thư viện của Hiếu - Không gian đọc cá nhân</p>
+    </footer>
+
+    <script>
+        async function loadBooks() {
+            try {
+                const response = await fetch('http://192.168.1.8:3000/api/books');
+                const books = await response.json();
+
+                const chinaGrid = document.querySelector('#china-section .book-grid');
+                const koreaGrid = document.querySelector('#korea-section .book-grid');
+                const japanGrid = document.querySelector('#japan-section .book-grid');
+
+                chinaGrid.innerHTML = '';
+                koreaGrid.innerHTML = '';
+                japanGrid.innerHTML = '';
+
+                books.forEach(book => {
+                    const bookHTML = `
+                        <div class="book-card">
+                            <div class="book-cover">
+                                <img src="${book.coverUrl}" alt="${book.title}">
+                                <div class="overlay">
+                                    <a href="detail.html?bookId=${book._id}" class="read-btn" style="text-decoration: none; display: inline-block;">Xem chi tiết</a>
+                                </div>
+                            </div>
+                            <div class="book-info">
+                                <h3>${book.title}</h3>
+                                <p class="author">${book.author}</p>
+                                <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
+                            </div>
+                        </div>
+                    `;
+
+                    if (book.region === 'china') {
+                        chinaGrid.innerHTML += bookHTML; 
+                    } else if (book.region === 'korea') {
+                        koreaGrid.innerHTML += bookHTML; 
+                    } else if (book.region === 'japan') {
+                        japanGrid.innerHTML += bookHTML; 
+                    }
+                });
+                
+            } catch (error) {
+                console.error("Lỗi khi tải truyện từ server:", error);
+            }
+        }
+        // Hàm gọi API xóa nhân vật vĩnh viễn khỏi Database đám mây
+async function deleteCharacter(id, name) {
+    if (confirm(`⚠️ Bạn có chắc chắn muốn xóa nhân vật "${name}" khỏi bảng xếp hạng không?`)) {
+        try {
+            const res = await fetch(`${SERVER_URL}/api/characters/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                alert(`🗑️ Đã xóa nhân vật "${name}" thành công!`);
+                // Tự động tải lại bảng xếp hạng hiện tại để cập nhật giao diện
+                loadCharacterLeaderboard(activeGenderTab, activeGenderTab === 'male' ? 'male-leaderboard' : 'female-leaderboard');
+            } else {
+                alert("❌ Server từ chối lệnh xóa nhân vật!");
+            }
+        } catch (err) {
+            alert("❌ Lỗi kết nối đến Server Backend!");
+        }
+    }
+}
+        document.addEventListener('DOMContentLoaded', loadBooks);
+    </script>
+</body>
+</html>

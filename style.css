@@ -1,0 +1,446 @@
+/* BIẾN MÀU SẮC CHUNG */
+:root {
+    --bg-dark: #0a0a0a;
+    --card-bg: #161616;
+    --accent-color: #4fc3f7; /* Mặc định là xanh Electric Blue */
+    --text-main: #ffffff;
+    --text-dim: #a0a0a0;
+    --transition: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Tùy chỉnh màu sắc riêng theo trang */
+.page-china { --accent-color: #d4af37; } /* Vàng Gold */
+.page-japan { --accent-color: #b91c1c; } /* Đỏ Sakura */
+.page-korea { --accent-color: #6366f1; } /* Tím Neon/Xanh */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #050505;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(30, 20, 60, 0.4) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(20, 40, 60, 0.4) 0%, transparent 40%);
+    background-attachment: fixed;
+    color: var(--text-main);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    position: relative;
+}
+
+/* Hiệu ứng các vì sao (Dải ngân hà) */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 2px);
+    background-size: 50px 50px;
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* HEADER */
+header {
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 25px 50px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid #222;
+    backdrop-filter: blur(10px);
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--accent-color);
+    letter-spacing: 2px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: var(--text-dim);
+}
+
+.user-info i {
+    font-size: 24px;
+    color: var(--accent-color);
+}
+
+/* CONTAINER NỘI DUNG */
+.container {
+    max-width: 1400px;
+    margin: 50px auto;
+    padding: 0 50px;
+}
+
+/* TIÊU ĐỀ KHU VỰC & NÚT XEM TẤT CẢ */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 60px 0 30px 0;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: var(--text-main);
+    position: relative;
+    padding-left: 20px;
+    margin: 0; 
+}
+
+.section-title i {
+    color: var(--accent-color);
+}
+
+.section-title::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10%; height: 80%;
+    width: 3px;
+    background: var(--accent-color);
+    box-shadow: 0 0 10px var(--accent-color);
+}
+
+/* NÚT CHUYỂN TRANG / QUAY LẠI */
+.view-all-btn {
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 14px;
+    letter-spacing: 1px;
+    border: 1px solid var(--accent-color);
+    padding: 8px 20px;
+    border-radius: 20px;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.view-all-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    box-shadow: 0 0 15px var(--accent-color);
+}
+
+.back-btn {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+    padding: 8px 15px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid transparent;
+}
+
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-color);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* LƯỚI HIỂN THỊ SÁCH */
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 40px;
+}
+
+/* THẺ SÁCH (BOOK CARD) TỔNG HỢP */
+.book-card {
+    background: rgba(20, 20, 25, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.book-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    border-color: var(--accent-color);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--accent-color);
+}
+
+/* ẢNH BÌA SÁCH */
+.book-cover {
+    width: 100%;
+    height: 320px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+}
+
+.book-cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: var(--transition);
+}
+
+.book-card:hover .book-cover img {
+    transform: scale(1.1);
+}
+
+.book-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.9), transparent 60%);
+    pointer-events: none;
+}
+
+/* LỚP PHỦ & NÚT ĐỌC KHI HOVER */
+.overlay {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: var(--transition);
+    z-index: 2;
+}
+
+.book-card:hover .overlay {
+    opacity: 1;
+}
+
+.read-btn {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 12px 30px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.read-btn:hover {
+    background: var(--accent-color);
+    color: #000;
+    box-shadow: 0 0 20px var(--accent-color);
+}
+
+/* THÔNG TIN SÁCH */
+.book-info {
+    padding: 20px;
+}
+
+.book-info h3 {
+    font-size: 18px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.book-info .author {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 15px;
+}
+
+/* THANH TIẾN ĐỘ ĐỌC */
+.progress-bar {
+    width: 100%;
+    height: 4px;
+    background: #333;
+    border-radius: 2px;
+}
+
+.progress {
+    height: 100%;
+    background: var(--accent-color);
+    border-radius: 2px;
+}
+
+/* FOOTER */
+footer {
+    text-align: center;
+    padding: 50px;
+    color: #444;
+    border-top: 1px solid #111;
+}
+/* THANH CÔNG CỤ TÌM KIẾM VÀ LỌC (NÂNG CẤP) */
+.library-controls {
+    display: flex;
+    justify-content: center; /* Đưa thanh tìm kiếm ra giữa cho cân đối */
+    margin-bottom: 50px;
+    width: 100%;
+}
+
+.search-filter-wrapper {
+    display: flex;
+    align-items: center;
+    background: rgba(20, 20, 25, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50px; /* Bo tròn hoàn toàn */
+    padding: 10px 25px;
+    width: 100%;
+    max-width: 800px; /* Chiều rộng thanh tìm kiếm rất to và bề thế */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s ease;
+}
+
+/* Hiệu ứng phát sáng khi người dùng đang bấm vào thanh tìm kiếm */
+.search-filter-wrapper:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.2); 
+}
+
+.search-icon {
+    color: var(--text-dim);
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.search-filter-wrapper input {
+    flex: 1; /* Chiếm hết khoảng trống còn lại */
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 16px;
+    padding: 10px 0;
+    outline: none;
+    font-family: inherit;
+}
+
+.search-filter-wrapper input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Vạch kẻ chia cắt giữa ô nhập chữ và nút chọn thể loại */
+.search-filter-wrapper .divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0 20px;
+}
+
+/* KHU VỰC DROPDOWN CHỌN THỂ LOẠI */
+.custom-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent-color);
+}
+
+.category-dropdown {
+    background: transparent;
+    border: none;
+    color: var(--text-main);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Tùy chỉnh màu sắc danh sách xổ xuống */
+.category-dropdown option {
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 10px;
+}
+/* =========================================================
+           THIẾT KẾ MENU THẢ XUỐNG TÙY CHỈNH (CUSTOM DROPDOWN)
+           ========================================================= */
+        .custom-dropdown {
+            position: relative;
+            min-width: 170px;
+            cursor: pointer;
+            user-select: none; /* Không cho bôi đen chữ */
+        }
+        
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+        
+        .dropdown-header .selected-text {
+            color: var(--text-main);
+            flex: 1;
+        }
+        
+        .dropdown-list {
+            position: absolute;
+            top: 180%; /* Cách thanh tìm kiếm một chút */
+            right: 0;
+            background: rgba(20, 15, 10, 0.95); /* Nâu đen huyền bí */
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 8px;
+            list-style: none;
+            padding: 5px 0;
+            margin: 0;
+            width: max-content;
+            min-width: 100%;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            
+            /* Hiệu ứng ẩn/hiện mượt mà */
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        /* Khi menu được mở ra */
+        .custom-dropdown.open .dropdown-list {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-list li {
+            padding: 12px 20px;
+            color: var(--text-dim);
+            transition: 0.2s;
+            font-size: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .dropdown-list li:last-child {
+            border-bottom: none;
+        }
+        
+        /* Khi di chuột vào hoặc đang chọn sẽ sáng màu vàng Gold, không bị dính nền xanh dương nữa */
+        .dropdown-list li:hover, .dropdown-list li.active {
+            background: rgba(212, 175, 55, 0.15);
+            color: var(--accent-color);
+            padding-left: 25px; /* Hiệu ứng thụt lề nhẹ khi hover */
+        }

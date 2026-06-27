@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiểu thuyết Trung Quốc | Thư viện của Hiếu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body.page-china { 
+            --accent-color: #d4af37; 
+        } 
+        
+        body.page-china::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/chinese-lattice.png');
+            opacity: 0.15; 
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .page-china .section-title, 
+        .page-china .logo {
+            font-family: 'Playfair Display', serif;
+            letter-spacing: 2px;
+        }
+
+        .section-title { 
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.3); 
+            margin-bottom: 0 !important; 
+        }
+        
+        .ancient-divider {
+            width: 250px;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-color), transparent);
+            margin-top: 15px;
+            margin-bottom: 40px; 
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        .page-china .search-filter-wrapper {
+            background: rgba(30, 20, 15, 0.8) !important; 
+            border-color: rgba(212, 175, 55, 0.3) !important;
+        }
+
+        /* =========================================================
+           CHUYỂN ĐỔI SANG GIAO DIỆN DANH SÁCH DỌC (LIST VIEW)
+           ========================================================= */
+        .book-list-view {
+            display: flex;
+            flex-direction: column; /* Xếp dọc từ trên xuống */
+            gap: 20px; /* Khoảng cách giữa các truyện */
+            max-width: 900px; /* Giới hạn chiều rộng để không bị dàn quá dài trên màn hình to */
+            margin: 0 auto; /* Căn giữa danh sách */
+        }
+
+        .book-list-view .book-card {
+            display: flex; /* Chia thẻ sách thành 2 cột ngang */
+            flex-direction: row;
+            height: 180px; /* Chiều cao cố định cho mỗi dòng */
+            border-top: none; /* Bỏ viền trên cũ */
+            border-left: 4px solid var(--accent-color); /* Chuyển vạch nhấn sang viền trái */
+        }
+
+        .book-list-view .book-cover {
+            width: 140px; /* Chiều rộng ảnh bìa nhỏ lại */
+            height: 100%;
+            border-radius: 8px 0 0 8px; /* Chỉ bo tròn góc bên trái */
+            flex-shrink: 0; /* Không cho ảnh bị bóp méo */
+        }
+
+        .book-list-view .book-info {
+            flex: 1; /* Phần thông tin chiếm toàn bộ diện tích còn lại */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px 30px;
+        }
+
+        .book-list-view .book-info h3 {
+            font-size: 22px; /* Tên truyện to hơn */
+            margin-bottom: 8px;
+        }
+
+        .book-list-view .book-info .author {
+            font-size: 15px;
+            color: var(--accent-color);
+            margin-bottom: auto; /* Đẩy tác giả lên trên, thanh tiến trình xuống dưới */
+        }
+
+        /* Thêm đoạn mô tả ngắn cho truyện */
+        .book-desc {
+            color: var(--text-dim);
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Chỉ hiện 2 dòng mô tả, dài quá sẽ có dấu ... */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .book-list-view .progress-bar {
+            margin-top: 15px;
+        }
+       /* =========================================================
+           TỐI ƯU HÓA CHO ĐIỆN THOẠI (MOBILE RESPONSIVE)
+           ========================================================= */
+        @media (max-width: 768px) {
+            /* 1. Căn chỉnh lại khoảng cách trang */
+            .container {
+                padding: 0 15px;
+                margin-top: 20px;
+            }
+
+            header { padding: 15px; }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .logo { font-size: 22px; }
+            .section-title { font-size: 1.6rem; }
+
+            /* 2. Mở rộng thanh tìm kiếm và bộ lọc (Dễ bấm, dễ nhìn) */
+            .search-filter-wrapper {
+                flex-direction: column; /* Xếp dọc tìm kiếm và bộ lọc */
+                border-radius: 12px;
+                padding: 15px;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .search-filter-wrapper .divider {
+                display: none; /* Ẩn vạch kẻ chia cắt đi */
+            }
+
+            .search-filter-wrapper input {
+                width: 100%;
+                font-size: 16px; /* Phóng to cỡ chữ nhập liệu */
+                padding: 5px 0;
+            }
+
+            .dropdown-header {
+                justify-content: space-between;
+                padding-top: 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1); /* Tạo vạch ngăn cách ngang mờ */
+                font-size: 16px;
+            }
+
+            .dropdown-list {
+                width: 100%;
+            }
+
+            /* 3. Phóng to danh sách truyện (Ảnh to, chữ rõ) */
+            .book-list-view .book-card {
+                height: auto; /* Bỏ chiều cao cố định để thẻ tự giãn theo nội dung */
+                min-height: 160px; /* Đảm bảo chiều cao tối thiểu đủ rộng rãi */
+            }
+
+            .book-list-view .book-cover {
+                width: 120px; /* Phóng to ảnh bìa để nhìn rõ art truyện */
+            }
+
+            .book-list-view .book-info {
+                padding: 15px;
+                justify-content: flex-start;
+            }
+
+            .book-list-view .book-info h3 {
+                font-size: 18px; /* Tên truyện to hơn hẳn */
+                margin-bottom: 8px;
+                white-space: normal; /* Cho phép chữ rớt dòng nếu tên quá dài */
+                line-height: 1.4;
+            }
+
+            .book-list-view .book-info .author {
+                font-size: 14px; /* Tên tác giả to hơn một chút */
+                margin-bottom: 10px;
+            }
+
+            .book-desc {
+                display: none; /* Tạm ẩn mô tả để tránh thẻ bị quá dài trên mobile, giữ sự gọn gàng */
+            }
+            
+            .book-list-view .progress-bar {
+                margin-top: 15px; /* Đẩy thanh tiến trình xuống dưới cùng */
+            }
+        }
+    </style>
+</head>
+<body class="page-china">
+
+    <header>
+        <div class="header-content">
+            <div class="logo">THƯ VIỆN TRUNG HOA</div>
+            <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title"><i class="fa-solid fa-scroll"></i> Thế giới Tiên hiệp & Cổ phong</h2>
+        
+        <div class="ancient-divider"></div>
+
+       <div class="library-controls" style="position: relative; z-index: 999;">
+            <div class="search-filter-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Tìm kiếm tên truyện, tác giả...">
+                
+                <div class="divider"></div> 
+                
+               <div class="custom-dropdown" id="customDropdown">
+                    <div class="dropdown-header">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span class="selected-text">Tất cả thể loại</span>
+                        <i class="fa-solid fa-angle-down"></i>
+                    </div>
+                    <ul class="dropdown-list">
+                        <li data-value="all" class="active">Tất cả thể loại</li>
+                        <li data-value="tien-hiep">Tiên Hiệp</li>
+                        <li data-value="kiem-hiep">Kiếm Hiệp</li>
+                        <li data-value="huyen-huyen">Huyền Huyễn</li>
+                        <li data-value="ngon-tinh">Ngôn Tình</li>
+                        <li data-value="xuyen-khong">Xuyên Không</li>
+                        <li data-value="trong-sinh">Trọng Sinh</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="book-list-view">
+            
+            <div class="book-card" data-category="tien-hiep">
+                <div class="book-cover">
+                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?q=80&w=1887" alt="Tiên Nghịch">
+                    <div class="overlay">
+                        <button class="read-btn">Đọc</button>
+                    </div>
+                </div>
+                <div class="book-info">
+                    <h3>Tiên Nghịch</h3>
+                    <p class="author"><i class="fa-solid fa-pen-nib"></i> Nhĩ Căn</p>
+                    <p class="book-desc">Thuận vi phàm, nghịch tắc tiên. Câu chuyện về một thiếu niên bình phàm bước lên con đường tu đạo đầy chông gai để cải biến vận mệnh.</p>
+                    <div class="progress-bar"><div class="progress" style="width: 50%;"></div></div>
+                </div>
+            </div>
+
+            <div class="book-card" data-category="huyen-huyen">
+                <div class="book-cover">
+                    <img src="https://images.unsplash.com/photo-1618331835717-801e976710b2?q=80&w=1974" alt="Phàm Nhân Tu Tiên">
+                    <div class="overlay">
+                        <button class="read-btn">Đọc</button>
+                    </div>
+                </div>
+                <div class="book-info">
+                    <h3>Phàm Nhân Tu Tiên</h3>
+                    <p class="author"><i class="fa-solid fa-pen-nib"></i> Vong Ngữ</p>
+                    <p class="book-desc">Một tiểu tử nghèo bình thường ở sơn thôn, tình cờ tiến vào một môn phái giang hồ nhỏ, trở thành một gã ký danh đệ tử. Thân phận tuy thấp kém nhưng với tâm trí kiên định đã bước lên đỉnh cao.</p>
+                    <div class="progress-bar"><div class="progress" style="width: 85%;"></div></div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+    
+ <script>
+        // 1. HÀM TẢI TRUYỆN TỪ SERVER VÀ ĐỔ RA MÀN HÌNH
+       async function loadCategoryBooks() {
+            try {
+                const response = await fetch('http://192.168.1.8:3000/api/books');
+                const books = await response.json();
+                
+                const listView = document.querySelector('.book-list-view');
+                listView.innerHTML = ''; 
+                
+                // 1. Lọc lấy truyện theo đúng nước của trang hiện tại
+                let regionBooks = [];
+                if (document.body.classList.contains('page-china')) {
+                    regionBooks = books.filter(b => b.region === 'china');
+                } else if (document.body.classList.contains('page-japan')) {
+                    regionBooks = books.filter(b => b.region === 'japan');
+                } else if (document.body.classList.contains('page-korea')) {
+                    regionBooks = books.filter(b => b.region === 'korea');
+                }
+
+                // 2. TỰ ĐỘNG TẠO MENU BỘ LỌC TỪ DATABASE
+                // Lấy ra tất cả các chữ thể loại không trùng nhau của nước đó
+                const uniqueCategories = [...new Set(regionBooks.map(b => b.category))];
+                const dropdownList = document.querySelector('.dropdown-list');
+                
+                // Reset lại menu thả xuống
+                dropdownList.innerHTML = '<li data-value="all" class="active">Tất cả thể loại</li>';
+                uniqueCategories.forEach(cat => {
+                    dropdownList.innerHTML += `<li data-value="${cat}">${cat}</li>`;
+                });
+
+                // 3. In danh sách truyện ra màn hình
+                regionBooks.forEach(book => {
+                    listView.innerHTML += `
+                        <div class="book-card" data-category="${book.category}">
+                            <div class="book-cover">
+                                <img src="${book.coverUrl}" alt="${book.title}">
+                                <div class="overlay">
+                                    <a href="detail.html?bookId=${book._id}" class="read-btn" style="text-decoration: none; display: inline-block;">Xem chi tiết</a>
+                                </div>
+                            </div>
+                            <div class="book-info">
+                                <h3>${book.title}</h3>
+                                <p class="author"><i class="fa-solid fa-pen-nib"></i> ${book.author}</p>
+                                <p class="book-desc">${book.description}</p>
+                                <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Kích hoạt lại tính năng bấm lọc
+                setupFilters();
+
+            } catch (error) {
+                console.error("Lỗi:", error);
+            }
+        }
+
+        // HÀM XỬ LÝ THANH TÌM KIẾM VÀ DROPDOWN
+        function setupFilters() {
+            const bookCards = document.querySelectorAll('.book-card');
+
+            // Xử lý Menu Dropdown
+            const dropdown = document.getElementById('customDropdown');
+            const dropdownHeader = dropdown.querySelector('.dropdown-header');
+            const selectedText = dropdown.querySelector('.selected-text');
+            const dropdownList = dropdown.querySelector('.dropdown-list');
+            const dropdownItems = dropdownList.querySelectorAll('li');
+
+            dropdownHeader.onclick = (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('open');
+            };
+
+            document.onclick = (e) => {
+                if (!dropdown.contains(e.target)) {
+                    dropdown.classList.remove('open');
+                }
+            };
+
+            dropdownItems.forEach(item => {
+                item.onclick = () => {
+                    selectedText.innerText = item.innerText;
+                    dropdownItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    dropdown.classList.remove('open');
+
+                    const filterValue = item.getAttribute('data-value');
+                    bookCards.forEach(card => {
+                        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                            card.style.display = 'flex'; 
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                };
+            });
+
+            // Xử lý Thanh Tìm kiếm chữ
+            const searchInput = document.getElementById('searchInput');
+            searchInput.onkeyup = (e) => {
+                const searchValue = e.target.value.toLowerCase();
+                bookCards.forEach(card => {
+                    const title = card.querySelector('h3').innerText.toLowerCase();
+                    const author = card.querySelector('.author').innerText.toLowerCase();
+                    if (title.includes(searchValue) || author.includes(searchValue)) {
+                        card.style.display = 'flex'; 
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            };
+        }
+
+        // Gọi hàm chạy ngay khi web vừa tải xong
+        document.addEventListener('DOMContentLoaded', loadCategoryBooks);
+    </script>
+</body>
+</html>

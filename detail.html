@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<title>Chi Tiết Truyện | Luxury Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f1014; color: #d4d4d8; margin: 0; padding: 0; }
+    
+    /* HERO SECTION */
+    .story-hero { position: relative; padding: 50px 20px; background-size: cover; background-position: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .story-hero::before { content: ""; position: absolute; inset: 0; background: rgba(15, 16, 20, 0.85); backdrop-filter: blur(10px); }
+    .story-box { max-width: 1000px; margin: 0 auto; position: relative; z-index: 2; display: flex; gap: 30px; align-items: flex-start; flex-wrap: wrap; }
+    .story-cover { width: 220px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+    .story-meta { flex: 1; min-width: 300px; }
+    .story-meta h1 { margin: 0 0 15px 0; font-size: 32px; color: #fff; }
+    .tags span { background: rgba(79, 195, 247, 0.15); color: #4fc3f7; padding: 5px 12px; border-radius: 20px; font-size: 13px; margin-right: 8px; border: 1px solid rgba(79, 195, 247, 0.3); }
+    .story-stats { margin-top: 20px; font-size: 14px; color: #a0a0a0; line-height: 2; }
+    
+    /* BUTTONS */
+    .read-btn { background: #4fc3f7; color: #000; padding: 12px 25px; border-radius: 25px; text-decoration: none; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-block; border: none; font-size: 15px;}
+    .read-btn:hover { background: #29b6f6; box-shadow: 0 0 15px rgba(79, 195, 247, 0.4); }
+    .secondary-btn { background: transparent; color: #a0a0a0; text-decoration: none; padding: 12px 20px; margin-left: 10px; border-radius: 25px; border: 1px solid #444; transition: 0.2s; display: inline-block; }
+    .secondary-btn:hover { color: #fff; border-color: #fff; }
+
+    /* CONTENT SECTIONS */
+    .story-desc, .chapter-list, .story-comments { max-width: 1000px; margin: 40px auto; padding: 0 20px; box-sizing: border-box; }
+    h2 { color: #fff; border-bottom: 2px solid #4fc3f7; display: inline-block; padding-bottom: 5px; margin-bottom: 20px; }
+    .story-desc p { line-height: 1.7; font-size: 16px; text-align: justify; }
+    
+    /* CHAPTER CARDS */
+    .chapter-header { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+    .chapter-card { display: flex; justify-content: space-between; align-items: center; background: #161622; padding: 15px 20px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; border: 1px solid transparent; transition: 0.2s; text-decoration: none;}
+    .chapter-card:hover { border-color: #4fc3f7; background: rgba(79, 195, 247, 0.05); }
+    .chapter-main { font-weight: bold; color: #fff; font-size: 16px; }
+    .chapter-sub { font-size: 13px; color: #888; margin-top: 5px; }
+    .chapter-arrow { color: #666; font-size: 20px; }
+
+    /* CSS STYLE CHO PHẦN BÌNH LUẬN MỚI */
+    .comment-item { background: #161622; padding: 18px 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.03); position: relative; }
+    .comment-content { line-height: 1.6; font-size: 15px; color: #e4e4e7; white-space: pre-wrap; text-align: justify; }
+    .comment-date { font-size: 12px; color: #71717a; margin-top: 10px; display: block; font-family: sans-serif; }
+    .delete-comment-btn { position: absolute; top: 18px; right: 20px; background: transparent; color: #ff4757; border: none; cursor: pointer; font-size: 13px; font-weight: 600; opacity: 0.6; transition: 0.2s; }
+    .delete-comment-btn:hover { opacity: 1; text-decoration: underline; }
+    /* =========================================================
+   ✨ UPGRADED LUXURY UI FOR CHAPTER LIST & CONTROLS
+   ========================================================= */
+.chapter-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid rgba(255,255,255,0.08); 
+    padding-bottom: 15px; 
+    margin-bottom: 25px; 
+}
+.chapter-header h2 { 
+    margin: 0 !important; 
+    border: none !important; 
+    padding: 0 !important; 
+    font-size: 22px; 
+    font-weight: 700; 
+}
+#chapterCount {
+    font-size: 13px;
+    color: #4fc3f7;
+    background: rgba(79, 195, 247, 0.1);
+    padding: 4px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(79, 195, 247, 0.2);
+    font-weight: 600;
+}
+
+/* Khối bao bọc controls tinh tế, đổ bóng nhẹ */
+.chapter-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    align-items: center;
+    background: rgba(22, 22, 34, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* Ô tìm kiếm có icon đính kèm kính râm quý phái */
+.search-box-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+}
+.search-box-wrapper i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #62627a;
+    font-size: 14px;
+}
+.search-box-wrapper input {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    background: #0f1014;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #fff;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+.search-box-wrapper input:focus {
+    border-color: #4fc3f7;
+    box-shadow: 0 0 12px rgba(79, 195, 247, 0.2);
+}
+
+/* Nút đảo thứ tự đồng bộ giao diện Dark sang xịn */
+.control-btn {
+    background: #0f1014;
+    color: #a0a0a0;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+.control-btn:hover {
+    color: #fff;
+    border-color: #4fc3f7;
+    background: rgba(79, 195, 247, 0.05);
+}
+
+/* Cụm phân trang nhỏ gọn, không tranh giành spotlight với nút Đọc */
+.chap-pagination {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    background: #0f1014;
+    padding: 4px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    margin-left: auto;
+}
+.page-btn {
+    background: transparent;
+    color: #a0a0a0;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 12px;
+}
+.page-btn:hover:not(:disabled) {
+    background: #4fc3f7;
+    color: #000;
+}
+.page-btn:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+#chapPageInfo {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    min-width: 85px;
+    text-align: center;
+}
+
+/* Responsive Engine: Tự động dàn hàng dọc mượt mà trên điện thoại */
+@media (max-width: 768px) {
+    .chapter-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 12px;
+    }
+    .search-box-wrapper {
+        min-width: 100%;
+    }
+    .control-btn {
+        justify-content: center;
+        padding: 11px;
+    }
+    .chap-pagination {
+        margin-left: 0;
+        justify-content: space-between;
+        padding: 6px;
+    }
+}
+</style>
+</head>
+<body>
+
+<section class="story-hero" id="heroBg">
+  <div class="story-box">
+    <img src="" class="story-cover" id="bookCover">
+    <div class="story-meta">
+      <h1 id="bookTitle">Đang tải truyện...</h1>
+      <div class="tags">
+        <span id="bookCategory">Thể loại</span>
+      </div>
+      <div class="story-stats">
+        ✍️ Tác giả: <span id="bookAuthor">...</span> <br>
+        📖 <span id="chapterCountTop">0</span> chương
+      </div>
+      <div style="margin-top:25px;">
+          <a class="read-btn" id="readFromStart">Đọc từ đầu</a>
+          <a class="read-btn" id="resumeReading" style="background: #2ecc71; color: #fff; margin-left: 10px; display: none;">
+            ▶ Đọc tiếp
+          </a>
+          <a class="secondary-btn" href="index.html">← Trang chủ</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="story-desc">
+  <h2>Giới thiệu truyện</h2>
+  <p id="bookDesc">Đang tải giới thiệu...</p>
+</section>
+
+<section class="story-comments">
+  <h2>Góc suy tư & Đánh giá</h2>
+  <div style="background: #161622; padding: 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;">
+    <textarea id="commentInput" style="width: 100%; height: 100px; background: #0f1014; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 15px; font-size: 15px; box-sizing: border-box; resize: none; outline: none; margin-bottom: 15px; font-family: inherit;" placeholder="Ghi lại cảm xúc, suy tư hay đánh giá của bạn về bộ truyện này tại đây..."></textarea>
+    <button class="read-btn" id="submitCommentBtn" style="border-radius: 8px; padding: 10px 22px;">Gửi suy tư lên mây</button>
+  </div>
+  <div id="commentContainer"></div>
+</section>
+
+<section class="chapter-list">
+  <div class="chapter-header">
+    <h2>Danh sách chương</h2>
+    <span id="chapterCount">0 chương</span>
+  </div>
+  
+  <div class="chapter-controls">
+    <div class="search-box-wrapper">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="chapterSearchInput" placeholder="Nhập số chương hoặc tên chương cần tìm...">
+    </div>
+    
+    <button id="sortChaptersBtn" class="control-btn">
+        <i class="fa-solid fa-sort"></i> <span>Cũ nhất trước</span>
+    </button>
+    
+    <div class="chap-pagination">
+        <button id="chapPrevBtn" class="page-btn" disabled><i class="fa-solid fa-chevron-left"></i></button>
+        <span id="chapPageInfo">Trang 1 / 1</span>
+        <button id="chapNextBtn" class="page-btn"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+  </div>
+  
+  <div id="chapterContainer"></div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const bookId = urlParams.get('bookId');
+  
+  const resumeBtn = document.getElementById("resumeReading");
+  const commentInput = document.getElementById("commentInput");
+  const submitCommentBtn = document.getElementById("submitCommentBtn");
+  const commentContainer = document.getElementById("commentContainer");
+
+  const SERVER_URL = "https://thuvienbackend.onrender.com";
+
+  try {
+    // 1. Tải chi tiết truyện
+    const bookRes = await fetch(`${SERVER_URL}/api/books/detail/${bookId}`);
+    const book = await bookRes.json();
+    
+    document.getElementById("heroBg").style.backgroundImage = `url('${book.coverUrl}')`;
+    document.getElementById("bookCover").src = book.coverUrl;
+    document.getElementById("bookTitle").innerText = book.title;
+    document.getElementById("bookAuthor").innerText = book.author;
+    document.getElementById("bookCategory").innerText = book.category;
+    document.getElementById("bookDesc").innerText = book.description;
+
+    // 2. Tải danh sách chương
+    const chapRes = await fetch(`${SERVER_URL}/api/books/${bookId}/chapters`);
+    const chapters = await chapRes.json();
+
+    document.getElementById("chapterCountTop").innerText = chapters.length;
+    document.getElementById("chapterCount").innerText = `${chapters.length} chương`;
+
+    // 3. ĐỒNG BỘ: LẤY DẤU TRANG ĐÁM MÂY TỪ SERVER VỀ
+    try {
+        const bookmarkRes = await fetch(`${SERVER_URL}/api/books/${bookId}/bookmark`);
+        if (bookmarkRes.ok) {
+            const bookmarkData = await bookmarkRes.json();
+            if (bookmarkData && chapters.length > 0) {
+                const chapterExists = chapters.some(chap => chap._id === bookmarkData.chapterId);
+                if (chapterExists) {
+                    resumeBtn.href = `reading.html?bookId=${bookId}&chapterId=${bookmarkData.chapterId}`;
+                    resumeBtn.innerText = `▶ Đọc tiếp (${bookmarkData.chapterTitle})`;
+                    resumeBtn.style.display = "inline-block"; 
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Lỗi lấy dấu trang đồng bộ từ server:", err);
+    }
+
+    // =========================================================
+    // ✨ MỚI: JAVASCRIPT ENGINE XỬ LÝ BÌNH LUẬN ĐỒNG BỘ ĐÁM MÂY
+    // =========================================================
+    async function renderComments() {
+      commentContainer.innerHTML = "<p style='opacity:.5; font-size:14px;'>Đang tải danh sách suy tư từ đám mây...</p>";
+      try {
+        const res = await fetch(`${SERVER_URL}/api/books/${bookId}/comments`);
+        if (res.ok) {
+          const comments = await res.json();
+          commentContainer.innerHTML = "";
+          
+          if (comments.length === 0) {
+            commentContainer.innerHTML = "<p style='opacity:.4; font-size:15px; text-align:center; padding:20px 0;'>Chưa có suy tư hay đánh giá nào được lưu lại cho truyện này.</p>";
+            return;
+          }
+
+          comments.forEach(c => {
+            const date = new Date(c.createdAt).toLocaleString('vi-VN');
+            const div = document.createElement("div");
+            div.className = "comment-item";
+            div.innerHTML = `
+              <div class="comment-content">${c.content}</div>
+              <span class="comment-date">🕒 Lưu lại lúc: ${date}</span>
+              <button class="delete-comment-btn">Xóa nhật ký</button>
+            `;
+
+            // Lệnh xóa bình luận đám mây
+            div.querySelector(".delete-comment-btn").onclick = async () => {
+              if (confirm("⚠️ Bạn có chắc chắn muốn xóa dòng cảm xúc/suy tư này vĩnh viễn không?")) {
+                const delRes = await fetch(`${SERVER_URL}/api/comments/${c._id}`, { method: 'DELETE' });
+                if (delRes.ok) {
+                  renderComments(); 
+                } else {
+                  alert("Không thể xóa bình luận trên server!");
+                }
+              }
+            };
+            commentContainer.appendChild(div);
+          });
+        }
+      } catch (err) {
+        commentContainer.innerHTML = "<p style='color:#ff4757; font-size:14px;'>❌ Không thể kết nối server để tải dữ liệu suy tư!</p>";
+      }
+    }
+
+    // Chạy tải danh sách bình luận ngay khi mở trang truyện
+    renderComments();
+
+    // Lệnh gửi bình luận lên lưu trữ trên MongoDB Atlas
+    submitCommentBtn.onclick = async () => {
+      const contentText = commentInput.value.trim();
+      if (!contentText) {
+        alert("Vui lòng gõ nội dung suy tư hoặc đánh giá của bạn trước khi lưu!");
+        return;
+      }
+
+      try {
+        const response = await fetch(`${SERVER_URL}/api/books/${bookId}/comments`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: contentText })
+        });
+
+        if (response.ok) {
+          commentInput.value = ""; 
+          renderComments(); 
+        } else {
+          alert("Server từ chối ghi nhận bình luận đám mây!");
+        }
+      } catch (err) {
+        alert("Lỗi kết nối Backend, kiểm tra lại server!");
+      }
+    };
+    // =========================================================
+
+    const chapterContainer = document.getElementById("chapterContainer");
+    if (chapters.length > 0) {
+      document.getElementById("readFromStart").href = `reading.html?bookId=${bookId}&chapterId=${chapters[0]._id}`;
+      
+     // =========================================================
+    // ✨ ENGINE XỬ LÝ PHÂN TRANG & SẮP XẾP CHƯƠNG THÔNG MINH
+    // =========================================================
+    let activeChapters = [...chapters]; // Lưu trữ bản sao danh sách chương gốc
+    let isReversed = false;             // Trạng thái sắp xếp mặc định (Cũ -> Mới)
+    let chapCurrentPage = 1;            // Trang hiện tại
+    const chapRowsPerPage = 50;         // Cấu hình hiển thị tối đa 50 chương trên 1 trang
+
+    function renderChapterPage() {
+      const chapterContainer = document.getElementById("chapterContainer");
+      chapterContainer.innerHTML = "";
+
+      // 1. Thực hiện lọc dữ liệu theo ký tự tìm kiếm (nếu có)
+      const query = document.getElementById("chapterSearchInput").value.toLowerCase().trim();
+      let filtered = activeChapters.filter(chap => 
+          chap.title.toLowerCase().includes(query) || 
+          chap.chapterNumber.toString().includes(query)
+      );
+
+      // 2. Thực hiện đảo thứ tự danh sách dựa theo trạng thái nút bấm
+      if (isReversed) {
+          filtered = [...filtered].reverse();
+      }
+
+      const totalPages = Math.ceil(filtered.length / chapRowsPerPage);
+      
+      // Xử lý giao diện nếu không tìm thấy chương nào trùng khớp
+      if (totalPages === 0) {
+          chapterContainer.innerHTML = "<p style='opacity:.5; text-align:center; padding: 20px 0;'>Không tìm thấy chương nào khớp với từ khóa!</p>";
+          document.getElementById("chapPageInfo").innerText = "Trang 0 / 0";
+          document.getElementById("chapPrevBtn").disabled = true;
+          document.getElementById("chapNextBtn").disabled = true;
+          return;
+      }
+
+      // Đảm bảo trang hiện tại luôn nằm trong vùng an toàn
+      if (chapCurrentPage > totalPages) chapCurrentPage = totalPages;
+      if (chapCurrentPage < 1) chapCurrentPage = 1;
+
+      // Cập nhật trạng thái hiển thị của bộ phân trang
+      document.getElementById("chapPageInfo").innerText = `Trang ${chapCurrentPage} / ${totalPages}`;
+      document.getElementById("chapPrevBtn").disabled = (chapCurrentPage === 1);
+      document.getElementById("chapNextBtn").disabled = (chapCurrentPage === totalPages);
+
+      // 3. Cắt mảng dữ liệu để chỉ lấy đúng 50 chương thuộc trang hiện tại
+      const start = (chapCurrentPage - 1) * chapRowsPerPage;
+      const end = start + chapRowsPerPage;
+      const pageItems = filtered.slice(start, end);
+
+      // 4. Tiến hành đổ dữ liệu ra giao diện
+      pageItems.forEach((chap) => {
+        const a = document.createElement("a");
+        a.className = "chapter-card";
+        a.href = `reading.html?bookId=${bookId}&chapterId=${chap._id}`;
+        a.innerHTML = `
+          <div class="chapter-info">
+            <div class="chapter-main">${chap.title}</div>
+            <div class="chapter-sub">Chương số ${chap.chapterNumber}</div>
+          </div>
+          <div class="chapter-arrow">→</div>
+        `;
+        chapterContainer.appendChild(a);
+      });
+    }
+
+    // --- KÍCH HOẠT CÁC BỘ LẮNG NGHE SỰ KIỆN (EVENT LISTENERS) ---
+    
+    // Sự kiện tìm kiếm: Gõ chữ đến đâu lọc chương và nhảy về trang 1 đến đó
+    document.getElementById("chapterSearchInput").addEventListener("input", () => {
+        chapCurrentPage = 1;
+        renderChapterPage();
+    });
+
+    // Sự kiện đảo thứ tự: Bấm đổi trạng thái và vẽ lại giao diện
+    document.getElementById("sortChaptersBtn").addEventListener("click", (e) => {
+        isReversed = !isReversed;
+        e.currentTarget.innerHTML = isReversed 
+            ? `<i class="fa-solid fa-sort"></i> Mới nhất trước` 
+            : `<i class="fa-solid fa-sort"></i> Cũ nhất trước`;
+        chapCurrentPage = 1;
+        renderChapterPage();
+    });
+
+    // Sự kiện bấm nút lùi trang
+    document.getElementById("chapPrevBtn").addEventListener("click", () => {
+        if (chapCurrentPage > 1) { chapCurrentPage--; renderChapterPage(); }
+    });
+
+    // Sự kiện bấm nút tiến trang
+    document.getElementById("chapNextBtn").addEventListener("click", () => {
+        const query = document.getElementById("chapterSearchInput").value.toLowerCase().trim();
+        const filtered = activeChapters.filter(chap => 
+            chap.title.toLowerCase().includes(query) || 
+            chap.chapterNumber.toString().includes(query)
+        );
+        const totalPages = Math.ceil(filtered.length / chapRowsPerPage);
+        if (chapCurrentPage < totalPages) { chapCurrentPage++; renderChapterPage(); }
+    });
+
+    // Gọi lệnh chạy trang chương đầu tiên ngay sau khi tải xong danh sách dữ liệu từ Server
+    if (chapters.length > 0) {
+      document.getElementById("readFromStart").href = `reading.html?bookId=${bookId}&chapterId=${chapters[0]._id}`;
+      renderChapterPage();
+    } else {
+      chapterContainer.innerHTML = "<p style='opacity:.6'>Truyện này chưa có chương nào.</p>";
+      document.getElementById("readFromStart").style.display = "none";
+    }
+    // =========================================================
+    } else {
+      chapterContainer.innerHTML = "<p style='opacity:.6'>Truyện này chưa có chương nào.</p>";
+      document.getElementById("readFromStart").style.display = "none";
+    }
+  } catch (error) {
+    console.error("Lỗi:", error);
+  }
+});
+</script>
+</body>
+</html>
