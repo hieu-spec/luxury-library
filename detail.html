@@ -464,12 +464,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
 
             if (uploadRes.ok) {
-                const updatedBook = await uploadRes.json();
-                alert('🎉 Cập nhật ảnh bìa thành công!');
-                const newCoverUrl = updatedBook.coverUrl + '?t=' + new Date().getTime();
-                document.getElementById('bookCover').src = newCoverUrl;
-                document.getElementById('heroBg').style.backgroundImage = `url('${newCoverUrl}')`;
-            } else {
+    const updatedBook = await uploadRes.json();
+    alert('🎉 Cập nhật ảnh bìa thành công!');
+    
+    // ✨ SỬA TẠI ĐÂY: Nối thêm SERVER_URL vào trước để đảm bảo chỉ đúng link server phát ảnh
+    const newCoverUrl = SERVER_URL + updatedBook.coverUrl + '?t=' + new Date().getTime();
+    
+    document.getElementById('bookCover').src = newCoverUrl;
+    document.getElementById('heroBg').style.backgroundImage = `url('${newCoverUrl}')`;
+} else {
                 const errData = await uploadRes.json().catch(() => ({}));
                 alert(`❌ Thất bại: ${errData.message || 'Server lỗi khi xử lý ảnh.'}`);
             }
