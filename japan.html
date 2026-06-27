@@ -239,23 +239,28 @@
         });
 
         regionBooks.forEach(book => {
-            listView.innerHTML += `
-                <div class="book-card" data-category="${book.category}">
-                    <div class="book-cover">
-                        <img src="${book.coverUrl}" alt="${book.title}">
-                        <div class="overlay">
-                            <a href="detail.html?bookId=${book._id}" class="read-btn" style="text-decoration: none; display: inline-block;">Xem chi tiết</a>
-                        </div>
-                    </div>
-                    <div class="book-info">
-                        <h3>${book.title}</h3>
-                        <p class="author"><i class="fa-solid fa-pen-nib"></i> ${book.author}</p>
-                        <p class="book-desc">${book.description}</p>
-                        <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
-                    </div>
+    // Ép gộp link SERVER_URL nếu ảnh bìa thuộc thư mục lưu trữ nội bộ của Render
+    const publicCoverUrl = book.coverUrl.startsWith('/uploads/') 
+        ? `https://thuvienbackend.onrender.com${book.coverUrl}?t=${new Date().getTime()}` 
+        : book.coverUrl;
+
+    listView.innerHTML += `
+        <div class="book-card" data-category="${book.category}">
+            <div class="book-cover">
+                <img src="${publicCoverUrl}" alt="${book.title}">
+                <div class="overlay">
+                    <a href="detail.html?bookId=${book._id}" class="read-btn" style="text-decoration: none; display: inline-block;">Xem chi tiết</a>
                 </div>
-            `;
-        });
+            </div>
+            <div class="book-info">
+                <h3>${book.title}</h3>
+                <p class="author"><i class="fa-solid fa-pen-nib"></i> ${book.author}</p>
+                <p class="book-desc">${book.description}</p>
+                <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
+            </div>
+        </div>
+    `;
+});
 
         setupFilters();
 

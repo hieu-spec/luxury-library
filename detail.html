@@ -334,8 +334,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const bookRes = await fetch(`${SERVER_URL}/api/books/detail/${bookId}`);
     const book = await bookRes.json();
     
-    document.getElementById("heroBg").style.backgroundImage = `url('${book.coverUrl}')`;
-    document.getElementById("bookCover").src = book.coverUrl;
+   // Tự động kiểm tra cấu trúc link ảnh từ DB đám mây trả về
+const finalCover = book.coverUrl.startsWith('/uploads/') ? `${SERVER_URL}${book.coverUrl}` : book.coverUrl;
+
+document.getElementById("heroBg").style.backgroundImage = `url('${finalCover}')`;
+document.getElementById("bookCover").src = finalCover;
     document.getElementById("bookTitle").innerText = book.title;
     document.getElementById("bookAuthor").innerText = book.author;
     document.getElementById("bookCategory").innerText = book.category;

@@ -246,68 +246,57 @@
     </footer>
 
     <script>
-        async function loadBooks() {
-    try {
-        // Đã đổi link IP cũ thành link Render online của Hiếu
-        const response = await fetch('https://thuvienbackend.onrender.com/api/books');
-        const books = await response.json();
+    // ✨ BỔ SUNG: Khai báo địa chỉ Server tập trung ở đây để tránh lỗi Crash hệ thống
+    const SERVER_URL = "https://thuvienbackend.onrender.com";
 
-        const chinaGrid = document.querySelector('#china-section .book-grid');
-        const koreaGrid = document.querySelector('#korea-section .book-grid');
-        const japanGrid = document.querySelector('#japan-section .book-grid');
-
-        chinaGrid.innerHTML = '';
-        koreaGrid.innerHTML = '';
-        japanGrid.innerHTML = '';
-
-        books.forEach(book => {
-           // TRONG FILE index.html -> Tìm đoạn tạo thẻ bookHTML:
-const bookHTML = `
-    <div class="book-card" data-category="${book.category}" onclick="location.href='detail.html?id=${book._id}'">
-        <img src="${SERVER_URL}${book.coverUrl}?t=${new Date().getTime()}" alt="${book.title}" class="book-cover">
-        <div class="book-info">
-            <h3>${book.title}</h3>
-            <p class="author"><i class="fa-solid fa-feather-pointed"></i> ${book.author}</p>
-            <p class="desc">${book.description}</p>
-            <div class="progress-container">
-                <span class="progress-text">Tiến độ đọc: 0%</span>
-                <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
-            </div>
-        </div>
-    </div>
-`;
-
-            if (book.region === 'china') {
-                chinaGrid.innerHTML += bookHTML; 
-            } else if (book.region === 'korea') {
-                koreaGrid.innerHTML += bookHTML; 
-            } else if (book.region === 'japan') {
-                japanGrid.innerHTML += bookHTML; 
-            }
-        });
-        
-    } catch (error) {
-        console.error("Lỗi khi tải truyện từ server:", error);
-    }
-}
-        // Hàm gọi API xóa nhân vật vĩnh viễn khỏi Database đám mây
-async function deleteCharacter(id, name) {
-    if (confirm(`⚠️ Bạn có chắc chắn muốn xóa nhân vật "${name}" khỏi bảng xếp hạng không?`)) {
+    async function loadBooks() {
         try {
-            const res = await fetch(`${SERVER_URL}/api/characters/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                alert(`🗑️ Đã xóa nhân vật "${name}" thành công!`);
-                // Tự động tải lại bảng xếp hạng hiện tại để cập nhật giao diện
-                loadCharacterLeaderboard(activeGenderTab, activeGenderTab === 'male' ? 'male-leaderboard' : 'female-leaderboard');
-            } else {
-                alert("❌ Server từ chối lệnh xóa nhân vật!");
-            }
-        } catch (err) {
-            alert("❌ Lỗi kết nối đến Server Backend!");
+            const response = await fetch(`${SERVER_URL}/api/books`);
+            const books = await response.json();
+
+            const chinaGrid = document.querySelector('#china-section .book-grid');
+            const koreaGrid = document.querySelector('#korea-section .book-grid');
+            const japanGrid = document.querySelector('#japan-section .book-grid');
+
+            chinaGrid.innerHTML = '';
+            koreaGrid.innerHTML = '';
+            japanGrid.innerHTML = '';
+
+            books.forEach(book => {
+                // Tự động kiểm tra xem coverUrl là link upload nội bộ hay link ảnh mạng
+                const fullCoverUrl = book.coverUrl.startsWith('/uploads/') 
+                    ? `${SERVER_URL}${book.coverUrl}?t=${new Date().getTime()}` 
+                    : `${book.coverUrl}?t=${new Date().getTime()}`;
+
+                const bookHTML = `
+                    <div class="book-card" data-category="${book.category}" onclick="location.href='detail.html?bookId=${book._id}'">
+                        <img src="${fullCoverUrl}" alt="${book.title}" class="book-cover">
+                        <div class="book-info">
+                            <h3>${book.title}</h3>
+                            <p class="author"><i class="fa-solid fa-feather-pointed"></i> ${book.author}</p>
+                            <p class="desc">${book.description}</p>
+                            <div class="progress-container">
+                                <span class="progress-text">Tiến độ đọc: 0%</span>
+                                <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                if (book.region === 'china') {
+                    chinaGrid.innerHTML += bookHTML; 
+                } else if (book.region === 'korea') {
+                    koreaGrid.innerHTML += bookHTML; 
+                } else if (book.region === 'japan') {
+                    japanGrid.innerHTML += bookHTML; 
+                }
+            });
+            
+        } catch (error) {
+            console.error("Lỗi khi tải truyện từ server:", error);
         }
     }
-}
-        document.addEventListener('DOMContentLoaded', loadBooks);
-    </script>
+    document.addEventListener('DOMContentLoaded', loadBooks);
+</script>
 </body>
 </html>

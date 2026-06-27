@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị | Luxury Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background-color: #0a0a0f; color: #ffffff; font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; margin: 0; padding: 40px 20px; }
+        .admin-container { background: rgba(22, 22, 30, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 40px; border-radius: 16px; width: 100%; max-width: 600px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-bottom: 30px; }
+        h2 { text-align: center; margin-bottom: 30px; color: #4fc3f7; letter-spacing: 1px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; color: #a0a0a0; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px 15px; background: #111116; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #fff; font-family: inherit; font-size: 15px; outline: none; box-sizing: border-box; transition: 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: #4fc3f7; box-shadow: 0 0 10px rgba(79, 195, 247, 0.2); }
+        textarea { resize: vertical; height: 100px; }
+        .submit-btn { width: 100%; background: #4fc3f7; color: #000; border: none; padding: 14px; border-radius: 8px; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .submit-btn:hover { background: #29b6f6; box-shadow: 0 0 20px rgba(79, 195, 247, 0.4); }
+        .back-home { display: block; text-align: center; margin-top: 20px; color: #a0a0a0; text-decoration: none; font-size: 14px; }
+        .back-home:hover { color: #fff; }
+
+        /* Style cho bảng Quản lý truyện */
+        .table-container { max-width: 800px; width: 100%; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { color: #a0a0a0; font-weight: 600; font-size: 14px; }
+        .delete-btn { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); padding: 8px 15px; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: bold;}
+        .delete-btn:hover { background: #ff4757; color: #fff; }
+
+        /* THANH PHÂN TRANG (PAGINATION) */
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; font-size: 14px; color: #a0a0a0; }
+        .page-nav-btn { background: #161622; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .page-nav-btn:hover:not(:disabled) { background: #4fc3f7; color: #000; border-color: #4fc3f7; }
+        .page-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* MODAL QUẢN LÝ CHƯƠNG TRUYỆN */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
+        .modal-overlay.open { display: flex; }
+        .chapter-modal { background: #161622; border: 1px solid rgba(255,255,255,0.1); width: 100%; max-width: 800px; max-height: 85vh; border-radius: 16px; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .modal-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; color: #4fc3f7; font-size: 18px; }
+        .close-modal-btn { background: none; border: none; color: #a0a0a0; font-size: 20px; cursor: pointer; transition: 0.2s; }
+        .close-modal-btn:hover { color: #fff; }
+        .modal-body { flex: 1; overflow-y: auto; padding: 20px; }
+
+        /* Form nhập/sửa chương */
+        .chapter-form-box { background: #0f1014; border: 1px dashed rgba(79, 195, 247, 0.3); padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .chapter-form-box h4 { margin: 0 0 12px 0; color: #ffcc00; font-size: 14px; }
+        .inline-btn-group { display: flex; gap: 10px; margin-top: 10px; }
+        .btn-action { padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 14px; }
+        .btn-save { background: #4fc3f7; color: #000; }
+        .btn-cancel { background: transparent; color: #a0a0a0; border: 1px solid #444; }
+
+        /* List chương admin */
+        .admin-chap-list { display: flex; flex-direction: column; gap: 10px; }
+        .admin-chap-item { background: #1c1c27; padding: 12px 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.02); }
+        .admin-chap-item span { font-weight: 600; color: #fff; font-size: 15px; }
+        .edit-chap-btn { background: rgba(79, 195, 247, 0.1); color: #4fc3f7; border: 1px solid rgba(79, 195, 247, 0.2); padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .edit-chap-btn:hover { background: #4fc3f7; color: #000; }
+        /* =========================================================
+           ✨ HIỆU ỨNG THANH TIẾN TRÌNH QUÉT SÁNG KHI TẢI DỮ LIỆU
+           ========================================================= */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            padding: 40px 0;
+            color: #a0a0a0;
+            font-size: 14px;
+        }
+        .linear-progress-bar {
+            width: 100%;
+            max-width: 450px;
+            height: 6px;
+            background: #111116;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .linear-progress-value {
+            width: 100%;
+            height: 100%;
+            /* Tạo dải sáng xanh Electric chạy quét qua lại */
+            background: linear-gradient(90deg, transparent, #4fc3f7, #29b6f6, transparent);
+            position: absolute;
+            animation: linearScanning 1.4s infinite linear;
+        }
+        @keyframes linearScanning {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <h2><i class="fa-solid fa-user-gear"></i> THÊM TRUYỆN MỚI</h2>
+        <form id="addBookForm">
+            <div class="form-group"><label>Tên truyện</label><input type="text" id="title" required></div>
+            <div class="form-group"><label>Tác giả</label><input type="text" id="author" required></div>
+            
+            <div class="form-group">
+                <label>Thuộc quốc gia</label>
+                <select id="region" required>
+                    <option value="china">Trung Quốc (Tiên Hiệp/Cổ Phong)</option>
+                    <option value="japan">Nhật Bản (Light Novel)</option>
+                    <option value="korea">Hàn Quốc (Thợ Săn/Hệ Thống)</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Thể loại truyện (Tự nhập chữ)</label>
+                <input type="text" id="category" placeholder="Ví dụ: Trinh Thám, Kinh Dị, Hài Hước..." required>
+            </div>
+
+            <div class="form-group"><label>Đường dẫn ảnh bìa (URL)</label><input type="url" id="coverUrl" required></div>
+            <div class="form-group"><label>Mô tả ngắn</label><textarea id="description" required></textarea></div>
+            <div class="form-group"><label>File nội dung (.docx, .epub)</label>
+    <input type="file" id="bookFile" accept=".docx,.epub" style="background: transparent; border: 1px dashed #4fc3f7; padding: 10px; text-align: center;" required>
+</div>
+            <button type="submit" class="submit-btn">ĐĂNG LÊN HỆ THỐNG KÈM FILE</button>
+        </form>
+        <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+    </div>
+
+    <div class="admin-container table-container">
+        <h2><i class="fa-solid fa-trash-can"></i> QUẢN LÝ TRUYỆN ĐÃ ĐĂNG</h2>
+        
+        <div class="form-group">
+            <input type="text" id="adminSearchInput" placeholder="🔍 Nhập tên truyện hoặc tác giả cần tìm để quản lý...">
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tên truyện</th>
+                    <th>Tác giả</th>
+                    <th style="text-align: right;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody id="bookListTable"></tbody>
+        </table>
+
+        <div class="pagination-controls">
+            <button class="page-nav-btn" id="adminPrevBtn">◀ Trước</button>
+            <span id="adminPageInfo">Trang 1 / 1</span>
+            <button class="page-nav-btn" id="adminNextBtn">Sau ▶</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="chapterManagerModal">
+        <div class="chapter-modal">
+            <div class="modal-header">
+                <h3 id="modalBookTitle"><i class="fa-solid fa-book-bookmark"></i> Quản lý chương</h3>
+                <button class="close-modal-btn" id="closeModalBtn">✕</button>
+            </div>
+            <div class="modal-body">
+                
+                <div class="chapter-form-box">
+                    <h4 id="formActionTitle">➕ THÊM CHƯƠNG MỚI (VIẾT TAY / COPY-PASTE)</h4>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Tiêu đề chương</label>
+                        <input type="text" id="inputChapTitle" placeholder="Ví dụ: Chương X: Khởi Đầu Mới">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Nội dung chi tiết chương</label>
+                        <textarea id="inputChapContent" style="height: 180px;" placeholder="Dán hoặc viết nội dung truyện vào đây..."></textarea>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 12px;" id="batchUploadGroup">
+    <label style="color: #ffcc00; font-weight: bold;"><i class="fa-solid fa-file-import"></i> HOẶC IMPORT FILE CHƯƠNG HÀNG LOẠT (.DOCX, .EPUB)</label>
+    <input type="file" id="inputChapFile" accept=".docx,.epub" style="background: transparent; border: 1px dashed #4fc3f7; padding: 12px; text-align: center;">
+    <small style="color: #666; display: block; margin-top: 5px;">* Hệ thống sẽ tự động bóc tách các từ khóa "Chương X" bên trong file để tạo nhiều chương mới nối tiếp vào truyện.</small>
+</div>
+                    <div class="inline-btn-group">
+                        <button class="btn-action btn-save" id="saveChapBtn">LƯU CHƯƠNG</button>
+                        <button class="btn-action btn-cancel" id="cancelFormBtn" style="display: none;">HỦY SỬA</button>
+                    </div>
+                </div>
+
+                <h4 style="color: #a0a0a0; font-size: 14px; margin-bottom: 12px;">📖 DANH SÁCH CHƯƠNG HIỆN CÓ</h4>
+                <div class="admin-chap-list" id="adminChapListContainer"></div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal-overlay" id="uploadProgressModal" style="display: none; z-index: 3000;">
+    <div class="chapter-modal" style="max-width: 450px; padding: 30px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <h3 style="color: #4fc3f7; margin-bottom: 20px;">
+            <i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Đang tải truyện lên hệ thống...
+        </h3>
+        
+        <div class="progress-bar" style="width: 100%; height: 16px; background: #111116; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-bottom: 15px;">
+            <div id="uploadProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #4fc3f7, #29b6f6); transition: width 0.1s ease;"></div>
+        </div>
+        
+        <span id="uploadProgressPercent" style="font-size: 18px; font-weight: bold; color: #fff;">0%</span>
+    </div>
+</div>
+
+    <script>
+    // 🌟 CẤU HÌNH ĐỊA CHỈ SERVER TẬP TRUNG
+    // Thay đổi IP này thành "http://localhost:3000" nếu chạy hoàn toàn trên máy tính
+    const SERVER_URL = "https://thuvienbackend.onrender.com";
+
+    // --- 1. XỬ LÝ UP TRUYỆN CÓ ĐO TIẾN TRÌNH (UPLOAD PROGRESS) ---
+    document.getElementById('addBookForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData();
+        formData.append('title', document.getElementById('title').value);
+        formData.append('author', document.getElementById('author').value);
+        formData.append('region', document.getElementById('region').value);
+        formData.append('category', document.getElementById('category').value);
+        formData.append('coverUrl', document.getElementById('coverUrl').value);
+        formData.append('description', document.getElementById('description').value);
+        
+        const fileInput = document.getElementById('bookFile');
+        if (fileInput.files.length > 0) formData.append('bookFile', fileInput.files[0]);
+
+        const progressModal = document.getElementById('uploadProgressModal');
+        const progressBar = document.getElementById('uploadProgressBar');
+        const progressPercent = document.getElementById('uploadProgressPercent');
+        
+        progressModal.style.display = 'flex';
+        progressBar.style.width = '0%';
+        progressPercent.innerText = '0%';
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${SERVER_URL}/api/books/upload`, true);
+
+        xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+                const percentComplete = Math.round((event.loaded / event.total) * 100);
+                progressBar.style.width = percentComplete + '%';
+                progressPercent.innerText = percentComplete + '%';
+                
+                if (percentComplete === 100) {
+                    progressPercent.innerHTML = `100% <br><span style="font-size:13px; color:#ffcc00; font-weight:normal;">Server đang bóc tách chương truyện, vui lòng đợi...</span>`;
+                }
+            }
+        });
+
+        xhr.onload = function () {
+            progressModal.style.display = 'none';
+            if (xhr.status >= 200 && xhr.status < 300) {
+                alert('🎉 Đăng truyện và bóc tách chương thành công!');
+                document.getElementById('addBookForm').reset();
+                loadAdminBooks(); 
+            } else {
+                try {
+                    const resData = JSON.parse(xhr.responseText);
+                    alert(`❌ Lỗi từ hệ thống: ${resData.message}`);
+                } catch (err) {
+                    alert('❌ Có lỗi xảy ra trong quá trình xử lý file!');
+                }
+            }
+        };
+
+        xhr.onerror = function () {
+            progressModal.style.display = 'none';
+            alert('❌ Lỗi kết nối đến Server! Hãy kiểm tra xem bạn đã bật Backend chưa.');
+        };
+
+        xhr.send(formData);
+    });
+
+    // --- 2. XỬ LÝ SEARCH VÀ PHÂN TRANG ---
+    let allAdminBooks = [];       
+    let filteredAdminBooks = [];  
+    let currentAdminPage = 1;     
+    const rowsPerPage = 5;        
+
+    async function loadAdminBooks() {
+        try {
+            const response = await fetch(`${SERVER_URL}/api/books`);
+            allAdminBooks = await response.json();
+            filteredAdminBooks = [...allAdminBooks]; 
+            currentAdminPage = 1;                    
+            renderAdminTable();
+        } catch (error) { console.error("Lỗi tải danh sách truyện:", error); }
+    }
+
+    function renderAdminTable() {
+        const tbody = document.getElementById('bookListTable');
+        tbody.innerHTML = '';
+        const totalPages = Math.ceil(filteredAdminBooks.length / rowsPerPage);
+        
+        if (totalPages === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#a0a0a0;">Không tìm thấy truyện nào tương ứng</td></tr>';
+            document.getElementById('adminPageInfo').innerText = 'Trang 0 / 0';
+            document.getElementById('adminPrevBtn').disabled = true;
+            document.getElementById('adminNextBtn').disabled = true;
+            return;
+        }
+
+        document.getElementById('adminPageInfo').innerText = `Trang ${currentAdminPage} / ${totalPages}`;
+        document.getElementById('adminPrevBtn').disabled = (currentAdminPage === 1);
+        document.getElementById('adminNextBtn').disabled = (currentAdminPage === totalPages);
+
+        const start = (currentAdminPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pageItems = filteredAdminBooks.slice(start, end);
+
+        pageItems.forEach(book => {
+            tbody.innerHTML += `
+                <tr>
+                    <td style="color:#fff; font-weight:600;">${book.title}</td>
+                    <td>${book.author}</td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <button class="page-nav-btn" style="background: rgba(79,195,247,0.1); color:#4fc3f7; border-color: rgba(79,195,247,0.3); margin-right: 8px;" onclick="openChapterManager('${book._id}', '${book.title}')">
+                            <i class="fa-solid fa-list-ol"></i> Chương
+                        </button>
+                        <button class="delete-btn" onclick="deleteBook('${book._id}', '${book.title}')">
+                            <i class="fa-solid fa-trash"></i> Xóa
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    document.getElementById('adminSearchInput').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        filteredAdminBooks = allAdminBooks.filter(book => 
+            book.title.toLowerCase().includes(query) || 
+            book.author.toLowerCase().includes(query)
+        );
+        currentAdminPage = 1; 
+        renderAdminTable();
+    });
+
+    document.getElementById('adminPrevBtn').addEventListener('click', () => {
+        if(currentAdminPage > 1) { currentAdminPage--; renderAdminTable(); }
+    });
+    document.getElementById('adminNextBtn').addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredAdminBooks.length / rowsPerPage);
+        if(currentAdminPage < totalPages) { currentAdminPage++; renderAdminTable(); }
+    });
+
+    async function deleteBook(id, title) {
+        if(confirm(`⚠️ Bạn có chắc chắn muốn XÓA VĨNH VIỄN truyện "${title}" không? Hành động này không thể hoàn tác!`)) {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/books/${id}`, { method: 'DELETE' });
+                if (response.ok) {
+                    alert(`🗑️ Đã xóa truyện "${title}" thành công!`);
+                    loadAdminBooks(); 
+                } else alert("❌ Có lỗi xảy ra khi xóa!");
+            } catch (error) { console.error("Lỗi:", error); }
+        }
+    }
+
+    // --- 3. LOGIC XỬ LÝ QUẢN LÝ TỪNG CHƯƠNG ---
+    let currentTargetBookId = ""; 
+    let editingChapterId = null;  
+
+    const modal = document.getElementById("chapterManagerModal");
+    const formTitle = document.getElementById("formActionTitle");
+    const inputTitle = document.getElementById("inputChapTitle");
+    const inputContent = document.getElementById("inputChapContent");
+    const cancelBtn = document.getElementById("cancelFormBtn");
+    const saveBtn = document.getElementById("saveChapBtn");
+    const chapListContainer = document.getElementById("adminChapListContainer");
+
+    async function openChapterManager(bookId, bookTitle) {
+        currentTargetBookId = bookId;
+        document.getElementById("modalBookTitle").innerText = `Quản lý chương - ${bookTitle}`;
+        resetChapForm();
+        modal.classList.add("open");
+        await loadChaptersForAdmin();
+    }
+
+  async function loadChaptersForAdmin() {
+    chapListContainer.innerHTML = `
+        <div class="loading-container">
+            <div class="linear-progress-bar"><div class="linear-progress-value"></div></div>
+            <span><i class="fa-solid fa-spinner fa-spin" style="color: #4fc3f7; margin-right: 5px;"></i> Đang lấy danh sách chương...</span>
+        </div>
+    `;
+    
+    try {
+        const res = await fetch(`${SERVER_URL}/api/books/${currentTargetBookId}/chapters`);
+        const chapters = await res.json();
+        
+        if(chapters.length === 0) {
+            chapListContainer.innerHTML = `<p style="color:#666; text-align:center;">Truyện này chưa có chương nào. Hãy nhập chương đầu tiên!</p>`;
+            return;
+        }
+
+        // ✨ GIẢI PHÁP: Tạo một biến chuỗi tạm để gom toàn bộ HTML lại
+        let htmlBuffer = "";
+
+        chapters.forEach(chap => {
+            const hasAudio = !!chap.audioUrl;
+            const audioBadge = hasAudio ? `<span style="color: #2ecc71; font-size: 12px; margin-left: 8px;"><i class="fa-solid fa-file-audio"></i> Có Audio</span>` : '';
+
+            const audioControlBtn = !hasAudio 
+                ? `<button class="edit-chap-btn" style="background: rgba(46, 204, 113, 0.1); color: #2ecc71; border-color: rgba(46, 204, 113, 0.3);" onclick="document.getElementById('audioInput_${chap._id}').click()">
+                        <i class="fa-solid fa-microphone"></i> Đăng Audio
+                   </button>`
+                : `<button class="delete-btn" style="padding: 5px 12px; font-size: 13px; margin: 0; background: rgba(231, 76, 60, 0.1); color: #e74c3c; border-color: rgba(231, 76, 60, 0.3);" onclick="executeAudioDelete('${chap._id}', '${chap.title}')">
+                        <i class="fa-solid fa-music-slash"></i> Xóa Audio
+                   </button>`;
+
+            // Cộng dồn chuỗi vào biến đệm, hoàn toàn không động chạm vào giao diện (DOM) lúc này
+            htmlBuffer += `
+                <div class="admin-chap-item">
+                    <div>
+                        <span>${chap.title} (Chương ${chap.chapterNumber})</span>
+                        ${audioBadge}
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                        <input type="file" id="audioInput_${chap._id}" accept="audio/*" style="display:none;" onchange="executeAudioUpload('${chap._id}')">
+                        ${audioControlBtn}
+                        <button class="edit-chap-btn" onclick="triggerEditChapter('${chap._id}')">
+                            <i class="fa-solid fa-pen-to-square"></i> Sửa
+                        </button>
+                        <button class="delete-btn" style="padding: 5px 12px; font-size: 13px; margin: 0;" onclick="deleteChapter('${chap._id}', '${chap.title}')">
+                            <i class="fa-solid fa-trash"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+            `;
+        });
+
+        // ✨ Đổ toàn bộ dữ liệu vào DOM 1 lần duy nhất sau khi lặp xong
+        chapListContainer.innerHTML = htmlBuffer;
+
+    } catch (error) { 
+        console.error(error); 
+        chapListContainer.innerHTML = `<p style="color:#ff4757; text-align:center;">❌ Lỗi đường truyền, không thể tải danh sách chương!</p>`;
+    }
+}
+
+    saveBtn.addEventListener("click", async () => {
+        const fileInput = document.getElementById("inputChapFile");
+        
+        // TRƯỜNG HỢP 1: Đang sửa chương HOẶC không chọn file -> Chạy logic viết tay cũ
+        if (editingChapterId || !fileInput.files || fileInput.files.length === 0) {
+            const title = inputTitle.value.trim();
+            const content = inputContent.value.trim();
+            
+            if(!content) {
+                alert("⚠️ Vui lòng điền nội dung chương hoặc chọn file để bóc tách!");
+                return;
+            }
+
+            let url = `${SERVER_URL}/api/books/${currentTargetBookId}/chapters/manual`;
+            let method = "POST";
+
+            if(editingChapterId) {
+                url = `${SERVER_URL}/api/chapters/${editingChapterId}`;
+                method = "PUT";
+            }
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content })
+                });
+
+                if(response.ok) {
+                    alert(editingChapterId ? "🎉 Cập nhật chương thành công!" : "🎉 Thêm chương mới thành công!");
+                    resetChapForm();
+                    await loadChaptersForAdmin(); 
+                } else { alert("❌ Lỗi xử lý dữ liệu từ Server!"); }
+            } catch (error) { alert("❌ Lỗi kết nối Server!"); }
+        } 
+        
+        // TRƯỜNG HỢP 2: Đăng tải file bóc tách chương hàng loạt (Batch Import)
+        else {
+            const formData = new FormData();
+            formData.append('chapterFile', fileInput.files[0]);
+
+            const progressModal = document.getElementById('uploadProgressModal');
+            const progressBar = document.getElementById('uploadProgressBar');
+            const progressPercent = document.getElementById('uploadProgressPercent');
+            const progressTitle = progressModal.querySelector('h3');
+            const originalTitleHTML = progressTitle.innerHTML;
+
+            progressTitle.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles fa-bounce"></i> Đang bóc tách file chương hàng loạt...`;
+            progressModal.style.display = 'flex';
+            progressBar.style.width = '0%';
+            progressPercent.innerText = '0%';
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', `${SERVER_URL}/api/books/${currentTargetBookId}/chapters/upload`, true);
+
+            xhr.upload.addEventListener('progress', (event) => {
+                if (event.lengthComputable) {
+                    const percentComplete = Math.round((event.loaded / event.total) * 100);
+                    progressBar.style.width = percentComplete + '%';
+                    progressPercent.innerText = percentComplete + '%';
+                    if (percentComplete === 100) {
+                        progressPercent.innerHTML = `100% <br><span style="font-size:13px; color:#ffcc00; font-weight:normal;">Server đang phân rã văn bản thành nhiều chương, vui lòng đợi...</span>`;
+                    }
+                }
+            });
+
+            xhr.onload = async function () {
+                progressModal.style.display = 'none';
+                progressTitle.innerHTML = originalTitleHTML;
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const resData = JSON.parse(xhr.responseText);
+                        alert(`🎉 ${resData.message}`);
+                    } catch(e) {
+                        alert("🎉 Import danh sách chương thành công!");
+                    }
+                    resetChapForm();
+                    await loadChaptersForAdmin();
+                } else {
+                    try {
+                        const resData = JSON.parse(xhr.responseText);
+                        alert(`❌ Lỗi từ hệ thống: ${resData.message}`);
+                    } catch (err) {
+                        alert('❌ Có lỗi xảy ra trong quá trình xử lý file!');
+                    }
+                }
+            };
+
+            xhr.onerror = function () {
+                progressModal.style.display = 'none';
+                progressTitle.innerHTML = originalTitleHTML;
+                alert('❌ Lỗi kết nối đến Server Backend!');
+            };
+
+            xhr.send(formData);
+        }
+    });
+
+   // =========================================================================
+    // ✨ KHU VỰC DỌN SẠCH CODE: ĐÃ LOẠI BỎ TRÙNG LẶP HÀM & GIỮ NGUYÊN AUDIO ENGINE
+    // =========================================================================
+
+    function resetChapForm() {
+        editingChapterId = null;
+        formTitle.innerText = "➕ THÊM CHƯƠNG MỚI (VIẾT TAY / COPY-PASTE)";
+        inputTitle.value = "";
+        inputContent.value = "";
+        const fileInput = document.getElementById("inputChapFile");
+        if(fileInput) fileInput.value = "";
+        document.getElementById("batchUploadGroup").style.display = "block"; // Hiện lại ô chọn file hàng loạt
+        cancelBtn.style.display = "none";
+    }
+
+    async function triggerEditChapter(chapterId) {
+        try {
+            const res = await fetch(`${SERVER_URL}/api/chapters/${chapterId}`);
+            const chapter = await res.json();
+            
+            editingChapterId = chapterId;
+            formTitle.innerText = `📝 ĐANG SỬA NỘI DUNG: ${chapter.title}`;
+            inputTitle.value = chapter.title;
+            inputContent.value = chapter.content;
+            document.getElementById("batchUploadGroup").style.display = "none"; // Ẩn ô chọn file khi đang sửa
+            cancelBtn.style.display = "inline-block"; 
+            inputTitle.focus();
+        } catch (error) { alert("Không lấy được nội dung chi tiết chương!"); }
+    }
+
+    cancelBtn.onclick = resetChapForm;
+    document.getElementById("closeModalBtn").onclick = () => modal.classList.remove("open");
+    document.addEventListener('DOMContentLoaded', loadAdminBooks);
+
+    async function deleteChapter(chapterId, chapterTitle) {
+        if (confirm(`⚠️ Bạn có chắc chắn muốn XÓA VĨNH VIỄN chương "${chapterTitle}" không?\nHệ thống sẽ tự động dồn các số chương phía sau lên!`)) {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/chapters/${chapterId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert(`🗑️ Đã dọn dẹp chương "${chapterTitle}" khỏi cơ sở dữ liệu!`);
+                    resetChapForm();          
+                    await loadChaptersForAdmin(); 
+                } else {
+                    alert("❌ Có lỗi xảy ra, server từ chối xóa chương!");
+                }
+            } catch (error) {
+                console.error("Lỗi kết nối:", error);
+                alert("❌ Không thể kết nối tới máy chủ!");
+            }
+        }
+    }
+
+    async function executeAudioUpload(chapterId) {
+        const fileInput = document.getElementById(`audioInput_${chapterId}`);
+        if (fileInput.files.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('audioFile', fileInput.files[0]);
+
+        const progressModal = document.getElementById('uploadProgressModal');
+        const progressBar = document.getElementById('uploadProgressBar');
+        const progressPercent = document.getElementById('uploadProgressPercent');
+        
+        const progressTitle = progressModal.querySelector('h3');
+        const originalTitleHTML = progressTitle.innerHTML; 
+        progressTitle.innerHTML = `<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Đang tải file Audio lên hệ thống...`;
+
+        progressModal.style.display = 'flex';
+        progressBar.style.width = '0%';
+        progressPercent.innerText = '0%';
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${SERVER_URL}/api/chapters/${chapterId}/audio`, true);
+
+        xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+                const percentComplete = Math.round((event.loaded / event.total) * 100);
+                progressBar.style.width = percentComplete + '%';
+                progressPercent.innerText = percentComplete + '%';
+                
+                if (percentComplete === 100) {
+                    progressPercent.innerHTML = `100% <br><span style="font-size:13px; color:#ffcc00; font-weight:normal;">Server đang lưu trữ cấu hình Audio, vui lòng đợi...</span>`;
+                }
+            }
+        });
+
+        xhr.onload = function () {
+            progressModal.style.display = 'none'; 
+            progressTitle.innerHTML = originalTitleHTML; 
+            
+            if (xhr.status >= 200 && xhr.status < 300) {
+                alert("🎉 Đăng tải file âm thanh lên hệ thống thành công!");
+                loadChaptersForAdmin(); 
+            } else {
+                try {
+                    const resData = JSON.parse(xhr.responseText);
+                    alert(`❌ Lỗi từ hệ thống: ${resData.message}`);
+                } catch (err) {
+                    console.error("Nội dung lỗi crash từ Server:", xhr.responseText);
+                    alert(`❌ Server báo lỗi mã ${xhr.status}! Hãy kiểm tra thư mục uploads/audio hoặc xem lỗi chi tiết ở tab Console (nhấn F12).`);
+                }
+            }
+        };
+
+        xhr.onerror = function () {
+            progressModal.style.display = 'none';
+            progressTitle.innerHTML = originalTitleHTML;
+            alert('❌ Lỗi kết nối đến Server! Hãy kiểm tra xem bạn đã bật Backend chưa.');
+        };
+
+        xhr.send(formData);
+    }
+
+    async function executeAudioDelete(chapterId, chapterTitle) {
+        if (confirm(`⚠️ Bạn có chắc chắn muốn XÓA FILE AUDIO của chương "${chapterTitle}" vĩnh viễn không?`)) {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/chapters/${chapterId}/audio`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert(`🗑️ Đã xóa sạch file âm thanh khỏi chương "${chapterTitle}"!`);
+                    await loadChaptersForAdmin(); 
+                } else {
+                    alert("❌ Server từ chối lệnh xóa audio!");
+                }
+            } catch (err) {
+                alert("❌ Lỗi đường truyền, không thể kết nối tới Backend!");
+            }
+        }
+    }
+    </script>
+    
+</body>
+</html>
