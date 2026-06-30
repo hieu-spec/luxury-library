@@ -296,18 +296,21 @@ try {
       const audioContainer = document.getElementById("audioPlayerContainer");
       const audioControl = document.getElementById("chapterAudio");
 
-     if (chapter.audioUrl) {
-    // Kỹ thuật thông minh: Kiểm tra xem đó là link Drive (có chữ http) hay link cục bộ
-    if (chapter.audioUrl.startsWith('http')) {
-        audioControl.src = chapter.audioUrl;
-    } else {
-        audioControl.src = `${SERVER_URL}${chapter.audioUrl}`;
-    }
-    
-    audioContainer.style.display = "block"; 
-    // ...
+    if (chapter.audioUrl) {
+          let finalAudioLink = chapter.audioUrl;
+          
+          // BẺ LÁI: Nếu phát hiện link Google Drive, bóc tách ID file và đẩy qua API trung chuyển
+          if (chapter.audioUrl.includes('id=')) {
+              const fileId = chapter.audioUrl.split('id=')[1];
+              finalAudioLink = `${SERVER_URL}/api/stream-audio?id=${fileId}`;
+          } else if (!chapter.audioUrl.startsWith('http')) {
+              finalAudioLink = `${SERVER_URL}${chapter.audioUrl}`;
+          }
 
-          // ✨ THÀNH PHẦN MỚI: Nếu được kích hoạt lệnh nghe liên tục, tự động bật nhạc lên ngay
+          audioControl.src = finalAudioLink;
+          audioContainer.style.display = "block"; 
+          audioControl.volume = 0.7; 
+
           if (shouldAutoPlay) {
               audioControl.play().catch(err => console.log("Tự động phát nhạc bị trình duyệt chặn:", err));
           }
