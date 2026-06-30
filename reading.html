@@ -296,10 +296,16 @@ try {
       const audioContainer = document.getElementById("audioPlayerContainer");
       const audioControl = document.getElementById("chapterAudio");
 
-      if (chapter.audioUrl) {
-          audioControl.src = `${SERVER_URL}${chapter.audioUrl}`;
-          audioContainer.style.display = "block"; 
-          audioControl.volume = 0.7; 
+     if (chapter.audioUrl) {
+    // Kỹ thuật thông minh: Kiểm tra xem đó là link Drive (có chữ http) hay link cục bộ
+    if (chapter.audioUrl.startsWith('http')) {
+        audioControl.src = chapter.audioUrl;
+    } else {
+        audioControl.src = `${SERVER_URL}${chapter.audioUrl}`;
+    }
+    
+    audioContainer.style.display = "block"; 
+    // ...
 
           // ✨ THÀNH PHẦN MỚI: Nếu được kích hoạt lệnh nghe liên tục, tự động bật nhạc lên ngay
           if (shouldAutoPlay) {
