@@ -4,161 +4,58 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tiểu thuyết Hàn Quốc | Thư viện của Hiếu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        body.page-korea { 
-            --accent-color: #6366f1; /* Màu xanh tím đặc trưng của portal/hunter */
-        } 
-        
+        /* CSS bổ sung dành riêng cho Tiểu thuyết Hàn Quốc */
         body.page-korea::after {
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); /* Pattern hiện đại/hệ thống */
-            opacity: 0.15; 
+            background-image: url('https://www.transparenttextures.com/patterns/cubes.png');
+            opacity: 0.08; 
             pointer-events: none;
             z-index: -1;
         }
 
-        .page-korea .section-title, 
-        .page-korea .logo {
-            font-family: 'Playfair Display', serif;
-            letter-spacing: 2px;
-        }
-
-        .section-title { 
-            text-shadow: 0 0 10px rgba(99, 102, 241, 0.3); 
-            margin-bottom: 0 !important; 
-        }
-        
-        .modern-divider {
-            width: 250px;
-            height: 2px;
-            background: linear-gradient(90deg, var(--accent-color), transparent);
-            margin-top: 15px;
-            margin-bottom: 40px; 
-            box-shadow: 0 0 10px var(--accent-color);
-        }
-
-        .page-korea .search-filter-wrapper {
-            background: rgba(15, 15, 25, 0.8) !important; 
-            border-color: rgba(99, 102, 241, 0.3) !important;
-        }
-
-        /* GIAO DIỆN DANH SÁCH DỌC (LIST VIEW) */
-        .book-list-view {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .book-list-view .book-card {
-            display: flex;
-            flex-direction: row;
-            height: 180px;
-            border-top: none;
-            border-left: 4px solid var(--accent-color);
-        }
-
-        .book-list-view .book-cover {
-            width: 140px;
-            height: 100%;
-            border-radius: 8px 0 0 8px;
-            flex-shrink: 0;
-        }
-
-        .book-list-view .book-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 20px 30px;
-        }
-
-        .book-list-view .book-info h3 {
-            font-size: 22px;
-            margin-bottom: 8px;
-        }
-
-        .book-list-view .book-info .author {
-            font-size: 15px;
-            color: var(--accent-color);
-            margin-bottom: auto;
-        }
-
-        .book-desc {
-            color: var(--text-dim);
-            font-size: 14px;
-            line-height: 1.5;
-            margin-bottom: 15px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .book-list-view .progress-bar {
-            margin-top: 15px;
-        }
-
-        /* TỐI ƯU HÓA MOBILE */
-        @media (max-width: 768px) {
-            .container { padding: 0 15px; margin-top: 20px; }
-            header { padding: 15px; }
-            .header-content { flex-direction: column; gap: 15px; text-align: center; }
-            .logo { font-size: 22px; }
-            .section-title { font-size: 1.6rem; }
-            
-            .search-filter-wrapper { flex-direction: column; border-radius: 12px; padding: 15px; gap: 15px; align-items: stretch; }
-            .search-filter-wrapper .divider { display: none; }
-            .search-filter-wrapper input { width: 100%; font-size: 16px; padding: 5px 0; }
-            
-            .dropdown-header { justify-content: space-between; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 16px; }
-            .dropdown-list { width: 100%; }
-
-            .book-list-view .book-card { height: auto; min-height: 160px; }
-            .book-list-view .book-cover { width: 120px; }
-            .book-list-view .book-info { padding: 15px; justify-content: flex-start; }
-            .book-list-view .book-info h3 { font-size: 18px; margin-bottom: 8px; white-space: normal; line-height: 1.4; }
-            .book-list-view .book-info .author { font-size: 14px; margin-bottom: 10px; }
-            .book-desc { display: none; }
-            .book-list-view .progress-bar { margin-top: 15px; }
-        }
-        
-        /* CUSTOM DROPDOWN CHỈNH RIÊNG CHO HÀN */
+        /* Tùy chỉnh hover dropdown theo tone tím neon */
         .dropdown-list li:hover, .dropdown-list li.active {
-            background: rgba(99, 102, 241, 0.15);
-            color: var(--accent-color);
-            padding-left: 25px;
+            background: rgba(99, 102, 241, 0.12) !important;
+            color: var(--accent-color) !important;
         }
     </style>
 </head>
 <body class="page-korea">
+    <div class="stars-overlay"></div>
+    <div class="cyber-grid"></div>
+    <div class="cyber-scanner"></div>
 
     <header>
         <div class="header-content">
-            <div class="logo">THƯ VIỆN HÀN QUỐC</div>
+            <a href="index.html" class="logo">THƯ VIỆN HÀN QUỐC</a>
             <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
         </div>
     </header>
 
     <main class="container">
-        <h2 class="section-title"><i class="fa-solid fa-fire-flame-curved"></i> Kỷ Nguyên Thợ Săn & Hệ Thống</h2>
-        
-        <div class="modern-divider"></div>
+        <!-- Banner đầu danh mục -->
+        <div class="category-hero" style="background-image: url('https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=1920');">
+            <div class="category-hero-content">
+                <h1>Thế Giới Thợ Săn & Hệ Thống</h1>
+                <p>Khám phá kỷ nguyên thức tỉnh đầy kịch tính. Theo chân các thợ săn vượt qua hầm ngục sinh tử, hoàn thành các nhiệm vụ hệ thống và thăng cấp sức mạnh vô hạn.</p>
+            </div>
+        </div>
 
-       <div class="library-controls" style="position: relative; z-index: 999;">
+        <!-- Hộp tìm kiếm và lọc thể loại -->
+        <div class="library-controls" style="position: relative; z-index: 999;">
             <div class="search-filter-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="searchInput" placeholder="Tìm kiếm tên truyện, tác giả...">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm tên truyện, tác giả Hàn Quốc...">
                 
                 <div class="divider"></div> 
                 
-               <div class="custom-dropdown" id="customDropdown">
+                <div class="custom-dropdown" id="customDropdown">
                     <div class="dropdown-header">
                         <i class="fa-solid fa-layer-group"></i>
                         <span class="selected-text">Tất cả thể loại</span>
@@ -166,122 +63,169 @@
                     </div>
                     <ul class="dropdown-list">
                         <li data-value="all" class="active">Tất cả thể loại</li>
-                        <li data-value="he-thong">Hệ Thống</li>
-                        <li data-value="ham-nguc">Hầm Ngục (Dungeon)</li>
-                        <li data-value="hanh-dong">Hành Động</li>
-                        <li data-value="trong-sinh">Trọng Sinh / Hồi Quy</li>
                     </ul>
                 </div>
             </div>
         </div>
+
+        <!-- Bộ điều khiển chế độ xem (Grid / List Toggle) -->
+        <div class="layout-controller">
+            <div style="font-size: 15px; font-weight: 600; color: var(--accent-color); display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-fire-flame-curved"></i> Danh sách tác phẩm
+            </div>
+            <div class="view-toggle-container">
+                <button class="view-btn active" id="listBtn" title="Chế độ Danh sách"><i class="fa-solid fa-list"></i></button>
+                <button class="view-btn" id="gridBtn" title="Chế độ Lưới"><i class="fa-solid fa-table-cells"></i></button>
+            </div>
+        </div>
         
-        <div class="book-list-view">
-            
-            <div class="book-card" data-category="he-thong">
-                <div class="book-cover">
-                    <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=2070" alt="Solo Leveling">
-                    <div class="overlay">
-                        <button class="read-btn">Đọc</button>
-                    </div>
-                </div>
-                <div class="book-info">
-                    <h3>Solo Leveling (Tôi Thăng Cấp Một Mình)</h3>
-                    <p class="author"><i class="fa-solid fa-pen-nib"></i> Chugong</p>
-                    <p class="book-desc">Từ một thợ săn hạng E yếu nhất thế giới, Sung Jin-Woo vô tình nhận được một hệ thống bí ẩn cho phép anh thăng cấp không giới hạn.</p>
-                    <div class="progress-bar"><div class="progress" style="width: 90%;"></div></div>
-                </div>
+        <!-- Khung hiển thị danh sách sách -->
+        <div class="book-list-view list-mode">
+            <div style="text-align: center; padding: 40px; color: var(--text-dim);">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: var(--accent-color);"></i> Đang kết nối tới máy chủ lấy dữ liệu sách...
             </div>
-
-            <div class="book-card" data-category="trong-sinh">
-                <div class="book-cover">
-                    <img src="https://images.unsplash.com/photo-1605806616949-1e87b487cb2a?q=80&w=2070" alt="Toàn Trí Độc Giả">
-                    <div class="overlay">
-                        <button class="read-btn">Đọc</button>
-                    </div>
-                </div>
-                <div class="book-info">
-                    <h3>Toàn Trí Độc Giả (Omniscient Reader's Viewpoint)</h3>
-                    <p class="author"><i class="fa-solid fa-pen-nib"></i> Sing Shong</p>
-                    <p class="book-desc">Một ngày nọ, thế giới biến thành cuốn tiểu thuyết rác rưởi mà Kim Dokja là người duy nhất đọc đến chương cuối cùng. Cuộc chiến sinh tồn bắt đầu.</p>
-                    <div class="progress-bar"><div class="progress" style="width: 30%;"></div></div>
-                </div>
-            </div>
-
         </div>
     </main>
+
+    <footer>
+        <p>&copy; 2026 Thư viện của Hiếu - Không gian đọc cá nhân cao cấp</p>
+    </footer>
     
-   <script>
-        // 1. HÀM TẢI TRUYỆN TỪ SERVER VÀ ĐỔ RA MÀN HÌNH
-   async function loadCategoryBooks() {
-    try {
-        // Đã đổi link IP cũ thành link Render online
-        const response = await fetch('https://thuvienbackend.onrender.com/api/books');
-        const books = await response.json();
-        
-        const listView = document.querySelector('.book-list-view');
-        listView.innerHTML = ''; 
-        
-        let regionBooks = [];
-        if (document.body.classList.contains('page-china')) {
-            regionBooks = books.filter(b => b.region === 'china');
-        } else if (document.body.classList.contains('page-japan')) {
-            regionBooks = books.filter(b => b.region === 'japan');
-        } else if (document.body.classList.contains('page-korea')) {
-            regionBooks = books.filter(b => b.region === 'korea');
+    <script>
+        const SERVER_URL = "https://thuvienbackend.onrender.com";
+        let booksCache = []; // Bộ nhớ đệm danh sách sách
+        let currentFilterCategory = "all";
+        let currentSearchQuery = "";
+        let viewMode = "list"; // Mặc định là list-mode
+
+        // Lấy tiến độ đọc từ Bookmark và Chapter
+        async function getReadingProgress(bookId) {
+            try {
+                const [bookmarkRes, chaptersRes] = await Promise.all([
+                    fetch(`${SERVER_URL}/api/books/${bookId}/bookmark`),
+                    fetch(`${SERVER_URL}/api/books/${bookId}/chapters`)
+                ]);
+                if (!bookmarkRes.ok || !chaptersRes.ok) return 0;
+                const bookmark = await bookmarkRes.json();
+                const chapters = await chaptersRes.json();
+                if (!bookmark || !bookmark.chapterId || !chapters || chapters.length === 0) return 0;
+                const index = chapters.findIndex(c => c._id === bookmark.chapterId);
+                if (index === -1) return 0;
+                return Math.round(((index + 1) / chapters.length) * 100);
+            } catch (e) {
+                console.warn("Lỗi lấy tiến trình đọc:", e);
+                return 0;
+            }
         }
 
-        const uniqueCategories = [...new Set(regionBooks.map(b => b.category))];
-        const dropdownList = document.querySelector('.dropdown-list');
-        
-        dropdownList.innerHTML = '<li data-value="all" class="active">Tất cả thể loại</li>';
-        uniqueCategories.forEach(cat => {
-            dropdownList.innerHTML += `<li data-value="${cat}">${cat}</li>`;
-        });
+        async function updateBookProgress(bookId, textId, barId) {
+            const progress = await getReadingProgress(bookId);
+            const textEl = document.getElementById(textId);
+            const barEl = document.getElementById(barId);
+            if (textEl && barEl) {
+                textEl.innerText = `Tiến độ đọc: ${progress}%`;
+                barEl.style.width = `${progress}%`;
+            }
+        }
 
-        regionBooks.forEach(book => {
-    // Ép gộp link SERVER_URL nếu ảnh bìa thuộc thư mục lưu trữ nội bộ của Render
-    const publicCoverUrl = book.coverUrl.startsWith('/uploads/') 
-        ? `https://thuvienbackend.onrender.com${book.coverUrl}?t=${new Date().getTime()}` 
-        : book.coverUrl;
+        // Tải truyện và phân tích thể loại
+        async function loadCategoryBooks() {
+            try {
+                const response = await fetch(`${SERVER_URL}/api/books`);
+                if (!response.ok) throw new Error("Lỗi mạng máy chủ!");
+                const books = await response.json();
+                
+                // Lọc sách theo khu vực Hàn Quốc
+                booksCache = books.filter(b => b.region === 'korea');
+                
+                // Thiết lập bộ lọc Dropdown thể loại động
+                const uniqueCategories = [...new Set(booksCache.map(b => b.category).filter(Boolean))];
+                const dropdownList = document.querySelector('.dropdown-list');
+                
+                dropdownList.innerHTML = '<li data-value="all" class="active">Tất cả thể loại</li>';
+                uniqueCategories.forEach(cat => {
+                    dropdownList.innerHTML += `<li data-value="${cat}">${cat}</li>`;
+                });
 
-    listView.innerHTML += `
-        <div class="book-card" data-category="${book.category}">
-            <div class="book-cover">
-                <img src="${publicCoverUrl}" alt="${book.title}">
-                <div class="overlay">
-                    <a href="detail.html?bookId=${book._id}" class="read-btn" style="text-decoration: none; display: inline-block;">Xem chi tiết</a>
-                </div>
-            </div>
-            <div class="book-info">
-                <h3>${book.title}</h3>
-                <p class="author"><i class="fa-solid fa-pen-nib"></i> ${book.author}</p>
-                <p class="book-desc">${book.description}</p>
-                <div class="progress-bar"><div class="progress" style="width: 0%;"></div></div>
-            </div>
-        </div>
-    `;
-});
+                renderBooks();
+                setupDropdownEvents();
+                setupSearchEvent();
+                setupLayoutEvents();
 
-        setupFilters();
+            } catch (error) {
+                console.error("Lỗi:", error);
+                document.querySelector('.book-list-view').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-circle-exclamation" style="color: var(--accent-color);"></i>
+                        <h3>Lỗi kết nối máy chủ</h3>
+                        <p>Không thể đồng bộ thư viện truyện từ máy chủ đám mây vào lúc này. Vui lòng kiểm tra lại kết nối mạng!</p>
+                    </div>
+                `;
+            }
+        }
 
-    } catch (error) {
-        console.error("Lỗi:", error);
-    }
-}
+        // Vẽ danh sách truyện ra màn hình dựa trên bộ lọc
+        function renderBooks() {
+            const listView = document.querySelector('.book-list-view');
+            listView.innerHTML = ''; 
 
-        // Gọi hàm chạy ngay khi web vừa tải xong
-        document.addEventListener('DOMContentLoaded', loadCategoryBooks);
-        // HÀM XỬ LÝ THANH TÌM KIẾM VÀ DROPDOWN (Bổ sung cho Japan và Korea)
-        function setupFilters() {
-            const bookCards = document.querySelectorAll('.book-list-view .book-card');
+            const filteredBooks = booksCache.filter(book => {
+                const matchCategory = currentFilterCategory === 'all' || book.category === currentFilterCategory;
+                const matchSearch = book.title.toLowerCase().includes(currentSearchQuery) || 
+                                    book.author.toLowerCase().includes(currentSearchQuery);
+                return matchCategory && matchSearch;
+            });
 
-            // Xử lý Menu Dropdown
+            if (filteredBooks.length === 0) {
+                listView.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <h3>Không tìm thấy truyện</h3>
+                        <p>Thử tìm kiếm với một từ khóa khác hoặc lọc thể loại khác nhé!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredBooks.forEach(book => {
+                const publicCoverUrl = book.coverUrl.startsWith('/uploads/') 
+                    ? `${SERVER_URL}${book.coverUrl}?t=${new Date().getTime()}` 
+                    : book.coverUrl;
+
+                const progressTextId = `progress-text-${book._id}`;
+                const progressBarId = `progress-bar-${book._id}`;
+
+                listView.innerHTML += `
+                    <div class="book-card" data-category="${book.category}" onclick="location.href='detail.html?bookId=${book._id}'">
+                        <div class="book-cover">
+                            <img src="${publicCoverUrl}" alt="${book.title}" loading="lazy">
+                            <div class="overlay">
+                                <button class="read-btn">Chi Tiết</button>
+                            </div>
+                        </div>
+                        <div class="book-info">
+                            <h3>${book.title}</h3>
+                            <p class="author"><i class="fa-solid fa-pen-nib"></i> ${book.author}</p>
+                            <p class="book-desc">${book.description || 'Chưa có phần giới thiệu nội dung cho tác phẩm này...'}</p>
+                            <div class="progress-container">
+                                <span class="progress-text" id="${progressTextId}">Tiến độ đọc: 0%</span>
+                                <div class="progress-bar"><div class="progress" id="${progressBarId}" style="width: 0%;"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Tải tiến trình đọc không đồng bộ
+                updateBookProgress(book._id, progressTextId, progressBarId);
+            });
+        }
+
+        // Xử lý sự kiện Menu Dropdown Lọc
+        function setupDropdownEvents() {
             const dropdown = document.getElementById('customDropdown');
             const dropdownHeader = dropdown.querySelector('.dropdown-header');
             const selectedText = dropdown.querySelector('.selected-text');
             const dropdownList = dropdown.querySelector('.dropdown-list');
-            
-            // Lấy các li sau khi đã được sinh ra động từ Database
             const dropdownItems = dropdownList.querySelectorAll('li');
 
             dropdownHeader.onclick = (e) => {
@@ -302,32 +246,50 @@
                     item.classList.add('active');
                     dropdown.classList.remove('open');
 
-                    const filterValue = item.getAttribute('data-value');
-                    bookCards.forEach(card => {
-                        if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
-                            card.style.display = 'flex'; 
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
+                    currentFilterCategory = item.getAttribute('data-value');
+                    renderBooks();
                 };
             });
+        }
 
-            // Xử lý Thanh Tìm kiếm chữ
+        // Xử lý sự kiện Thanh Tìm Kiếm
+        function setupSearchEvent() {
             const searchInput = document.getElementById('searchInput');
             searchInput.onkeyup = (e) => {
-                const searchValue = e.target.value.toLowerCase();
-                bookCards.forEach(card => {
-                    const title = card.querySelector('h3').innerText.toLowerCase();
-                    const author = card.querySelector('.author').innerText.toLowerCase();
-                    if (title.includes(searchValue) || author.includes(searchValue)) {
-                        card.style.display = 'flex'; 
-                    } else {
-                        card.style.display = 'none';
-                    }
-                });
+                currentSearchQuery = e.target.value.toLowerCase().trim();
+                renderBooks();
             };
         }
+
+        // Xử lý bộ chuyển Grid/List View
+        function setupLayoutEvents() {
+            const listBtn = document.getElementById('listBtn');
+            const gridBtn = document.getElementById('gridBtn');
+            const listView = document.querySelector('.book-list-view');
+
+            if (listBtn && gridBtn && listView) {
+                listBtn.onclick = () => {
+                    viewMode = "list";
+                    listBtn.classList.add('active');
+                    gridBtn.classList.remove('active');
+                    listView.classList.remove('grid-mode');
+                    listView.classList.add('list-mode');
+                };
+
+                gridBtn.onclick = () => {
+                    viewMode = "grid";
+                    gridBtn.classList.add('active');
+                    listBtn.classList.remove('active');
+                    listView.classList.remove('list-mode');
+                    listView.classList.add('grid-mode');
+                };
+            }
+        }
+
+        // Khởi động trang web
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCategoryBooks();
+        });
     </script>
 </body>
 </html>
