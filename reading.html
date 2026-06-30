@@ -1,556 +1,1034 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đọc Truyện | Luxury Library</title>
-<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<style>
-    /* =========================================
-       GIAO DIỆN CHUNG
-       ========================================= */
-    body { 
-        font-family: 'Merriweather', serif; 
-        background-color: #111; 
-        color: #d4d4d8; 
-        margin: 0; padding: 0; 
-        transition: background-color 0.3s;
-    }
-    
-    .progress-bar { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background: #222; z-index: 1000; }
-    #progress { height: 100%; background: #4fc3f7; width: 0%; border-radius: 0 2px 2px 0; transition: width 0.1s;}
-
-    /* MENU TRÊN CÙNG */
-    .reader-top { 
-        position: fixed; top: 4px; left: 0; width: 100%; background: rgba(20, 20, 25, 0.95); 
-        backdrop-filter: blur(10px); padding: 12px 20px; display: flex; align-items: center; 
-        gap: 12px; z-index: 999; box-sizing: border-box; border-bottom: 1px solid rgba(255,255,255,0.05);
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .reader-top button, .reader-top a, select { 
-        background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1); 
-        padding: 8px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; font-size: 14px;
-        transition: 0.2s;
-    }
-    .reader-top button:hover, .reader-top a:hover, select:hover { background: #4fc3f7; color: #000; border-color: #4fc3f7;}
-    .reader-top button:disabled { opacity: 0.3; cursor: not-allowed; }
-    #chapterSelect { flex: 1; max-width: 350px; outline: none; appearance: none; cursor: pointer;}
-    .back-btn { margin-left: auto; font-weight: 600; }
-
-    /* NỘI DUNG TRUYỆN */
-    .reader { max-width: 800px; margin: 100px auto 80px auto; padding: 0 25px; box-sizing: border-box; }
-    .chapter-title { text-align: center; color: #4fc3f7; margin-bottom: 40px; font-size: 28px; font-family: 'Plus Jakarta Sans', sans-serif;}
-    .reader-content { font-size: 20px; line-height: 1.8; text-align: justify; white-space: pre-line; }
-    .reader-content p { margin-bottom: 28px; }
-
-    /* BÔI ĐEN (HIGHLIGHT) */
-    .highlight { 
-        background-color: rgba(255, 204, 0, 0.3); 
-        border-bottom: 2px dashed #ffcc00; 
-        cursor: pointer; 
-        border-radius: 3px; 
-        padding: 2px 4px;
-        transition: 0.2s;
-    }
-    .highlight:hover { background-color: rgba(255, 204, 0, 0.6); }
-
-    /* HỆ THỐNG GHI CHÚ SMART TOOLTIP */
-    .note-btn {
-        position: absolute; display: none; background: #ffcc00; color: #000;
-        border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: bold;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5), 0 0 10px rgba(255, 204, 0, 0.3); 
-        cursor: pointer; z-index: 1500; font-family: 'Plus Jakarta Sans', sans-serif; 
-        transform: translate(-50%, -100%);
-    }
-    .note-btn::after { content: ""; position: absolute; bottom: -6px; left: 50%; transform: translateX(-50%); border-width: 6px 6px 0; border-style: solid; border-color: #ffcc00 transparent; display: block; width: 0; }
-
-    .note-panel {
-        position: fixed; top: 0; right: -400px; width: 350px; height: 100vh;
-        background: rgba(20, 20, 25, 0.98); backdrop-filter: blur(10px); z-index: 2000;
-        transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-        display: flex; flex-direction: column; font-family: 'Plus Jakarta Sans', sans-serif; border-left: 1px solid rgba(255,255,255,0.05);
-    }
-    .note-panel.open { right: 0; }
-    .note-header { padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
-    .note-header h3 { margin: 0; color: #ffcc00; font-size: 18px; }
-    #closeNotePanel { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
-    #noteList { flex: 1; overflow-y: auto; padding: 20px; }
-    
-    .note-item { background: #1a1a24; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #ffcc00; }
-    .note-item strong { display: block; margin-bottom: 8px; color: #fff; cursor: pointer; font-family: 'Merriweather', serif; font-style: italic;}
-    .note-item strong:hover { color: #4fc3f7; }
-    .note-item div { color: #a0a0a0; font-size: 14px; margin-bottom: 12px; }
-    .delete-note { background: rgba(255, 71, 87, 0.1); color: #ff4757; border: 1px solid rgba(255, 71, 87, 0.3); padding: 5px 12px; border-radius: 5px; cursor: pointer; font-size: 12px; }
-    .delete-note:hover { background: #ff4757; color: #fff; }
-
-    .note-modal {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);
-        display: none; justify-content: center; align-items: center; z-index: 2500; backdrop-filter: blur(5px); font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .note-modal-box { background: #161622; padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-    .note-modal-box h3 { margin: 0 0 20px 0; color: #ffcc00; }
-    #noteInput { width: 100%; height: 120px; background: #0f1014; color: #fff; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 15px; font-size: 15px; box-sizing: border-box; resize: none; outline: none; margin-bottom: 20px; font-family: inherit;}
-    #noteInput:focus { border-color: #4fc3f7; }
-    .note-modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
-    .note-modal-actions button { padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; }
-    #noteCancel { background: transparent; color: #a0a0a0; border: 1px solid #444; }
-    #noteCancel:hover { color: #fff; }
-    #noteSave { background: #ffcc00; color: #000; }
-    #noteSave:hover { background: #e6b800; }
-
-    /* TỐI ƯU HÓA MOBILE */
-    @media (max-width: 768px) {
-        .reader-top { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; }
-        #toggleNotes { grid-column: span 1; font-size: 12px; padding: 8px 4px; text-align: center; white-space: nowrap; }
-        .font-adjust-group { grid-column: span 1; display: flex; gap: 4px; justify-content: center; }
-        .font-adjust-group button { flex: 1; padding: 8px 0; }
-        .back-btn { grid-column: span 1; margin-left: 0; text-align: center; padding: 8px 0; }
-        #prevBtn { grid-column: span 1; order: 4; }
-        #chapterSelect { grid-column: span 1; order: 5; min-width: 100%; max-width: 100%; font-size: 12px; padding: 8px 4px; text-align: center; }
-        #nextBtn { grid-column: span 1; order: 6; }
-        .reader { margin-top: 140px; padding: 0 18px; }
-        .chapter-title { font-size: 22px; margin-bottom: 25px; }
-        .reader-content { font-size: 18px; line-height: 1.75; }
-        .note-panel { width: 100%; right: -100%; }
-    }
-    /* =========================================================
-       ✨ NÂNG CẤP GIAO DIỆN AUDIO PLAYER LUXURY
-       ========================================================= */
-    #audioPlayerContainer {
-        background: linear-gradient(135deg, rgba(22, 22, 33, 0.85), rgba(15, 15, 25, 0.95)) !important;
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(79, 195, 247, 0.25) !important;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), inset 0 1px 2px rgba(255, 255, 255, 0.1) !important;
-        padding: 22px !important;
-        border-radius: 16px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    #audioPlayerContainer:hover {
-        border-color: rgba(79, 195, 247, 0.5) !important;
-        box-shadow: 0 20px 40px rgba(79, 195, 247, 0.15), inset 0 1px 2px rgba(255, 255, 255, 0.1) !important;
-    }
-
-    /* Mẹo tối ưu: Ép thanh phát nhạc mặc định của trình duyệt sang giao diện Dark Mode cực chất */
-    #chapterAudio {
-        filter: invert(90%) hue-rotate(180deg); 
-        opacity: 0.85;
-        transition: opacity 0.2s;
-        margin-top: 5px;
-    }
-
-    #chapterAudio:hover {
-        opacity: 1;
-    }
-</style>
-</head>
-<body>
-
-<div class="progress-bar"><div id="progress"></div></div>
-
-<div class="reader-top">
-  <button id="toggleNotes">📌 Ghi chú</button>
-  <button id="bookmarkBtn" style="background: rgba(235, 94, 40, 0.2); color: #eb5e28; border-color: rgba(235, 94, 40, 0.4);">
-    🔖 Lưu dấu trang
-  </button>
-  <div class="font-adjust-group">
-      <button id="fontMinus">A-</button>
-      <button id="fontPlus">A+</button>
-  </div>
-  <a href="#" id="backBtn" class="back-btn">Thoát</a>
-  <button id="prevBtn">◀ Trước</button>
-  <select id="chapterSelect"></select>
-  <button id="nextBtn">Sau ▶</button>
-</div>
-
-<div class="reader">
-  <h1 class="chapter-title" id="chapterTitle">Đang kết nối...</h1>
-  
-  <div id="audioPlayerContainer" style="display: none; text-align: center; margin-bottom: 35px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 12px; border: 1px solid rgba(79, 195, 247, 0.1);">
-      <span style="display: block; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; color: #4fc3f7; margin-bottom: 10px;">
-          <i class="fa-solid fa-headphones fa-beat"></i> Sẵn sàng nghe Audio bản đặc biệt
-      </span>
-      <audio id="chapterAudio" controls style="width: 100%; max-width: 500px; outline: none;"></audio>
-  </div>
-
-  <div id="content" class="reader-content">
-      </div>
-</div>
-
-<div class="note-panel" id="notePanel">
-  <div class="note-header">
-    <h3>📌 Ghi chú của bạn</h3>
-    <button id="closeNotePanel">✕</button>
-  </div>
-  <div id="noteList"></div>
-</div>
-
-<button id="noteBtn" class="note-btn">✍️ Ghi chú</button>
-
-<div class="note-modal" id="noteModal">
-  <div class="note-modal-box">
-    <h3>📌 Thêm ghi chú</h3>
-    <textarea id="noteInput" placeholder="Suy nghĩ của bạn về đoạn văn này..."></textarea>
-    <div class="note-modal-actions">
-      <button id="noteCancel">Huỷ</button>
-      <button id="noteSave">Lưu Ghi Chú</button>
-    </div>
-  </div>
-</div>
-
-<script>
-document.addEventListener("DOMContentLoaded", async function(){
-  // 1. AN TOÀN ĐOÀN KHỞI TẠO BIẾN TRÊN CÙNG
-  const urlParams = new URLSearchParams(window.location.search);
-  const bookId = urlParams.get('bookId');
-  let currentChapterId = urlParams.get('chapterId');
-
-  const select = document.getElementById("chapterSelect");
-  const content = document.getElementById("content");
-  const titleDisplay = document.getElementById("chapterTitle");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const progress = document.getElementById("progress");
-
-  const notePanel = document.getElementById("notePanel");
-  const noteModal = document.getElementById("noteModal");
-  const noteInput = document.getElementById("noteInput");
-  const noteList = document.getElementById("noteList");
-  const noteBtn = document.getElementById("noteBtn");
-  const toggleNotesBtn = document.getElementById("toggleNotes"); 
-
-  let fontSize = 20;
-  let allChapters = [];
-  let currentIndex = -1;
-  let selectedText = "";
-
-  document.getElementById("backBtn").href = `detail.html?bookId=${bookId}`;
-
-  const SERVER_URL = "https://thuvienbackend.onrender.com";
-
-  // 2. TẢI DANH SÁCH CHƯƠNG VÀO DROPDOWN
-  try {
-    const chapRes = await fetch(`${SERVER_URL}/api/books/${bookId}/chapters`);
-    if (!chapRes.ok) throw new Error("Không thể tải danh sách chương của bộ truyện này!");
-    allChapters = await chapRes.json();
-
-    allChapters.forEach(chap => {
-      const opt = document.createElement("option");
-      opt.value = chap._id;
-      opt.textContent = chap.title;
-      select.appendChild(opt);
-    });
-
-    if (currentChapterId) {
-      await loadChapter(currentChapterId);
-    } else if (allChapters.length > 0) {
-      await loadChapter(allChapters[0]._id);
-    } else {
-      throw new Error("Truyện này hiện tại chưa có nội dung chương nào công bố!");
-    }
-  } catch (error) {
-    showErrorInterface(error.message);
-  }
-
- // 3. HÀM TẢI NỘI DUNG CHƯƠNG & ÁP DỤNG GHI CHÚ ĐÁM MÂY MỚI
- // ĐÃ CẬP NHẬT: Thêm tham số shouldAutoPlay (Mặc định là false)
-  async function loadChapter(chapterId, shouldAutoPlay = false) {
-    titleDisplay.innerText = "Đang tải...";
-    content.innerHTML = `
-      <p style="text-align:center; color:#a0a0a0; padding: 40px 0;">
-          <i class="fa-solid fa-spinner fa-spin" style="font-size: 26px; color:#4fc3f7; margin-bottom:15px;"></i><br>
-          Đang lấy dữ liệu chương chữ, vui lòng chờ...
-      </p>`;
-
-    try {
-      const response = await fetch(`${SERVER_URL}/api/chapters/${chapterId}`);
-      if (!response.ok) {
-          const errData = await response.json().catch(() => ({}));
-          throw new Error(errData.message || `Mã phản hồi lỗi: ${response.status}`);
-      }
-      const chapter = await response.json(); // Lấy dữ liệu chương xong
-
-      // === ✨ DI CHUYỂN ĐOẠN LƯU STORAGE XUỐNG ĐÂY ✨ ===
-    // === ✨ ĐỒNG BỘ: GỬI VỊ TRÍ DẤU TRANG LÊN DATABASE ATLAS MÂY ✨ ===
-try {
-    await fetch(`${SERVER_URL}/api/bookmarks`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            bookId: bookId,
-            chapterId: chapterId,
-            chapterTitle: chapter.title
-        })
-    });
-} catch (err) {
-    console.error("Lỗi gửi dấu trang lên đám mây:", err);
-}
-// =============================================================
-
-      currentChapterId = chapterId;
-      currentIndex = allChapters.findIndex(c => c._id === chapterId);
-      select.value = chapterId; 
-      titleDisplay.innerText = chapter.title;
-
-      const audioContainer = document.getElementById("audioPlayerContainer");
-      const audioControl = document.getElementById("chapterAudio");
-
-    if (chapter.audioUrl) {
-          let finalAudioLink = chapter.audioUrl;
-          
-          // BẺ LÁI: Nếu phát hiện link Google Drive, bóc tách ID file và đẩy qua API trung chuyển
-          if (chapter.audioUrl.includes('id=')) {
-              const fileId = chapter.audioUrl.split('id=')[1];
-              finalAudioLink = `${SERVER_URL}/api/stream-audio?id=${fileId}`;
-          } else if (!chapter.audioUrl.startsWith('http')) {
-              finalAudioLink = `${SERVER_URL}${chapter.audioUrl}`;
-          }
-
-          audioControl.src = finalAudioLink;
-          audioContainer.style.display = "block"; 
-          audioControl.volume = 0.7; 
-
-          if (shouldAutoPlay) {
-              audioControl.play().catch(err => console.log("Tự động phát nhạc bị trình duyệt chặn:", err));
-          }
-      } else {
-          audioControl.src = "";
-          audioContainer.style.display = "none"; 
-      }
-      
-      // ... (Giữ nguyên toàn bộ các đoạn code lấy chữ và xử lý highlight ghi chú đám mây ở phía dưới của hàm này)
-      // ============================================================
-
-      let htmlContent = chapter.content.split('\n').filter(p => p.trim() !== '').map(p => `<p>${p}</p>`).join('');
-
-      // Gọi API lấy ghi chú từ Database Atlas thay vì localStorage
-      const notesRes = await fetch(`${SERVER_URL}/api/books/${bookId}/notes`);
-      if (notesRes.ok) {
-          const cloudNotes = await notesRes.json();
-          const chapterNotes = cloudNotes.filter(n => n.chapterId === chapterId);
-          
-          chapterNotes.forEach(n => {
-            // Sử dụng n._id làm định danh mã bôi đen từ MongoDB
-            htmlContent = htmlContent.replace(n.text, `<span class="highlight" data-id="${n._id}">${n.text}</span>`);
-          });
-      }
-
-      content.innerHTML = htmlContent;
-      window.scrollTo(0, 0);
-      window.history.replaceState(null, null, `?bookId=${bookId}&chapterId=${chapterId}`);
-
-      prevBtn.disabled = (currentIndex <= 0);
-      nextBtn.disabled = (currentIndex >= allChapters.length - 1);
-      
-      renderNoteList();
-    } catch (error) {
-      showErrorInterface(error.message);
-    }
-  }
-
-  // GIAO DIỆN BÁO LỖI THÔNG MINH
-  function showErrorInterface(errorMsg) {
-      titleDisplay.innerText = "❌ Không thể hiển thị nội dung";
-      content.innerHTML = `
-        <div style="text-align:center; padding: 40px 10px; font-family:'Plus Jakarta Sans', sans-serif;">
-            <p style="color:#ff4757; font-weight:bold; font-size:18px; margin-bottom:12px;">Hệ thống phát hiện lỗi!</p>
-            <p style="color:#ffcc00; background:rgba(255,204,0,0.1); padding:10px; border-radius:6px; display:inline-block; font-size:14px; margin-bottom:25px; border:1px dashed #ffcc00;">
-                Chi tiết: ${errorMsg}
-            </p>
-            <p style="color:#a0a0a0; font-size:14px; line-height:1.7; text-align:left; max-width:400px; margin:0 auto;">
-                💡 <strong>Cách xử lý nhanh:</strong><br>
-                • Nếu lỗi báo <em>"Không tìm thấy chương"</em>: Do bạn đang mở lại link cũ đã bị xóa. Hãy quay lại <strong>Trang chủ</strong>, bấm vào truyện mới đăng để nhận mã ID mới.<br>
-                • Nếu lỗi báo <em>"Lỗi kết nối"</em>: Hãy chắc chắn máy tính đã bật lệnh <code>node server.js</code> và điện thoại đang bắt chung Wi-Fi.
-            </p>
-        </div>`;
-  }
-
-  select.addEventListener("change", () => loadChapter(select.value));
-  prevBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex - 1]._id));
-  nextBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex + 1]._id));
-  select.addEventListener("change", () => loadChapter(select.value));
-  prevBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex - 1]._id));
-  nextBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex + 1]._id));
-  document.getElementById("bookmarkBtn").onclick = () => {
-    alert(`🔖 Đã lưu dấu trang vị trí hiện tại: ${titleDisplay.innerText}`);
-};
-
-  // =========================================================================
-  // ✨ MỚI: TỰ ĐỘNG CHUYỂN CHƯƠNG KHI NGHE HẾT AUDIO (TÍNH NĂNG NGHE LIÊN TỤC)
-  // =========================================================================
-  const audioControl = document.getElementById("chapterAudio");
-  audioControl.addEventListener("ended", () => {
-      // Kiểm tra nếu chưa phải chương cuối cùng của cuốn sách
-      if (currentIndex < allChapters.length - 1) {
-          const nextChapterId = allChapters[currentIndex + 1]._id;
-          
-          // Gọi hàm tải chương kế tiếp và truyền tham số "true" để nhạc tự động phát
-          loadChapter(nextChapterId, true); 
-      } else {
-          alert("🎉 Bạn đã nghe hết chương cuối cùng của bộ truyện này rồi!");
-      }
-  });
-  // =========================================================================
-
-  document.getElementById("fontPlus").onclick = () => { fontSize += 2; content.style.fontSize = fontSize + "px"; }
-  document.getElementById("fontMinus").onclick = () => { fontSize -= 2; content.style.fontSize = fontSize + "px"; }
-
-  window.addEventListener("scroll", () => {
-    const scrollTotal = document.body.scrollHeight - window.innerHeight;
-    progress.style.width = scrollTotal > 0 ? (window.scrollY / scrollTotal) * 100 + "%" : "0%";
-  });
-
-  // Cơ chế bấm nút Ghi chú ở thanh công cụ trên cùng
-  toggleNotesBtn.onclick = () => {
-    const sel = window.getSelection();
-    if (window.innerWidth <= 768 && sel && !sel.isCollapsed && sel.toString().trim()) {
-        selectedText = sel.toString().trim();
-        noteInput.value = "";
-        noteModal.style.display = "flex";
-    } else {
-        notePanel.classList.toggle("open");
-    }
-  };
-  
-  document.getElementById("closeNotePanel").onclick = () => notePanel.classList.remove("open");
-  document.getElementById("noteCancel").onclick = () => noteModal.style.display = "none";
-
-  // Thuật toán đo tọa độ xử lý đa nền tảng
-  function handleTextSelection() {
-    const sel = window.getSelection();
-    
-    if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-        noteBtn.style.display = "none";
-        toggleNotesBtn.innerHTML = "📌 Ghi chú";
-        toggleNotesBtn.style.background = "rgba(255,255,255,0.05)";
-        toggleNotesBtn.style.color = "#fff";
-        toggleNotesBtn.style.borderColor = "rgba(255,255,255,0.1)";
-        return;
-    }
-    
-    selectedText = sel.toString().trim();
-
-    if (window.innerWidth > 768) {
-        const range = sel.getRangeAt(0);
-        const rect = range.getBoundingClientRect();
-        if (rect.width === 0 || rect.height === 0) return;
-
-        noteBtn.style.display = "block";
-        noteBtn.style.top = (window.scrollY + rect.top - 15) + "px";
-        noteBtn.style.left = (window.scrollX + rect.left + rect.width / 2) + "px";
-    } else {
-        noteBtn.style.display = "none";
-        toggleNotesBtn.innerHTML = "✍️ Tạo ghi chú";
-        toggleNotesBtn.style.background = "#ffcc00";
-        toggleNotesBtn.style.color = "#000";
-        toggleNotesBtn.style.borderColor = "#ffcc00";
-    }
-  }
-
-  let selectionTimeout;
-  document.addEventListener("selectionchange", () => {
-    clearTimeout(selectionTimeout);
-    selectionTimeout = setTimeout(() => {
-        handleTextSelection();
-    }, 150);
-  });
-
-  noteBtn.onmousedown = (e) => {
-    e.preventDefault();
-    noteInput.value = "";
-    noteModal.style.display = "flex";
-    noteBtn.style.display = "none";
-  };
-
-  // ĐÃ THAY ĐỔI: Gửi request POST đẩy dữ liệu ghi chú lên MongoDB Atlas
-  document.getElementById("noteSave").onclick = async () => {
-    const noteText = noteInput.value.trim();
-    if(!noteText) return;
-
-    try {
-        const response = await fetch(`${SERVER_URL}/api/notes`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                bookId: bookId,
-                chapterId: currentChapterId,
-                text: selectedText,
-                note: noteText
-            })
-        });
-
-        if (response.ok) {
-            noteModal.style.display = "none";
-            loadChapter(currentChapterId); // Tải lại trang để bôi màu từ database
-        } else {
-            alert("❌ Lỗi từ server, không thể lưu ghi chú!");
-        }
-    } catch (err) {
-        alert("❌ Thất bại: Không kết nối được tới máy chủ Backend!");
-    }
-  };
-
-  // ĐÃ THAY ĐỔI: Đồng bộ đổ danh sách ghi chú trực tiếp từ Database đám mây
-  async function renderNoteList(){
-    noteList.innerHTML = "";
-    
-    try {
-        const res = await fetch(`${SERVER_URL}/api/books/${bookId}/notes`);
-        if (!res.ok) throw new Error();
-        const bookNotes = await res.json();
-
-        if (bookNotes.length === 0) {
-            noteList.innerHTML = "<p style='color:#666; text-align:center;'>Chưa có ghi chú nào.</p>";
-            return;
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đọc Truyện | Luxury Library</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* =========================================================
+           THIẾT KẾ ĐỘC QUYỀN TRANG ĐỌC TRUYỆN (READING.HTML)
+           ========================================================= */
+        :root {
+            --bg-dark: #0f1015;
+            --text-dark: #d4d4d8;
+            
+            --bg-sepia: #f4edd8;
+            --text-sepia: #433422;
+            
+            --bg-light: #ffffff;
+            --text-light: #18181b;
+            
+            --accent-color: #4fc3f7;
+            --accent-rgb: 79, 195, 247;
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        bookNotes.forEach(n => {
-          const div = document.createElement("div");
-          div.className = "note-item";
-          div.innerHTML = `
-            <strong title="Bấm để cuộn tới đây">"${n.text}..."</strong>
-            <div>${n.note}</div>
-            <button class="delete-note">Xoá ghi chú</button>
-          `;
+        /* KHỞI TẠO CÁC CHỦ ĐỀ ĐỌC (THEMES) */
+        body.theme-dark {
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            --current-bg: var(--bg-dark);
+            --current-text: var(--text-dark);
+            --header-bg: rgba(20, 20, 28, 0.85);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --item-bg: rgba(255, 255, 255, 0.04);
+            --note-bg: #191924;
+            --input-bg: #0b0c10;
+        }
 
-          // Bấm vào ghi chú ở panel bên phải sẽ tự cuộn tìm dòng chữ
-          div.querySelector("strong").onclick = async () => {
-            if(currentChapterId !== n.chapterId) {
-                await loadChapter(n.chapterId);
+        body.theme-sepia {
+            background-color: var(--bg-sepia);
+            color: var(--text-sepia);
+            --current-bg: var(--bg-sepia);
+            --current-text: var(--text-sepia);
+            --header-bg: rgba(230, 220, 195, 0.9);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --item-bg: rgba(0, 0, 0, 0.04);
+            --note-bg: #e6dfc8;
+            --input-bg: #eae3cd;
+        }
+
+        body.theme-light {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            --current-bg: var(--bg-light);
+            --current-text: var(--text-light);
+            --header-bg: rgba(245, 245, 245, 0.9);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --item-bg: rgba(0, 0, 0, 0.03);
+            --note-bg: #f4f4f5;
+            --input-bg: #e4e4e7;
+        }
+
+        body {
+            font-family: 'Merriweather', serif;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.4s, color 0.4s;
+            min-height: 100vh;
+        }
+
+        /* PROGRESS BAR AT TOP */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 1001;
+        }
+
+        #progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-color), #2ecc71);
+            width: 0%;
+            border-radius: 0 2px 2px 0;
+            transition: width 0.1s;
+            box-shadow: 0 0 10px var(--accent-color);
+        }
+
+        /* STICKY GLASSMORPHIC TOOLBAR */
+        .reader-top {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: calc(100% - 40px);
+            max-width: 900px;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 999;
+            box-sizing: border-box;
+            border: 1px solid var(--card-border);
+            border-radius: 50px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            transition: var(--transition);
+        }
+
+        .reader-top button, .reader-top a, .reader-top select {
+            background: var(--item-bg);
+            color: inherit;
+            border: 1px solid var(--card-border);
+            padding: 8px 16px;
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reader-top button:hover, .reader-top a:hover {
+            background: var(--accent-color);
+            color: #06060c !important;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+            transform: translateY(-1px);
+        }
+
+        .reader-top button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+            background: var(--item-bg) !important;
+            color: inherit !important;
+            border-color: var(--card-border) !important;
+        }
+
+        #chapterSelect {
+            flex: 1;
+            max-width: 250px;
+            outline: none;
+            cursor: pointer;
+            padding-right: 25px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 14px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        /* THEME SELECTOR BUTTONS */
+        .theme-selector-group {
+            display: flex;
+            gap: 5px;
+            background: var(--item-bg);
+            padding: 3px;
+            border-radius: 30px;
+            border: 1px solid var(--card-border);
+        }
+
+        .theme-btn {
+            border: none !important;
+            width: 28px;
+            height: 28px;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px !important;
+        }
+
+        .theme-btn[data-theme="dark"] {
+            background: #0f1015 !important;
+            color: #fff !important;
+        }
+        .theme-btn[data-theme="sepia"] {
+            background: #e6dfc8 !important;
+            color: #433422 !important;
+        }
+        .theme-btn[data-theme="light"] {
+            background: #ffffff !important;
+            color: #18181b !important;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+        }
+
+        .theme-btn.active {
+            box-shadow: 0 0 0 2px var(--accent-color) !important;
+        }
+
+        /* READER CONTENT ZONE */
+        .reader {
+            max-width: 800px;
+            margin: 120px auto 100px auto;
+            padding: 0 24px;
+            box-sizing: border-box;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .chapter-title {
+            text-align: center;
+            color: var(--accent-color);
+            margin-bottom: 45px;
+            font-size: 32px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.1);
+        }
+
+        .reader-content {
+            font-size: 20px;
+            line-height: 1.85;
+            text-align: justify;
+            white-space: pre-line;
+        }
+
+        .reader-content p {
+            margin-bottom: 30px;
+            text-indent: 1.5em; /* Thụt dòng đầu dòng giống sách in cao cấp */
+        }
+
+        /* HIGHLIGHT & NOTE SYSTEM */
+        .highlight {
+            background-color: rgba(255, 204, 0, 0.25);
+            border-bottom: 2px dashed #ffcc00;
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 2px 2px;
+            transition: var(--transition);
+        }
+
+        .highlight:hover {
+            background-color: rgba(255, 204, 0, 0.45);
+        }
+
+        .note-btn {
+            position: absolute;
+            display: none;
+            background: #ffcc00;
+            color: #06060c;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 10px rgba(255, 204, 0, 0.2);
+            cursor: pointer;
+            z-index: 1500;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transform: translate(-50%, -100%);
+            transition: var(--transition);
+        }
+
+        .note-btn::after {
+            content: "";
+            position: absolute;
+            bottom: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px 6px 0;
+            border-style: solid;
+            border-color: #ffcc00 transparent;
+            display: block;
+            width: 0;
+        }
+
+        /* SIDEBAR NOTE PANEL */
+        .note-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 360px;
+            height: 100vh;
+            background: var(--header-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 2000;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: -15px 0 35px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            border-left: 1px solid var(--card-border);
+            color: inherit;
+        }
+
+        .note-panel.open {
+            right: 0;
+        }
+
+        .note-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .note-header h3 {
+            margin: 0;
+            color: #ffcc00;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        #closeNotePanel {
+            background: none;
+            border: none;
+            color: inherit;
+            font-size: 22px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        #closeNotePanel:hover {
+            opacity: 1;
+        }
+
+        #noteList {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .note-item {
+            background: var(--note-bg);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border-left: 4px solid #ffcc00;
+            border-top: 1px solid var(--card-border);
+            border-right: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: var(--transition);
+        }
+
+        .note-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .note-item strong {
+            display: block;
+            margin-bottom: 8px;
+            color: inherit;
+            cursor: pointer;
+            font-family: 'Merriweather', serif;
+            font-style: italic;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .note-item strong:hover {
+            color: var(--accent-color);
+        }
+
+        .note-item div {
+            color: inherit;
+            opacity: 0.8;
+            font-size: 13.5px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .delete-note {
+            background: rgba(255, 71, 87, 0.1);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.2);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .delete-note:hover {
+            background: #ff4757;
+            color: #ffffff;
+            border-color: #ff4757;
+        }
+
+        /* MODAL FOR WRITING NOTES */
+        .note-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(6, 6, 12, 0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2500;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        .note-modal-box {
+            background: var(--note-bg);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 460px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            color: inherit;
+        }
+
+        .note-modal-box h3 {
+            margin: 0 0 16px 0;
+            color: #ffcc00;
+            font-size: 1.3rem;
+        }
+
+        #noteInput {
+            width: 100%;
+            height: 120px;
+            background: var(--input-bg);
+            color: inherit;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 15px;
+            box-sizing: border-box;
+            resize: none;
+            outline: none;
+            margin-bottom: 20px;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        #noteInput:focus {
+            border-color: rgba(var(--accent-rgb), 0.5);
+        }
+
+        .note-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .note-modal-actions button {
+            padding: 10px 22px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 700;
+            border: none;
+            font-size: 13px;
+            transition: var(--transition);
+        }
+
+        #noteCancel {
+            background: transparent;
+            color: inherit;
+            opacity: 0.7;
+            border: 1px solid var(--card-border);
+        }
+
+        #noteCancel:hover {
+            opacity: 1;
+            background: rgba(255,255,255,0.05);
+        }
+
+        #noteSave {
+            background: #ffcc00;
+            color: #06060c;
+        }
+
+        #noteSave:hover {
+            background: #e6b800;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
+        }
+
+        /* =========================================================
+           AUDIO PLAYER LUXURY CAPSULE
+           ========================================================= */
+        #audioPlayerContainer {
+            background: linear-gradient(135deg, rgba(18, 18, 29, 0.65), rgba(10, 10, 18, 0.85)) !important;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(var(--accent-rgb), 0.25) !important;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4) !important;
+            padding: 24px !important;
+            border-radius: 20px !important;
+            transition: var(--transition);
+            max-width: 600px;
+            margin: 0 auto 35px auto;
+        }
+
+        #audioPlayerContainer:hover {
+            border-color: rgba(var(--accent-rgb), 0.45) !important;
+            box-shadow: 0 20px 45px rgba(var(--accent-rgb), 0.12) !important;
+        }
+
+        #chapterAudio {
+            filter: invert(90%) hue-rotate(180deg); 
+            opacity: 0.85;
+            transition: var(--transition);
+            margin-top: 5px;
+        }
+
+        #chapterAudio:hover {
+            opacity: 1;
+        }
+
+        /* MOBILE RESPONSIVE TOOLBAR & LAYOUT */
+        @media (max-width: 768px) {
+            .reader-top {
+                width: calc(100% - 20px);
+                top: 8px;
+                padding: 10px 14px;
+                border-radius: 24px;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
             }
-            setTimeout(() => {
-              const el = document.querySelector(`[data-id="${n._id}"]`);
-              if(el) {
-                  el.scrollIntoView({behavior: "smooth", block: "center"});
-                  el.style.backgroundColor = "rgba(255, 71, 87, 0.5)"; 
-                  setTimeout(() => el.style.backgroundColor = "", 1000);
-              }
-            }, 300);
-          };
 
-          // ĐÃ THAY ĐỔI: Gửi lệnh DELETE lên server xóa vĩnh viễn ghi chú
-          div.querySelector(".delete-note").onclick = async () => {
-             try {
-                 const delRes = await fetch(`${SERVER_URL}/api/notes/${n._id}`, { method: 'DELETE' });
-                 if (delRes.ok) {
-                     loadChapter(currentChapterId);
-                 } else {
-                     alert("Không thể xóa ghi chú này trên Server!");
-                 }
-             } catch (err) {
-                 alert("Lỗi kết nối máy chủ!");
-             }
-          };
+            #toggleNotes {
+                grid-column: span 1;
+                justify-content: center;
+            }
 
-          noteList.appendChild(div);
+            #bookmarkBtn {
+                grid-column: span 1;
+                justify-content: center;
+            }
+
+            .theme-selector-group {
+                grid-column: span 1;
+                justify-content: center;
+            }
+
+            .font-adjust-group {
+                grid-column: span 1;
+                display: flex;
+                gap: 4px;
+            }
+            .font-adjust-group button {
+                flex: 1;
+                justify-content: center;
+                padding: 8px 0;
+            }
+
+            .back-btn {
+                grid-column: span 1;
+                justify-content: center;
+                margin-left: 0;
+                padding: 8px 0;
+            }
+
+            #prevBtn {
+                grid-column: span 1;
+                order: 10;
+                justify-content: center;
+            }
+            #chapterSelect {
+                grid-column: span 1;
+                order: 11;
+                min-width: 100%;
+                max-width: 100%;
+                justify-content: center;
+                font-size: 11px;
+                padding: 8px 6px;
+            }
+            #nextBtn {
+                grid-column: span 1;
+                order: 12;
+                justify-content: center;
+            }
+
+            .reader {
+                margin-top: 200px;
+                padding: 0 16px;
+            }
+
+            .chapter-title {
+                font-size: 24px;
+                margin-bottom: 30px;
+            }
+
+            .reader-content {
+                font-size: 18px;
+                line-height: 1.75;
+            }
+
+            .note-panel {
+                width: 100%;
+                right: -100%;
+                border-left: none;
+            }
+        }
+    </style>
+</head>
+<body class="theme-dark">
+
+    <div class="progress-bar"><div id="progress"></div></div>
+
+    <div class="reader-top">
+        <button id="toggleNotes"><i class="fa-solid fa-list-check"></i> <span>Ghi chú</span></button>
+        <button id="bookmarkBtn" style="background: rgba(235, 94, 40, 0.12); color: #eb5e28; border-color: rgba(235, 94, 40, 0.25);">
+            <i class="fa-solid fa-bookmark"></i> Dấu trang
+        </button>
+        
+        <!-- Bộ chọn giao diện đọc sách -->
+        <div class="theme-selector-group">
+            <button class="theme-btn active" data-theme="dark" title="Giao diện tối"><i class="fa-solid fa-moon"></i></button>
+            <button class="theme-btn" data-theme="sepia" title="Giao diện cát ấm"><i class="fa-solid fa-eye"></i></button>
+            <button class="theme-btn" data-theme="light" title="Giao diện sáng"><i class="fa-solid fa-sun"></i></button>
+        </div>
+
+        <div class="font-adjust-group">
+            <button id="fontMinus" title="Thu nhỏ chữ"><i class="fa-solid fa-minus"></i></button>
+            <button id="fontPlus" title="Phóng to chữ"><i class="fa-solid fa-plus"></i></button>
+        </div>
+
+        <a href="#" id="backBtn" class="back-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Thoát</a>
+        
+        <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i> Trước</button>
+        <select id="chapterSelect"></select>
+        <button id="nextBtn">Sau <i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+    <div class="reader">
+        <h1 class="chapter-title" id="chapterTitle">Đang kết nối...</h1>
+        
+        <!-- Trình phát Audio đặc biệt -->
+        <div id="audioPlayerContainer" style="display: none; text-align: center;">
+            <span style="display: block; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; color: var(--accent-color); margin-bottom: 12px; font-weight: 600; letter-spacing: 0.5px;">
+                <i class="fa-solid fa-headphones fa-beat-fade"></i> TRÌNH PHÁT AUDIO CHƯƠNG ĐẶC BIỆT
+            </span>
+            <audio id="chapterAudio" controls style="width: 100%; max-width: 500px; outline: none;"></audio>
+        </div>
+
+        <div id="content" class="reader-content"></div>
+    </div>
+
+    <!-- Bảng ghi chú trượt ra từ bên phải -->
+    <div class="note-panel" id="notePanel">
+        <div class="note-header">
+            <h3><i class="fa-solid fa-pen-fancy" style="color: #ffcc00; margin-right: 6px;"></i> Ghi chú lưu lại</h3>
+            <button id="closeNotePanel">✕</button>
+        </div>
+        <div id="noteList"></div>
+    </div>
+
+    <button id="noteBtn" class="note-btn"><i class="fa-solid fa-pen-clip"></i> Tạo ghi chú</button>
+
+    <!-- Modal viết ghi chú -->
+    <div class="note-modal" id="noteModal">
+        <div class="note-modal-box">
+            <h3><i class="fa-solid fa-pen-to-square" style="color: #ffcc00; margin-right: 6px;"></i> Tạo ghi chú mới</h3>
+            <textarea id="noteInput" placeholder="Nhập cảm nhận của bạn về câu văn này..."></textarea>
+            <div class="note-modal-actions">
+                <button id="noteCancel">Huỷ</button>
+                <button id="noteSave">Lưu Ghi Chú</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function(){
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('bookId');
+            let currentChapterId = urlParams.get('chapterId');
+
+            const select = document.getElementById("chapterSelect");
+            const content = document.getElementById("content");
+            const titleDisplay = document.getElementById("chapterTitle");
+            const prevBtn = document.getElementById("prevBtn");
+            const nextBtn = document.getElementById("nextBtn");
+            const progress = document.getElementById("progress");
+
+            const notePanel = document.getElementById("notePanel");
+            const noteModal = document.getElementById("noteModal");
+            const noteInput = document.getElementById("noteInput");
+            const noteList = document.getElementById("noteList");
+            const noteBtn = document.getElementById("noteBtn");
+            const toggleNotesBtn = document.getElementById("toggleNotes"); 
+
+            let fontSize = 20;
+            let allChapters = [];
+            let currentIndex = -1;
+            let selectedText = "";
+
+            document.getElementById("backBtn").href = `detail.html?bookId=${bookId}`;
+
+            const SERVER_URL = "https://thuvienbackend.onrender.com";
+
+            // XỬ LÝ THEME ĐỌC SÁCH
+            const cachedTheme = localStorage.getItem('reader-theme') || 'dark';
+            applyTheme(cachedTheme);
+
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const theme = btn.getAttribute('data-theme');
+                    applyTheme(theme);
+                });
+            });
+
+            function applyTheme(theme) {
+                document.body.classList.remove('theme-dark', 'theme-sepia', 'theme-light');
+                document.body.classList.add(`theme-${theme}`);
+                localStorage.setItem('reader-theme', theme);
+                document.querySelectorAll('.theme-btn').forEach(b => {
+                    b.classList.toggle('active', b.getAttribute('data-theme') === theme);
+                });
+            }
+
+            // TẢI DANH SÁCH CHƯƠNG VÀO DROPDOWN
+            try {
+                const chapRes = await fetch(`${SERVER_URL}/api/books/${bookId}/chapters`);
+                if (!chapRes.ok) throw new Error("Không thể tải danh sách chương của bộ truyện này!");
+                allChapters = await chapRes.json();
+
+                allChapters.forEach(chap => {
+                    const opt = document.createElement("option");
+                    opt.value = chap._id;
+                    opt.textContent = chap.title;
+                    select.appendChild(opt);
+                });
+
+                if (currentChapterId) {
+                    await loadChapter(currentChapterId);
+                } else if (allChapters.length > 0) {
+                    await loadChapter(allChapters[0]._id);
+                } else {
+                    throw new Error("Truyện này hiện tại chưa có nội dung chương nào công bố!");
+                }
+            } catch (error) {
+                showErrorInterface(error.message);
+            }
+
+            // HÀM TẢI NỘI DUNG CHƯƠNG & ÁP DỤNG GHI CHÚ ĐÁM MÂY
+            async function loadChapter(chapterId, shouldAutoPlay = false) {
+                titleDisplay.innerText = "Đang tải...";
+                content.innerHTML = `
+                    <p style="text-align:center; color:#a0a0a0; padding: 40px 0; font-family: 'Plus Jakarta Sans', sans-serif;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 26px; color:var(--accent-color); margin-bottom:15px;"></i><br>
+                        Đang lấy dữ liệu chương chữ, vui lòng chờ...
+                    </p>`;
+
+                try {
+                    const response = await fetch(`${SERVER_URL}/api/chapters/${chapterId}`);
+                    if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.message || `Mã phản hồi lỗi: ${response.status}`);
+                    }
+                    const chapter = await response.json();
+
+                    // ĐỒNG BỘ: GỬI VỊ TRÍ DẤU TRANG LÊN DATABASE ATLAS MÂY
+                    try {
+                        await fetch(`${SERVER_URL}/api/bookmarks`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                bookId: bookId,
+                                chapterId: chapterId,
+                                chapterTitle: chapter.title
+                            })
+                        });
+                    } catch (err) {
+                        console.error("Lỗi gửi dấu trang lên đám mây:", err);
+                    }
+
+                    currentChapterId = chapterId;
+                    currentIndex = allChapters.findIndex(c => c._id === chapterId);
+                    select.value = chapterId; 
+                    titleDisplay.innerText = chapter.title;
+
+                    const audioContainer = document.getElementById("audioPlayerContainer");
+                    const audioControl = document.getElementById("chapterAudio");
+
+                    if (chapter.audioUrl) {
+                        let finalAudioLink = chapter.audioUrl;
+                        
+                        if (chapter.audioUrl.includes('id=')) {
+                            const fileId = chapter.audioUrl.split('id=')[1];
+                            finalAudioLink = `${SERVER_URL}/api/stream-audio?id=${fileId}`;
+                        } else if (!chapter.audioUrl.startsWith('http')) {
+                            finalAudioLink = `${SERVER_URL}${chapter.audioUrl}`;
+                        }
+
+                        audioControl.src = finalAudioLink;
+                        audioContainer.style.display = "block"; 
+                        audioControl.volume = 0.7; 
+
+                        if (shouldAutoPlay) {
+                            audioControl.play().catch(err => console.log("Tự động phát nhạc bị chặn:", err));
+                        }
+                    } else {
+                        audioControl.src = "";
+                        audioContainer.style.display = "none"; 
+                    }
+                    
+                    let htmlContent = chapter.content.split('\n').filter(p => p.trim() !== '').map(p => `<p>${p}</p>`).join('');
+
+                    // Lấy ghi chú đám mây
+                    const notesRes = await fetch(`${SERVER_URL}/api/books/${bookId}/notes`);
+                    if (notesRes.ok) {
+                        const cloudNotes = await notesRes.json();
+                        const chapterNotes = cloudNotes.filter(n => n.chapterId === chapterId);
+                        
+                        chapterNotes.forEach(n => {
+                            htmlContent = htmlContent.replace(n.text, `<span class="highlight" data-id="${n._id}">${n.text}</span>`);
+                        });
+                    }
+
+                    content.innerHTML = htmlContent;
+                    window.scrollTo(0, 0);
+                    window.history.replaceState(null, null, `?bookId=${bookId}&chapterId=${chapterId}`);
+
+                    prevBtn.disabled = (currentIndex <= 0);
+                    nextBtn.disabled = (currentIndex >= allChapters.length - 1);
+                    
+                    renderNoteList();
+                } catch (error) {
+                    showErrorInterface(error.message);
+                }
+            }
+
+            // GIAO DIỆN BÁO LỖI THÔNG MINH
+            function showErrorInterface(errorMsg) {
+                titleDisplay.innerText = "❌ Lỗi tải chương";
+                content.innerHTML = `
+                    <div style="text-align:center; padding: 40px 10px; font-family:'Plus Jakarta Sans', sans-serif;">
+                        <p style="color:#ff4757; font-weight:bold; font-size:18px; margin-bottom:12px;">Hệ thống phát hiện lỗi!</p>
+                        <p style="color:#ffcc00; background:rgba(255,204,0,0.1); padding:10px; border-radius:6px; display:inline-block; font-size:14px; margin-bottom:25px; border:1px dashed #ffcc00;">
+                            Chi tiết: ${errorMsg}
+                        </p>
+                        <p style="color:#a0a0a0; font-size:14px; line-height:1.7; text-align:left; max-width:400px; margin:0 auto;">
+                            💡 <strong>Cách xử lý nhanh:</strong><br>
+                            • Nếu lỗi báo <em>"Không tìm thấy chương"</em>: Do bạn đang mở lại link cũ đã bị xóa. Hãy quay lại <strong>Trang chủ</strong>, bấm vào truyện mới đăng để nhận mã ID mới.<br>
+                            • Nếu lỗi báo <em>"Lỗi kết nối"</em>: Hãy chắc chắn máy tính đã bật lệnh <code>node server.js</code> và điện thoại đang bắt chung Wi-Fi.
+                        </p>
+                    </div>`;
+            }
+
+            select.addEventListener("change", () => loadChapter(select.value));
+            prevBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex - 1]._id));
+            nextBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex + 1]._id));
+
+            document.getElementById("bookmarkBtn").onclick = () => {
+                alert(`🔖 Đã lưu dấu trang vị trí hiện tại: ${titleDisplay.innerText}`);
+            };
+
+            // TỰ ĐỘNG CHUYỂN CHƯƠNG KHI NGHE HẾT AUDIO
+            const audioControl = document.getElementById("chapterAudio");
+            audioControl.addEventListener("ended", () => {
+                if (currentIndex < allChapters.length - 1) {
+                    const nextChapterId = allChapters[currentIndex + 1]._id;
+                    loadChapter(nextChapterId, true); 
+                } else {
+                    alert("🎉 Bạn đã nghe hết chương cuối cùng của bộ truyện này rồi!");
+                }
+            });
+
+            document.getElementById("fontPlus").onclick = () => { fontSize += 2; content.style.fontSize = fontSize + "px"; }
+            document.getElementById("fontMinus").onclick = () => { fontSize -= 2; content.style.fontSize = fontSize + "px"; }
+
+            window.addEventListener("scroll", () => {
+                const scrollTotal = document.body.scrollHeight - window.innerHeight;
+                progress.style.width = scrollTotal > 0 ? (window.scrollY / scrollTotal) * 100 + "%" : "0%";
+            });
+
+            // GHI CHÚ EVENTS
+            toggleNotesBtn.onclick = () => {
+                const sel = window.getSelection();
+                if (window.innerWidth <= 768 && sel && !sel.isCollapsed && sel.toString().trim()) {
+                    selectedText = sel.toString().trim();
+                    noteInput.value = "";
+                    noteModal.style.display = "flex";
+                } else {
+                    notePanel.classList.toggle("open");
+                }
+            };
+            
+            document.getElementById("closeNotePanel").onclick = () => notePanel.classList.remove("open");
+            document.getElementById("noteCancel").onclick = () => noteModal.style.display = "none";
+
+            function handleTextSelection() {
+                const sel = window.getSelection();
+                
+                if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+                    noteBtn.style.display = "none";
+                    toggleNotesBtn.innerHTML = "<i class='fa-solid fa-list-check'></i> <span>Ghi chú</span>";
+                    toggleNotesBtn.style.background = "";
+                    toggleNotesBtn.style.color = "";
+                    toggleNotesBtn.style.borderColor = "";
+                    return;
+                }
+                
+                selectedText = sel.toString().trim();
+
+                if (window.innerWidth > 768) {
+                    const range = sel.getRangeAt(0);
+                    const rect = range.getBoundingClientRect();
+                    if (rect.width === 0 || rect.height === 0) return;
+
+                    noteBtn.style.display = "block";
+                    noteBtn.style.top = (window.scrollY + rect.top - 15) + "px";
+                    noteBtn.style.left = (window.scrollX + rect.left + rect.width / 2) + "px";
+                } else {
+                    noteBtn.style.display = "none";
+                    toggleNotesBtn.innerHTML = "<i class='fa-solid fa-pen-clip'></i> <span>Tạo ghi chú</span>";
+                    toggleNotesBtn.style.background = "#ffcc00";
+                    toggleNotesBtn.style.color = "#06060c";
+                    toggleNotesBtn.style.borderColor = "#ffcc00";
+                }
+            }
+
+            let selectionTimeout;
+            document.addEventListener("selectionchange", () => {
+                clearTimeout(selectionTimeout);
+                selectionTimeout = setTimeout(() => {
+                    handleTextSelection();
+                }, 150);
+            });
+
+            noteBtn.onmousedown = (e) => {
+                e.preventDefault();
+                noteInput.value = "";
+                noteModal.style.display = "flex";
+                noteBtn.style.display = "none";
+            };
+
+            document.getElementById("noteSave").onclick = async () => {
+                const noteText = noteInput.value.trim();
+                if(!noteText) return;
+
+                try {
+                    const response = await fetch(`${SERVER_URL}/api/notes`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            bookId: bookId,
+                            chapterId: currentChapterId,
+                            text: selectedText,
+                            note: noteText
+                        })
+                    });
+
+                    if (response.ok) {
+                        noteModal.style.display = "none";
+                        loadChapter(currentChapterId);
+                    } else {
+                        alert("❌ Lỗi từ server, không thể lưu ghi chú!");
+                    }
+                } catch (err) {
+                    alert("❌ Thất bại: Không kết nối được tới máy chủ Backend!");
+                }
+            };
+
+            async function renderNoteList(){
+                noteList.innerHTML = "";
+                
+                try {
+                    const res = await fetch(`${SERVER_URL}/api/books/${bookId}/notes`);
+                    if (!res.ok) throw new Error();
+                    const bookNotes = await res.json();
+
+                    if (bookNotes.length === 0) {
+                        noteList.innerHTML = "<p style='opacity:#666; text-align:center; padding-top:20px; font-size:14px;'>Chưa có ghi chú nào.</p>";
+                        return;
+                    }
+
+                    bookNotes.forEach(n => {
+                        const div = document.createElement("div");
+                        div.className = "note-item";
+                        div.innerHTML = `
+                            <strong title="Bấm để cuộn tới đây">"${n.text}..."</strong>
+                            <div>${n.note}</div>
+                            <button class="delete-note"><i class="fa-solid fa-trash-can"></i> Xoá ghi chú</button>
+                        `;
+
+                        div.querySelector("strong").onclick = async () => {
+                            if(currentChapterId !== n.chapterId) {
+                                await loadChapter(n.chapterId);
+                            }
+                            setTimeout(() => {
+                                const el = document.querySelector(`[data-id="${n._id}"]`);
+                                if(el) {
+                                    el.scrollIntoView({behavior: "smooth", block: "center"});
+                                    el.style.backgroundColor = "rgba(255, 71, 87, 0.4)"; 
+                                    setTimeout(() => el.style.backgroundColor = "", 1200);
+                                }
+                            }, 300);
+                        };
+
+                        div.querySelector(".delete-note").onclick = async () => {
+                            if (confirm("⚠️ Bạn có chắc muốn xóa ghi chú này không?")) {
+                                try {
+                                    const delRes = await fetch(`${SERVER_URL}/api/notes/${n._id}`, { method: 'DELETE' });
+                                    if (delRes.ok) {
+                                        loadChapter(currentChapterId);
+                                    } else {
+                                        alert("Không thể xóa ghi chú này trên Server!");
+                                    }
+                                } catch (err) {
+                                    alert("Lỗi kết nối máy chủ!");
+                                }
+                            }
+                        };
+
+                        noteList.appendChild(div);
+                    });
+                } catch (err) {
+                    noteList.innerHTML = "<p style='color:#ff4757; text-align:center;'>Lỗi tải danh sách ghi chú!</p>";
+                }
+            }
         });
-    } catch (err) {
-        noteList.innerHTML = "<p style='color:#ff4757; text-align:center;'>Lỗi không lấy được danh sách ghi chú đám mây!</p>";
-    }
-  }
-});
-</script>
-
+    </script>
 </body>
 </html>
