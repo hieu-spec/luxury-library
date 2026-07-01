@@ -1282,6 +1282,7 @@
 
             // HÀM TẢI NỘI DUNG CHƯƠNG & ÁP DỤNG GHI CHÚ ĐÁM MÂY
             async function loadChapter(chapterId, shouldAutoPlay = false) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 titleDisplay.innerText = "Đang tải...";
                 content.innerHTML = `
                     <p style="text-align:center; color:#a0a0a0; padding: 40px 0; font-family: 'Plus Jakarta Sans', sans-serif;">
