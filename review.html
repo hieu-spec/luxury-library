@@ -688,6 +688,7 @@
             select { width: 100%; }
         }
     </style>
+    <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
 
@@ -1052,5 +1053,40 @@
 
     document.addEventListener('DOMContentLoaded', loadReviewCoreData);
 </script>
+
+    <!-- MOBILE: Hiệu ứng nền sóng nước & gió -->
+    <div class="mobile-ambient" aria-hidden="true">
+        <div class="water-ring wr-1"></div>
+        <div class="water-ring wr-2"></div>
+        <div class="water-ring wr-3"></div>
+        <div class="wind-line wl-1"></div>
+        <div class="wind-line wl-2"></div>
+        <div class="wind-line wl-3"></div>
+        <div class="wind-dot wd-1"></div>
+        <div class="wind-dot wd-2"></div>
+        <div class="wind-dot wd-3"></div>
+        <div class="wind-dot wd-4"></div>
+        <div class="wind-dot wd-5"></div>
+    </div>
+
+    <!-- MOBILE: Thanh điều hướng dưới cùng -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="index.html" class="mob-nav-item" data-page="home">
+            <div class="mob-nav-icon"><i class="fa-solid fa-house"></i></div>
+            <span>Trang chủ</span>
+        </a>
+        <a href="chinese.html" class="mob-nav-item" data-page="library">
+            <div class="mob-nav-icon"><i class="fa-solid fa-book-open"></i></div>
+            <span>Thư viện</span>
+        </a>
+        <a href="character-rank.html" class="mob-nav-item" data-page="rank">
+            <div class="mob-nav-icon"><i class="fa-solid fa-crown"></i></div>
+            <span>Xếp hạng</span>
+        </a>
+        <a href="review.html" class="mob-nav-item active" data-page="review">
+            <div class="mob-nav-icon"><i class="fa-solid fa-trophy"></i></div>
+            <span>Đánh giá</span>
+        </a>
+    </nav>
 </body>
 </html>

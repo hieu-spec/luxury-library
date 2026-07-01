@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile.css">
     <style>
         /* CSS bổ sung dành riêng cho Light Novel Nhật Bản */
         body.page-japan::after {
@@ -309,5 +310,40 @@
             loadCategoryBooks();
         });
     </script>
+
+    <!-- MOBILE: Hiệu ứng nền sóng nước & gió -->
+    <div class="mobile-ambient" aria-hidden="true">
+        <div class="water-ring wr-1"></div>
+        <div class="water-ring wr-2"></div>
+        <div class="water-ring wr-3"></div>
+        <div class="wind-line wl-1"></div>
+        <div class="wind-line wl-2"></div>
+        <div class="wind-line wl-3"></div>
+        <div class="wind-dot wd-1"></div>
+        <div class="wind-dot wd-2"></div>
+        <div class="wind-dot wd-3"></div>
+        <div class="wind-dot wd-4"></div>
+        <div class="wind-dot wd-5"></div>
+    </div>
+
+    <!-- MOBILE: Thanh điều hướng dưới cùng -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="index.html" class="mob-nav-item" data-page="home">
+            <div class="mob-nav-icon"><i class="fa-solid fa-house"></i></div>
+            <span>Trang chủ</span>
+        </a>
+        <a href="japan.html" class="mob-nav-item active" data-page="library">
+            <div class="mob-nav-icon"><i class="fa-solid fa-book-open"></i></div>
+            <span>Thư viện</span>
+        </a>
+        <a href="character-rank.html" class="mob-nav-item" data-page="rank">
+            <div class="mob-nav-icon"><i class="fa-solid fa-crown"></i></div>
+            <span>Xếp hạng</span>
+        </a>
+        <a href="review.html" class="mob-nav-item" data-page="review">
+            <div class="mob-nav-icon"><i class="fa-solid fa-trophy"></i></div>
+            <span>Đánh giá</span>
+        </a>
+    </nav>
 </body>
 </html>

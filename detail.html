@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile.css">
     <style>
         /* =========================================================
            THIẾT KẾ ĐỘC QUYỀN CHO TRANG CHI TIẾT TRUYỆN (DETAIL.HTML)
@@ -686,6 +687,51 @@
         <div class="chapter-container" id="chapterContainer"></div>
     </section>
 
+    <!-- MOBILE: Hiệu ứng nền sóng nước & gió -->
+    <div class="mobile-ambient" aria-hidden="true">
+        <div class="water-ring wr-1"></div>
+        <div class="water-ring wr-2"></div>
+        <div class="water-ring wr-3"></div>
+        <div class="wind-line wl-1"></div>
+        <div class="wind-line wl-2"></div>
+        <div class="wind-line wl-3"></div>
+        <div class="wind-dot wd-1"></div>
+        <div class="wind-dot wd-2"></div>
+        <div class="wind-dot wd-3"></div>
+        <div class="wind-dot wd-4"></div>
+        <div class="wind-dot wd-5"></div>
+    </div>
+
+    <!-- MOBILE: Thanh CTA cố định dưới cùng -->
+    <div class="mobile-cta-bar" id="mobileCTABar">
+        <a class="read-btn" id="mobileReadFromStart" href="#" style="flex:1; text-align:center; text-decoration:none;">
+            <i class="fa-solid fa-play"></i> Đọc từ đầu
+        </a>
+        <a class="read-btn" id="mobileResumeReading" href="#" style="flex:1; text-align:center; text-decoration:none; background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff !important; box-shadow: 0 0 15px rgba(46,204,113,0.3); display:none;">
+            <i class="fa-solid fa-forward"></i> Đọc tiếp
+        </a>
+    </div>
+
+    <!-- MOBILE: Thanh điều hướng dưới cùng -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <a href="index.html" class="mob-nav-item" data-page="home">
+            <div class="mob-nav-icon"><i class="fa-solid fa-house"></i></div>
+            <span>Trang chủ</span>
+        </a>
+        <a href="chinese.html" class="mob-nav-item active" data-page="library">
+            <div class="mob-nav-icon"><i class="fa-solid fa-book-open"></i></div>
+            <span>Thư viện</span>
+        </a>
+        <a href="character-rank.html" class="mob-nav-item" data-page="rank">
+            <div class="mob-nav-icon"><i class="fa-solid fa-crown"></i></div>
+            <span>Xếp hạng</span>
+        </a>
+        <a href="review.html" class="mob-nav-item" data-page="review">
+            <div class="mob-nav-icon"><i class="fa-solid fa-trophy"></i></div>
+            <span>Đánh giá</span>
+        </a>
+    </nav>
+
     <footer>
         <p>&copy; 2026 Thư viện của Hiếu - Không gian đọc cá nhân cao cấp</p>
     </footer>
@@ -763,7 +809,13 @@
                             if (chapterExists) {
                                 resumeBtn.href = `reading.html?bookId=${bookId}&chapterId=${bookmarkData.chapterId}`;
                                 resumeBtn.innerHTML = `<i class="fa-solid fa-forward"></i> Đọc tiếp (${bookmarkData.chapterTitle})`;
-                                resumeBtn.style.display = "inline-flex"; 
+                                resumeBtn.style.display = "inline-flex";
+                                // MOBILE: Đồng bộ nút CTA mobile
+                                const mobResume = document.getElementById('mobileResumeReading');
+                                if (mobResume) {
+                                    mobResume.href = resumeBtn.href;
+                                    mobResume.style.display = 'flex';
+                                }
                             }
                         }
                     }
@@ -979,7 +1031,11 @@
                 });
 
                 if (chapters.length > 0) {
-                    document.getElementById("readFromStart").href = `reading.html?bookId=${bookId}&chapterId=${chapters[0]._id}`;
+                    const readStartHref = `reading.html?bookId=${bookId}&chapterId=${chapters[0]._id}`;
+                    document.getElementById("readFromStart").href = readStartHref;
+                    // MOBILE: Đồng bộ nút CTA mobile
+                    const mobReadStart = document.getElementById('mobileReadFromStart');
+                    if (mobReadStart) mobReadStart.href = readStartHref;
                     renderChapterPage();
                 } else {
                     document.getElementById("chapterContainer").innerHTML = "<p style='grid-column: 1/-1; opacity:.6; text-align:center;'>Truyện này chưa có chương nào.</p>";

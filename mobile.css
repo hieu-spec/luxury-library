@@ -1,0 +1,1550 @@
+/* =========================================================
+   GIAO DIỆN ĐIỆN THOẠI RIÊNG BIỆT - LUXURY LIBRARY MOBILE
+   Thiết kế Native Mobile-First hoàn toàn khác Desktop
+   ========================================================= */
+
+/* =========================================================
+   PHẦN 1: KEYFRAME ANIMATIONS (Global - dùng cho mobile)
+   ========================================================= */
+
+/* Sóng nước lộng lẫy - lan tỏa và mờ dần */
+@keyframes waterRippleExpand {
+    0% {
+        transform: scale(0.2);
+        opacity: 0;
+        border-width: 2px;
+    }
+    15% {
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(3);
+        opacity: 0;
+        border-width: 0.5px;
+    }
+}
+
+/* Mặt nước lung linh phản chiếu ánh sáng */
+@keyframes waterShimmer {
+    0% {
+        background-position: 0% 50%;
+        opacity: 0.3;
+    }
+    50% {
+        background-position: 100% 50%;
+        opacity: 0.6;
+    }
+    100% {
+        background-position: 0% 50%;
+        opacity: 0.3;
+    }
+}
+
+/* Sóng nước gợn nhẹ */
+@keyframes waterWave {
+    0% {
+        transform: translateX(0) scaleY(1);
+    }
+    25% {
+        transform: translateX(-5px) scaleY(1.02);
+    }
+    50% {
+        transform: translateX(0) scaleY(0.98);
+    }
+    75% {
+        transform: translateX(5px) scaleY(1.01);
+    }
+    100% {
+        transform: translateX(0) scaleY(1);
+    }
+}
+
+/* Cơn gió nhẹ lướt ngang */
+@keyframes windSweep {
+    0% {
+        left: -30%;
+        opacity: 0;
+        transform: translateY(0) rotate(-1deg) scaleX(0.5);
+    }
+    8% {
+        opacity: 0.8;
+        transform: translateY(-3px) rotate(0deg) scaleX(1);
+    }
+    92% {
+        opacity: 0.8;
+        transform: translateY(3px) rotate(0.5deg) scaleX(1);
+    }
+    100% {
+        left: 120%;
+        opacity: 0;
+        transform: translateY(0) rotate(1deg) scaleX(0.5);
+    }
+}
+
+/* Hạt bụi bay theo gió */
+@keyframes windParticle {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    50% {
+        opacity: 0.4;
+    }
+    100% {
+        transform: translate(90vw, -15vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Ánh sáng cực quang lay động */
+@keyframes auroraShift {
+    0% {
+        transform: translate(-5%, 0) rotate(0deg);
+        opacity: 0.4;
+    }
+    33% {
+        transform: translate(3%, -2%) rotate(1deg);
+        opacity: 0.7;
+    }
+    66% {
+        transform: translate(-2%, 3%) rotate(-1deg);
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(5%, 0) rotate(0deg);
+        opacity: 0.4;
+    }
+}
+
+/* Hiệu ứng chạm ripple */
+@keyframes touchRipple {
+    0% {
+        transform: scale(0);
+        opacity: 0.4;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Thanh nav item glow pulse */
+@keyframes navGlow {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(79, 195, 247, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(79, 195, 247, 0.6);
+    }
+}
+
+/* Fade in từ dưới lên */
+@keyframes mobFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Slide up bottom sheet */
+@keyframes slideUpSheet {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Glow breathing cho các accent */
+@keyframes breatheGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 4px currentColor);
+    }
+    50% {
+        filter: drop-shadow(0 0 12px currentColor);
+    }
+}
+
+/* Float nhẹ nhàng */
+@keyframes gentleFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+/* Sparkle lấp lánh */
+@keyframes sparkle {
+    0%, 100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+
+/* =========================================================
+   PHẦN 2: TOÀN BỘ THIẾT KẾ MOBILE (max-width: 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+
+    /* ===== 2.1: GLOBAL MOBILE OVERRIDES ===== */
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+        -webkit-tap-highlight-color: transparent;
+        overscroll-behavior-y: contain;
+        overflow-x: hidden !important;
+    }
+
+    /* Touch ripple container */
+    .touch-ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(79, 195, 247, 0.25);
+        animation: touchRipple 0.6s ease-out forwards;
+        pointer-events: none;
+        z-index: 9999;
+    }
+
+    /* ===== 2.2: ẨN CÁC PHẦN TỬ DESKTOP ===== */
+    
+    /* Ẩn overlay pattern sao trên desktop */
+    .stars-overlay {
+        display: none !important;
+    }
+
+    /* ===== 2.3: HIỆU ỨNG NỀN SÓNG NƯỚC & GIÓ ===== */
+    
+    /* Container chung cho hiệu ứng mobile */
+    .mobile-ambient {
+        display: block !important;
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    /* Mặt nước lung linh ở dưới cùng trang */
+    .mobile-ambient::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: -10%;
+        width: 120%;
+        height: 35vh;
+        background: 
+            linear-gradient(180deg, transparent 0%, rgba(79, 195, 247, 0.03) 40%, rgba(79, 195, 247, 0.06) 100%),
+            repeating-linear-gradient(
+                100deg,
+                transparent 0px,
+                rgba(79, 195, 247, 0.015) 30px,
+                transparent 60px
+            );
+        background-size: 200% 100%;
+        animation: waterShimmer 8s ease-in-out infinite;
+        mask-image: linear-gradient(180deg, transparent 0%, black 30%);
+        -webkit-mask-image: linear-gradient(180deg, transparent 0%, black 30%);
+    }
+
+    /* Ánh cực quang mờ ảo phía trên */
+    .mobile-ambient::after {
+        content: '';
+        position: absolute;
+        top: -20%;
+        left: -15%;
+        width: 130%;
+        height: 45%;
+        background: 
+            radial-gradient(ellipse at 30% 40%, rgba(79, 195, 247, 0.06) 0%, transparent 60%),
+            radial-gradient(ellipse at 70% 60%, rgba(99, 102, 241, 0.04) 0%, transparent 50%);
+        animation: auroraShift 15s ease-in-out infinite;
+    }
+
+    /* Vòng sóng nước lan tỏa */
+    .water-ring {
+        display: block !important;
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        border-style: solid;
+        border-color: rgba(79, 195, 247, 0.12);
+    }
+
+    .water-ring.wr-1 {
+        width: 180px;
+        height: 180px;
+        bottom: 50px;
+        left: calc(50% - 90px);
+        border-width: 1.5px;
+        animation: waterRippleExpand 5s ease-out infinite;
+    }
+
+    .water-ring.wr-2 {
+        width: 240px;
+        height: 240px;
+        bottom: 30px;
+        left: calc(50% - 120px);
+        border-width: 1px;
+        animation: waterRippleExpand 5s ease-out infinite 1.7s;
+    }
+
+    .water-ring.wr-3 {
+        width: 300px;
+        height: 300px;
+        bottom: 10px;
+        left: calc(50% - 150px);
+        border-width: 0.8px;
+        animation: waterRippleExpand 5s ease-out infinite 3.4s;
+    }
+
+    /* Làn gió lướt ngang */
+    .wind-line {
+        display: block !important;
+        position: absolute;
+        height: 1px;
+        pointer-events: none;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255, 255, 255, 0.04) 15%,
+            rgba(79, 195, 247, 0.08) 40%,
+            rgba(255, 255, 255, 0.04) 70%,
+            transparent 100%
+        );
+    }
+
+    .wind-line.wl-1 {
+        width: 55%;
+        top: 18%;
+        animation: windSweep 9s linear infinite;
+    }
+
+    .wind-line.wl-2 {
+        width: 40%;
+        top: 42%;
+        animation: windSweep 13s linear infinite 3.5s;
+    }
+
+    .wind-line.wl-3 {
+        width: 50%;
+        top: 68%;
+        animation: windSweep 11s linear infinite 7s;
+    }
+
+    /* Hạt bụi phát sáng bay theo gió */
+    .wind-dot {
+        display: block !important;
+        position: absolute;
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: rgba(79, 195, 247, 0.4);
+        box-shadow: 0 0 6px rgba(79, 195, 247, 0.3);
+        pointer-events: none;
+    }
+
+    .wind-dot.wd-1 {
+        top: 25%;
+        left: 10%;
+        animation: windParticle 8s linear infinite;
+    }
+
+    .wind-dot.wd-2 {
+        top: 50%;
+        left: 5%;
+        animation: windParticle 12s linear infinite 2s;
+    }
+
+    .wind-dot.wd-3 {
+        top: 35%;
+        left: 15%;
+        animation: windParticle 10s linear infinite 5s;
+    }
+
+    .wind-dot.wd-4 {
+        top: 60%;
+        left: 8%;
+        animation: windParticle 14s linear infinite 8s;
+    }
+
+    .wind-dot.wd-5 {
+        top: 75%;
+        left: 3%;
+        animation: windParticle 9s linear infinite 3s;
+    }
+
+    /* ===== HIỆU ỨNG THEO TỪNG QUỐC GIA ===== */
+
+    /* Trung Quốc: Sóng vàng kim, gió cổ phong */
+    .page-china .water-ring {
+        border-color: rgba(212, 175, 55, 0.12) !important;
+    }
+    .page-china .mobile-ambient::before {
+        background: 
+            linear-gradient(180deg, transparent 0%, rgba(212, 175, 55, 0.03) 40%, rgba(212, 175, 55, 0.06) 100%),
+            repeating-linear-gradient(100deg, transparent 0px, rgba(212, 175, 55, 0.015) 30px, transparent 60px) !important;
+        background-size: 200% 100% !important;
+    }
+    .page-china .mobile-ambient::after {
+        background: 
+            radial-gradient(ellipse at 30% 40%, rgba(212, 175, 55, 0.06) 0%, transparent 60%),
+            radial-gradient(ellipse at 70% 60%, rgba(184, 134, 11, 0.04) 0%, transparent 50%) !important;
+    }
+    .page-china .wind-line {
+        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 15%, rgba(212,175,55,0.08) 40%, rgba(255,255,255,0.04) 70%, transparent 100%) !important;
+    }
+    .page-china .wind-dot {
+        background: rgba(212, 175, 55, 0.5) !important;
+        box-shadow: 0 0 6px rgba(212, 175, 55, 0.3) !important;
+    }
+
+    /* Nhật Bản: Sóng hồng hoa anh đào, gió nhẹ */
+    .page-japan .water-ring {
+        border-color: rgba(255, 71, 87, 0.12) !important;
+    }
+    .page-japan .mobile-ambient::before {
+        background: 
+            linear-gradient(180deg, transparent 0%, rgba(255, 71, 87, 0.03) 40%, rgba(255, 71, 87, 0.06) 100%),
+            repeating-linear-gradient(100deg, transparent 0px, rgba(255, 71, 87, 0.015) 30px, transparent 60px) !important;
+        background-size: 200% 100% !important;
+    }
+    .page-japan .mobile-ambient::after {
+        background: 
+            radial-gradient(ellipse at 30% 40%, rgba(255, 71, 87, 0.06) 0%, transparent 60%),
+            radial-gradient(ellipse at 70% 60%, rgba(255, 118, 140, 0.04) 0%, transparent 50%) !important;
+    }
+    .page-japan .wind-line {
+        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 15%, rgba(255,71,87,0.08) 40%, rgba(255,255,255,0.04) 70%, transparent 100%) !important;
+    }
+    .page-japan .wind-dot {
+        background: rgba(255, 118, 140, 0.5) !important;
+        box-shadow: 0 0 6px rgba(255, 71, 87, 0.3) !important;
+    }
+
+    /* Hàn Quốc: Sóng tím neon, gió cyber */
+    .page-korea .water-ring {
+        border-color: rgba(99, 102, 241, 0.12) !important;
+    }
+    .page-korea .mobile-ambient::before {
+        background: 
+            linear-gradient(180deg, transparent 0%, rgba(99, 102, 241, 0.03) 40%, rgba(99, 102, 241, 0.06) 100%),
+            repeating-linear-gradient(100deg, transparent 0px, rgba(99, 102, 241, 0.015) 30px, transparent 60px) !important;
+        background-size: 200% 100% !important;
+    }
+    .page-korea .mobile-ambient::after {
+        background: 
+            radial-gradient(ellipse at 30% 40%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
+            radial-gradient(ellipse at 70% 60%, rgba(129, 140, 248, 0.04) 0%, transparent 50%) !important;
+    }
+    .page-korea .wind-line {
+        background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 15%, rgba(99,102,241,0.08) 40%, rgba(255,255,255,0.04) 70%, transparent 100%) !important;
+    }
+    .page-korea .wind-dot {
+        background: rgba(129, 140, 248, 0.5) !important;
+        box-shadow: 0 0 6px rgba(99, 102, 241, 0.3) !important;
+    }
+
+    /* ===== 2.4: MOBILE HEADER / TOP BAR ===== */
+    
+    /* Redesign header thành thanh trạng thái nhỏ gọn */
+    header {
+        padding: 10px 16px !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    header .header-content {
+        flex-direction: row !important;
+        gap: 0 !important;
+        text-align: left !important;
+    }
+
+    header .logo {
+        font-size: 16px !important;
+        letter-spacing: 2px !important;
+    }
+
+    /* Ẩn thông tin user trên mobile, chỉ giữ các nút quan trọng */
+    header .user-info {
+        flex-direction: row !important;
+        gap: 8px !important;
+    }
+
+    header .user-info span {
+        display: none !important;
+    }
+
+    header .user-info i.fa-user-ninja {
+        display: none !important;
+    }
+
+    header .user-info .view-all-btn {
+        font-size: 0 !important;
+        padding: 8px !important;
+        border-radius: 50% !important;
+        width: 36px !important;
+        height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    header .user-info .view-all-btn i {
+        font-size: 14px !important;
+        margin: 0 !important;
+    }
+
+    /* Nút quay lại trên mobile */
+    header .back-btn {
+        font-size: 0 !important;
+        padding: 8px !important;
+        border-radius: 50% !important;
+        width: 36px;
+        height: 36px;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    header .back-btn i {
+        font-size: 14px !important;
+    }
+
+    /* ===== 2.5: MOBILE BOTTOM NAVIGATION ===== */
+    
+    .mobile-bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9000;
+        background: rgba(8, 8, 16, 0.92);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 6px 0 calc(6px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.4);
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .mob-nav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.35);
+        font-size: 10px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        letter-spacing: 0.3px;
+        min-width: 56px;
+    }
+
+    .mob-nav-icon {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .mob-nav-item.active {
+        color: #ffffff;
+    }
+
+    .mob-nav-item.active .mob-nav-icon {
+        background: linear-gradient(135deg, rgba(79, 195, 247, 0.2), rgba(99, 102, 241, 0.15));
+        color: #4fc3f7;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(79, 195, 247, 0.2);
+    }
+
+    /* Chấm sáng dưới item active */
+    .mob-nav-item.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #4fc3f7;
+        box-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+    }
+
+    .mob-nav-item:active {
+        transform: scale(0.9);
+    }
+
+    /* Theme quốc gia cho bottom nav */
+    .page-china .mob-nav-item.active .mob-nav-icon {
+        background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(184, 134, 11, 0.15));
+        color: #d4af37;
+        box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+    }
+    .page-china .mob-nav-item.active::after {
+        background: #d4af37;
+        box-shadow: 0 0 8px rgba(212, 175, 55, 0.5);
+    }
+
+    .page-japan .mob-nav-item.active .mob-nav-icon {
+        background: linear-gradient(135deg, rgba(255, 71, 87, 0.2), rgba(255, 118, 140, 0.15));
+        color: #ff4757;
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.2);
+    }
+    .page-japan .mob-nav-item.active::after {
+        background: #ff4757;
+        box-shadow: 0 0 8px rgba(255, 71, 87, 0.5);
+    }
+
+    .page-korea .mob-nav-item.active .mob-nav-icon {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(129, 140, 248, 0.15));
+        color: #6366f1;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.2);
+    }
+    .page-korea .mob-nav-item.active::after {
+        background: #6366f1;
+        box-shadow: 0 0 8px rgba(99, 102, 241, 0.5);
+    }
+
+
+    /* ===== 2.6: TRANG CHỦ (INDEX.HTML) ===== */
+
+    /* Hero banner compact */
+    .hero-banner {
+        border-radius: 16px !important;
+        padding: 32px 20px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .hero-content h1 {
+        font-size: 1.6rem !important;
+        letter-spacing: 0 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .hero-content p {
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+        margin-bottom: 16px !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .hero-stats {
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        scrollbar-width: none;
+    }
+
+    .hero-stats::-webkit-scrollbar {
+        display: none;
+    }
+
+    .stat-item {
+        flex-shrink: 0;
+        font-size: 11px !important;
+        padding: 6px 12px !important;
+        white-space: nowrap;
+    }
+
+    .stat-item:hover {
+        transform: none !important;
+    }
+
+    /* Quick navigator - Horizontal card strip */
+    .quick-navigator {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        margin-bottom: 25px !important;
+    }
+
+    .nav-card {
+        padding: 16px !important;
+        border-radius: 14px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 14px !important;
+        animation: mobFadeInUp 0.5s ease-out both;
+    }
+
+    .nav-card:nth-child(1) { animation-delay: 0.05s; }
+    .nav-card:nth-child(2) { animation-delay: 0.15s; }
+    .nav-card:nth-child(3) { animation-delay: 0.25s; }
+
+    .nav-card .nav-card-icon {
+        margin-bottom: 0 !important;
+        width: 44px !important;
+        height: 44px !important;
+        flex-shrink: 0;
+    }
+
+    .nav-card h3 {
+        font-size: 1rem !important;
+        margin-bottom: 2px !important;
+    }
+
+    .nav-card p {
+        font-size: 11px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 0 !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .nav-card .nav-card-action {
+        display: none !important;
+    }
+
+    .nav-card:hover {
+        transform: none !important;
+    }
+
+    .nav-card:active {
+        transform: scale(0.97) !important;
+        transition: transform 0.1s !important;
+    }
+
+    /* Section headers - gọn hơn */
+    .section-header {
+        margin: 28px 0 16px 0 !important;
+    }
+
+    .section-title {
+        font-size: 1.3rem !important;
+        padding-left: 14px !important;
+    }
+
+    /* Container gọn hơn */
+    .container {
+        padding: 0 14px !important;
+        margin: 16px auto !important;
+    }
+
+    /* Book grid trên trang chủ - 2 cột touch-friendly */
+    .book-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .book-card {
+        border-radius: 14px !important;
+        overflow: hidden;
+        animation: mobFadeInUp 0.5s ease-out both;
+        background: rgba(14, 14, 24, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .book-card:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .book-card:active {
+        transform: scale(0.96) !important;
+        background: rgba(20, 20, 32, 0.9) !important;
+        transition: transform 0.15s ease !important;
+    }
+
+    .book-cover {
+        height: 200px !important;
+        border-radius: 14px 14px 0 0 !important;
+    }
+
+    .book-cover img {
+        border-radius: 14px 14px 0 0;
+    }
+
+    .book-card:hover .book-cover img {
+        transform: none !important;
+    }
+
+    /* Overlay luôn hiện nhẹ trên mobile */
+    .book-cover .overlay {
+        opacity: 1 !important;
+        background: linear-gradient(180deg, transparent 30%, rgba(0, 0, 0, 0.75) 100%) !important;
+        backdrop-filter: none !important;
+        align-items: flex-end !important;
+        padding: 10px !important;
+    }
+
+    .read-btn {
+        width: 100% !important;
+        text-align: center !important;
+        padding: 7px 0 !important;
+        font-size: 10px !important;
+        border-radius: 8px !important;
+        box-shadow: none !important;
+        letter-spacing: 1px;
+    }
+
+    .book-info {
+        padding: 10px 12px 12px !important;
+    }
+
+    .book-info h3 {
+        font-size: 13px !important;
+        line-height: 1.35 !important;
+        white-space: normal !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        height: auto !important;
+        min-height: 34px;
+        margin-bottom: 4px !important;
+    }
+
+    .book-info .author {
+        font-size: 10px !important;
+        margin-bottom: 6px !important;
+        opacity: 0.7;
+    }
+
+    .book-desc {
+        display: none !important;
+    }
+
+    .progress-text {
+        font-size: 9px !important;
+    }
+
+    .progress-bar {
+        height: 3px !important;
+        border-radius: 2px !important;
+    }
+
+
+    /* ===== 2.7: TRANG THƯ VIỆN (CHINESE/JAPAN/KOREA) ===== */
+
+    /* Category Hero compact mobile */
+    .category-hero {
+        border-radius: 14px !important;
+        padding: 28px 18px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .category-hero-content h1 {
+        font-size: 1.5rem !important;
+    }
+
+    .category-hero-content p {
+        font-size: 12px !important;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    /* Thanh tìm kiếm mobile - sticky */
+    .library-controls {
+        position: sticky !important;
+        top: 56px !important;
+        z-index: 998 !important;
+        margin-bottom: 16px !important;
+        padding: 0 !important;
+    }
+
+    .search-filter-wrapper {
+        border-radius: 14px !important;
+        padding: 10px 14px !important;
+        gap: 8px !important;
+        background: rgba(12, 12, 20, 0.85) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+        flex-direction: column !important;
+    }
+
+    .search-filter-wrapper .divider {
+        display: none !important;
+    }
+
+    .search-filter-wrapper input {
+        font-size: 14px !important;
+        padding: 10px 0 !important;
+    }
+
+    .search-icon {
+        font-size: 14px !important;
+        margin-right: 10px !important;
+    }
+
+    /* Layout controller mobile */
+    .layout-controller {
+        margin-bottom: 16px !important;
+    }
+
+    /* Book list view - touch optimized */
+    .book-list-view.grid-mode {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .book-list-view.grid-mode .book-cover {
+        height: 200px !important;
+    }
+
+    .book-list-view.list-mode {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 12px !important;
+    }
+
+    .book-list-view.list-mode .book-card {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .book-list-view.list-mode .book-cover {
+        width: 100% !important;
+        height: 200px !important;
+    }
+
+    .book-list-view.list-mode .book-info {
+        padding: 10px 12px 12px !important;
+    }
+
+    .book-list-view.list-mode .book-info h3 {
+        font-size: 13px !important;
+    }
+
+    .book-list-view.list-mode .progress-container {
+        max-width: 100% !important;
+    }
+
+
+    /* ===== 2.8: TRANG CHI TIẾT (DETAIL.HTML) ===== */
+
+    /* Hero full-width trên mobile */
+    .story-hero {
+        padding: 20px 14px 24px !important;
+    }
+
+    .story-box {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        padding: 20px 16px !important;
+        border-radius: 16px !important;
+        gap: 20px !important;
+    }
+
+    .cover-wrapper {
+        width: 160px !important;
+        height: 230px !important;
+        border-radius: 14px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+    }
+
+    .story-meta {
+        min-width: 100% !important;
+    }
+
+    .story-meta h1 {
+        font-size: 1.5rem !important;
+        text-align: center;
+    }
+
+    .tags {
+        justify-content: center !important;
+        flex-wrap: wrap !important;
+    }
+
+    .tags span {
+        font-size: 11px !important;
+        padding: 4px 12px !important;
+    }
+
+    .story-stats {
+        font-size: 13px !important;
+        padding: 12px 14px !important;
+        border-radius: 10px !important;
+        text-align: left !important;
+    }
+
+    /* CTA buttons - full width stacked */
+    .action-button-group {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    .action-button-group .read-btn,
+    .action-button-group .secondary-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Sticky CTA bar cho mobile */
+    .mobile-cta-bar {
+        display: flex !important;
+        position: fixed;
+        bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+        left: 0;
+        right: 0;
+        z-index: 8999;
+        background: rgba(8, 8, 16, 0.95);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        padding: 10px 14px;
+        gap: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        animation: slideUpSheet 0.4s ease-out;
+    }
+
+    .mobile-cta-bar .read-btn,
+    .mobile-cta-bar a {
+        flex: 1;
+        text-align: center;
+        padding: 12px 0;
+        font-size: 13px;
+        font-weight: 700;
+        border-radius: 10px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    /* Sections spacing on detail page */
+    .story-desc,
+    .chapter-list,
+    .story-comments {
+        padding: 0 14px !important;
+        margin: 24px auto !important;
+    }
+
+    .story-desc h2,
+    .chapter-list h2,
+    .story-comments h2 {
+        font-size: 1.3rem !important;
+        margin-bottom: 16px !important;
+    }
+
+    .story-desc p {
+        font-size: 13px !important;
+        padding: 14px 16px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Comment input mobile */
+    .comment-input-box {
+        padding: 16px !important;
+        border-radius: 14px !important;
+    }
+
+    .comment-input-box textarea {
+        height: 90px !important;
+        font-size: 14px !important;
+        padding: 12px !important;
+        border-radius: 10px !important;
+    }
+
+    /* Chapter controls mobile */
+    .chapter-controls {
+        flex-direction: column !important;
+        padding: 12px !important;
+        gap: 10px !important;
+        border-radius: 14px !important;
+    }
+
+    .search-box-wrapper {
+        min-width: 100% !important;
+    }
+
+    .search-box-wrapper input {
+        padding: 12px 14px 12px 38px !important;
+        font-size: 13px !important;
+        border-radius: 10px !important;
+    }
+
+    .control-btn {
+        justify-content: center !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+    }
+
+    .chap-pagination {
+        margin-left: 0 !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        border-radius: 10px !important;
+    }
+
+    /* Chapter cards - full width, touch-friendly 48px height */
+    .chapter-container {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+
+    .chapter-card {
+        padding: 14px 16px !important;
+        border-radius: 10px !important;
+        min-height: 48px;
+    }
+
+    .chapter-card:hover {
+        transform: none !important;
+    }
+
+    .chapter-card:active {
+        background: rgba(79, 195, 247, 0.08) !important;
+        transform: scale(0.98) !important;
+    }
+
+    .chapter-main {
+        font-size: 13px !important;
+        max-width: none !important;
+    }
+
+
+    /* ===== 2.9: TRANG ĐỌC TRUYỆN (READING.HTML) ===== */
+    /* Thiết kế immersive tối ưu cho 90% thời gian đọc */
+
+    /* Toolbar reader - thiết kế lại hoàn toàn */
+    .reader-top {
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important;
+        border-radius: 0 !important;
+        padding: 8px 12px calc(8px + env(safe-area-inset-top, 0px)) !important;
+        border: none !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease !important;
+    }
+
+    /* Auto-hide khi cuộn xuống */
+    .reader-top.mob-hidden {
+        transform: translateY(-100%) !important;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .reader-top button,
+    .reader-top a {
+        padding: 7px 12px !important;
+        font-size: 12px !important;
+        border-radius: 8px !important;
+    }
+
+    .reader-top button span,
+    .reader-top a span {
+        display: none;
+    }
+
+    .reader-top button i,
+    .reader-top a i {
+        font-size: 14px;
+    }
+
+    /* Chapter dropdown trong reader */
+    .reader-top .custom-dropdown {
+        flex: 1 !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        order: 10;
+    }
+
+    .reader-top .dropdown-selected {
+        padding: 7px 10px !important;
+        font-size: 11px !important;
+        border-radius: 8px !important;
+    }
+
+    .reader-top .dropdown-options {
+        left: 0 !important;
+        transform: none !important;
+        width: calc(100vw - 24px) !important;
+        max-width: none !important;
+        border-radius: 12px !important;
+        max-height: 50vh !important;
+    }
+
+    .reader-top .custom-dropdown.open .dropdown-options {
+        transform: none !important;
+    }
+
+    /* Prev/Next buttons inline */
+    #prevBtn, #nextBtn {
+        padding: 7px 10px !important;
+        flex-shrink: 0;
+    }
+
+    /* Theme selector compact */
+    .theme-selector-group {
+        border-radius: 8px !important;
+        padding: 2px !important;
+    }
+
+    .theme-btn {
+        width: 26px !important;
+        height: 26px !important;
+    }
+
+    /* Font adjust compact */
+    .font-adjust-group button {
+        padding: 7px 10px !important;
+    }
+
+    /* Reader content - tối ưu cho đọc truyện trên điện thoại */
+    .reader {
+        margin: 80px auto 60px auto !important;
+        padding: 0 18px !important;
+        max-width: 100% !important;
+    }
+
+    .chapter-title {
+        font-size: 20px !important;
+        margin-bottom: 28px !important;
+        line-height: 1.4;
+    }
+
+    .reader-content {
+        font-size: 17px !important;
+        line-height: 1.8 !important;
+        letter-spacing: 0.01em;
+    }
+
+    .reader-content p {
+        margin-bottom: 22px !important;
+        text-indent: 1.2em !important;
+    }
+
+    /* Note panel full-width trên mobile */
+    .note-panel {
+        width: 100% !important;
+        right: -100% !important;
+        border-left: none !important;
+        border-radius: 0 !important;
+    }
+
+    .note-panel.open {
+        right: 0 !important;
+    }
+
+    /* Note modal tối ưu mobile */
+    .note-modal-box {
+        width: 92% !important;
+        border-radius: 16px !important;
+        padding: 24px 20px !important;
+    }
+
+    #noteInput {
+        border-radius: 10px !important;
+        font-size: 14px !important;
+    }
+
+    /* Audio player mobile */
+    #audioPlayerContainer {
+        border-radius: 14px !important;
+        padding: 16px !important;
+        margin: 0 0 24px 0 !important;
+    }
+
+    .custom-audio-controls {
+        gap: 10px !important;
+    }
+
+    .audio-play-btn {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 14px !important;
+    }
+
+    .audio-time-display {
+        font-size: 11px !important;
+        min-width: 70px !important;
+    }
+
+    .audio-bottom-row {
+        gap: 10px !important;
+        flex-wrap: wrap;
+    }
+
+    .volume-slider {
+        width: 60px !important;
+    }
+
+    /* Mobile reader bottom bar */
+    .mobile-reader-bottom {
+        display: flex !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9000;
+        background: rgba(8, 8, 16, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease;
+    }
+
+    .mobile-reader-bottom.mob-hidden {
+        transform: translateY(100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .mob-reader-btn {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.7);
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        text-decoration: none;
+    }
+
+    .mob-reader-btn:active {
+        transform: scale(0.94);
+        background: rgba(79, 195, 247, 0.1);
+    }
+
+    .mob-reader-btn:disabled {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+
+    .mob-reader-chap-display {
+        flex: 1;
+        text-align: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+
+    /* ===== 2.10: TRANG ĐÁNH GIÁ (REVIEW.HTML) ===== */
+
+    /* Page wrapper mobile */
+    .page-wrapper {
+        padding: 0 14px 80px !important;
+    }
+
+    /* Hero header compact */
+    .hero-header {
+        padding: 24px 0 20px !important;
+    }
+
+    .hero-header h1 {
+        font-size: 1.6rem !important;
+    }
+
+    .hero-header p {
+        font-size: 12px !important;
+    }
+
+    /* Section navigation - horizontal scroll */
+    .section-nav {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none !important;
+        justify-content: flex-start !important;
+        gap: 6px !important;
+        padding-bottom: 8px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .section-nav::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .section-nav button {
+        flex-shrink: 0 !important;
+        font-size: 12px !important;
+        padding: 8px 16px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Review cards mobile */
+    .review-card,
+    .rank-card {
+        border-radius: 14px !important;
+        padding: 16px !important;
+    }
+
+    /* Input forms mobile */
+    .form-card {
+        border-radius: 14px !important;
+        padding: 18px !important;
+    }
+
+    .form-card input,
+    .form-card select,
+    .form-card textarea {
+        font-size: 14px !important;
+        padding: 12px !important;
+        border-radius: 10px !important;
+    }
+
+
+    /* ===== 2.11: TRANG XẾP HẠNG NHÂN VẬT (CHARACTER-RANK.HTML) ===== */
+
+    /* Tab bar horizontal scroll */
+    .tab-bar {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+    }
+
+    .tab-bar::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .tab-bar button {
+        flex-shrink: 0 !important;
+        font-size: 12px !important;
+        padding: 8px 16px !important;
+        white-space: nowrap !important;
+        border-radius: 10px !important;
+    }
+
+    /* Character cards mobile */
+    .char-card {
+        border-radius: 14px !important;
+        padding: 14px !important;
+    }
+
+    .char-card:active {
+        transform: scale(0.97) !important;
+    }
+
+    /* Score input mobile */
+    .score-input {
+        font-size: 14px !important;
+        padding: 10px !important;
+    }
+
+
+    /* ===== 2.12: FOOTER MOBILE ===== */
+
+    footer {
+        padding: 24px 16px calc(80px + env(safe-area-inset-bottom, 0px)) !important;
+        font-size: 11px !important;
+    }
+
+
+    /* ===== 2.13: UTILITIES & SAFE AREA ===== */
+
+    /* An toàn cho iPhone X+ notch */
+    @supports (padding: env(safe-area-inset-bottom)) {
+        .mobile-bottom-nav {
+            padding-bottom: calc(6px + env(safe-area-inset-bottom));
+        }
+    }
+
+    /* Empty state mobile */
+    .empty-state {
+        padding: 40px 16px !important;
+    }
+
+    .empty-state i {
+        font-size: 2.5rem !important;
+    }
+
+    .empty-state h3 {
+        font-size: 16px !important;
+    }
+
+    /* Divider mobile */
+    .ancient-divider,
+    .sakura-divider,
+    .modern-divider {
+        width: 100px !important;
+        margin-bottom: 20px !important;
+    }
+
+    /* View all button mobile */
+    .view-all-btn {
+        font-size: 11px !important;
+        padding: 6px 14px !important;
+    }
+}
+
+/* =========================================================
+   PHẦN 3: ẨN CÁC PHẦN TỬ MOBILE TRÊN DESKTOP
+   ========================================================= */
+@media (min-width: 769px) {
+    .mobile-bottom-nav,
+    .mobile-ambient,
+    .mobile-cta-bar,
+    .mobile-reader-bottom {
+        display: none !important;
+    }
+
+    .water-ring,
+    .wind-line,
+    .wind-dot {
+        display: none !important;
+    }
+}

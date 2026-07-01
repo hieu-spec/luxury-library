@@ -814,6 +814,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="mobile.css">
 </head>
 <body class="theme-dark">
 
@@ -1570,6 +1571,121 @@
                 }
             }
         });
+    </script>
+
+    <!-- MOBILE: Hiệu ứng nền sóng nước & gió -->
+    <div class="mobile-ambient" aria-hidden="true">
+        <div class="water-ring wr-1"></div>
+        <div class="water-ring wr-2"></div>
+        <div class="water-ring wr-3"></div>
+        <div class="wind-line wl-1"></div>
+        <div class="wind-line wl-2"></div>
+        <div class="wind-line wl-3"></div>
+        <div class="wind-dot wd-1"></div>
+        <div class="wind-dot wd-2"></div>
+        <div class="wind-dot wd-3"></div>
+        <div class="wind-dot wd-4"></div>
+        <div class="wind-dot wd-5"></div>
+    </div>
+
+    <!-- MOBILE: Thanh điều khiển đọc sách dưới cùng -->
+    <div class="mobile-reader-bottom" id="mobileReaderBottom">
+        <button class="mob-reader-btn" id="mobPrevBtn" disabled>
+            <i class="fa-solid fa-chevron-left"></i> Trước
+        </button>
+        <div class="mob-reader-chap-display" id="mobChapDisplay">Chọn chương...</div>
+        <button class="mob-reader-btn" id="mobNextBtn">
+            Sau <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <script>
+    // =========================================================
+    // MOBILE: Auto-hide toolbar khi cuộn đọc & đồng bộ bottom bar
+    // =========================================================
+    (function() {
+        if (window.innerWidth > 768) return;
+
+        const readerTop = document.querySelector('.reader-top');
+        const readerBottom = document.getElementById('mobileReaderBottom');
+        const mobPrev = document.getElementById('mobPrevBtn');
+        const mobNext = document.getElementById('mobNextBtn');
+        const mobChapDisplay = document.getElementById('mobChapDisplay');
+        
+        let lastScrollY = 0;
+        let ticking = false;
+        let isToolbarVisible = true;
+
+        // Auto-hide on scroll
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentScrollY = window.scrollY;
+                    const delta = currentScrollY - lastScrollY;
+
+                    if (delta > 8 && currentScrollY > 100 && isToolbarVisible) {
+                        // Cuộn xuống - ẩn toolbar
+                        readerTop.classList.add('mob-hidden');
+                        if (readerBottom) readerBottom.classList.add('mob-hidden');
+                        isToolbarVisible = false;
+                    } else if (delta < -5 && !isToolbarVisible) {
+                        // Cuộn lên - hiện toolbar
+                        readerTop.classList.remove('mob-hidden');
+                        if (readerBottom) readerBottom.classList.remove('mob-hidden');
+                        isToolbarVisible = true;
+                    }
+
+                    lastScrollY = currentScrollY;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
+
+        // Tap giữa màn hình để toggle toolbar
+        document.querySelector('.reader')?.addEventListener('click', (e) => {
+            if (e.target.closest('a, button, .highlight, .note-btn, .note-modal, .custom-dropdown')) return;
+            
+            isToolbarVisible = !isToolbarVisible;
+            if (isToolbarVisible) {
+                readerTop.classList.remove('mob-hidden');
+                if (readerBottom) readerBottom.classList.remove('mob-hidden');
+            } else {
+                readerTop.classList.add('mob-hidden');
+                if (readerBottom) readerBottom.classList.add('mob-hidden');
+            }
+        });
+
+        // Đồng bộ nút prev/next mobile với desktop
+        if (mobPrev) {
+            mobPrev.addEventListener('click', () => {
+                document.getElementById('prevBtn')?.click();
+            });
+        }
+        if (mobNext) {
+            mobNext.addEventListener('click', () => {
+                document.getElementById('nextBtn')?.click();
+            });
+        }
+
+        // Observer để đồng bộ trạng thái disabled và tên chương
+        const observer = new MutationObserver(() => {
+            const prevDesktop = document.getElementById('prevBtn');
+            const nextDesktop = document.getElementById('nextBtn');
+            const chapTitle = document.getElementById('chapterTitle');
+
+            if (mobPrev && prevDesktop) mobPrev.disabled = prevDesktop.disabled;
+            if (mobNext && nextDesktop) mobNext.disabled = nextDesktop.disabled;
+            if (mobChapDisplay && chapTitle) {
+                mobChapDisplay.textContent = chapTitle.textContent;
+            }
+        });
+
+        const targetNodes = [document.getElementById('prevBtn'), document.getElementById('nextBtn'), document.getElementById('chapterTitle')];
+        targetNodes.forEach(node => {
+            if (node) observer.observe(node, { attributes: true, childList: true, characterData: true });
+        });
+    })();
     </script>
 </body>
 </html>
