@@ -626,8 +626,8 @@
             
             <div class="story-meta">
                 <h1 id="bookTitle">Đang tải truyện...</h1>
-                <div class="tags">
-                    <span id="bookCategory">Thể loại</span>
+                <div class="tags" id="bookCategoryTags">
+                    <span>Thể loại</span>
                 </div>
                 <div class="story-stats">
                     <p><i class="fa-solid fa-pen-nib" style="color: var(--accent-color); margin-right: 8px;"></i> Tác giả: <strong id="bookAuthor">...</strong></p>
@@ -728,7 +728,22 @@
                 document.getElementById("bookCover").src = finalCover;
                 document.getElementById("bookTitle").innerText = book.title;
                 document.getElementById("bookAuthor").innerText = book.author;
-                document.getElementById("bookCategory").innerText = book.category;
+                
+                // Hiển thị multi-genre tags
+                const tagsContainer = document.getElementById("bookCategoryTags");
+                tagsContainer.innerHTML = '';
+                let categories = book.category;
+                if (typeof categories === 'string') {
+                    try { categories = JSON.parse(categories); } catch(e) { categories = categories ? [categories] : []; }
+                }
+                if (!Array.isArray(categories)) categories = categories ? [categories] : [];
+                if (categories.length === 0) categories = ['Chưa phân loại'];
+                categories.forEach(cat => {
+                    const span = document.createElement('span');
+                    span.textContent = cat;
+                    tagsContainer.appendChild(span);
+                });
+
                 document.getElementById("bookDesc").innerText = book.description || 'Chưa có phần giới thiệu nội dung cho tác phẩm này...';
 
                 // 2. Tải danh sách chương
