@@ -148,20 +148,110 @@
             border-color: var(--card-border) !important;
         }
 
-        #chapterSelect {
+        /* CUSTOM DROPDOWN CHAPTER SELECTOR */
+        .custom-dropdown {
+            position: relative;
             flex: 1;
             max-width: 250px;
-            outline: none;
-            cursor: pointer;
-            padding-right: 25px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 14px;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
         }
+        
+        .dropdown-selected {
+            background: var(--item-bg);
+            border: 1px solid var(--card-border);
+            color: inherit;
+            padding: 8px 16px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .dropdown-selected:hover {
+            background: var(--accent-color);
+            color: #06060c;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+        }
+        
+        .dropdown-selected i {
+            font-size: 11px;
+            opacity: 0.7;
+            transition: transform 0.3s;
+        }
+        
+        .custom-dropdown.open .dropdown-selected {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
+        }
+        
+        .custom-dropdown.open .dropdown-selected i {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-options {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            max-height: 350px;
+            overflow-y: auto;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        
+        .custom-dropdown.open .dropdown-options {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .dropdown-option {
+            padding: 10px 14px;
+            color: inherit;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+        
+        .dropdown-option:hover {
+            background: rgba(var(--accent-rgb), 0.15);
+            color: var(--accent-color);
+            padding-left: 18px;
+        }
+        
+        .dropdown-option.active {
+            background: var(--accent-color);
+            color: #06060c;
+            font-weight: 700;
+        }
+        
+        /* Custom Scrollbar for Dropdown */
+        .dropdown-options::-webkit-scrollbar { width: 6px; }
+        .dropdown-options::-webkit-scrollbar-track { background: transparent; }
+        .dropdown-options::-webkit-scrollbar-thumb { background: rgba(var(--accent-rgb), 0.3); border-radius: 10px; }
+        .dropdown-options::-webkit-scrollbar-thumb:hover { background: rgba(var(--accent-rgb), 0.6); }
 
         /* THEME SELECTOR BUTTONS */
         .theme-selector-group {
@@ -674,14 +764,17 @@
                 order: 10;
                 justify-content: center;
             }
-            #chapterSelect {
+            .custom-dropdown {
                 grid-column: span 1;
                 order: 11;
                 min-width: 100%;
                 max-width: 100%;
                 justify-content: center;
                 font-size: 11px;
-                padding: 8px 6px;
+            }
+            .dropdown-selected {
+                padding: 8px 10px;
+                font-size: 11px;
             }
             #nextBtn {
                 grid-column: span 1;
@@ -737,7 +830,13 @@
         <a href="#" id="backBtn" class="back-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Thoát</a>
         
         <button id="prevBtn"><i class="fa-solid fa-chevron-left"></i> Trước</button>
-        <select id="chapterSelect"></select>
+        <div class="custom-dropdown" id="chapterDropdown">
+            <div class="dropdown-selected" id="dropdownSelected">
+                <span id="dropdownSelectedText">Chọn chương...</span>
+                <i class="fa-solid fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-options" id="dropdownOptions"></div>
+        </div>
         <button id="nextBtn">Sau <i class="fa-solid fa-chevron-right"></i></button>
     </div>
 
@@ -814,7 +913,22 @@
             const bookId = urlParams.get('bookId');
             let currentChapterId = urlParams.get('chapterId');
 
-            const select = document.getElementById("chapterSelect");
+            const dropdownEl = document.getElementById("chapterDropdown");
+            const dropdownSelectedText = document.getElementById("dropdownSelectedText");
+            const dropdownOptions = document.getElementById("dropdownOptions");
+            
+            dropdownEl.querySelector(".dropdown-selected").addEventListener("click", (e) => {
+                e.stopPropagation();
+                dropdownEl.classList.toggle("open");
+                const activeOpt = dropdownOptions.querySelector('.dropdown-option.active');
+                if (activeOpt && dropdownEl.classList.contains("open")) {
+                    setTimeout(() => activeOpt.scrollIntoView({block: "center"}), 50);
+                }
+            });
+            
+            document.addEventListener("click", (e) => {
+                if (!dropdownEl.contains(e.target)) dropdownEl.classList.remove("open");
+            });
             const content = document.getElementById("content");
             const titleDisplay = document.getElementById("chapterTitle");
             const prevBtn = document.getElementById("prevBtn");
@@ -1132,11 +1246,17 @@
                 if (!chapRes.ok) throw new Error("Không thể tải danh sách chương của bộ truyện này!");
                 allChapters = await chapRes.json();
 
+                dropdownOptions.innerHTML = '';
                 allChapters.forEach(chap => {
-                    const opt = document.createElement("option");
-                    opt.value = chap._id;
+                    const opt = document.createElement("div");
+                    opt.className = "dropdown-option";
+                    opt.dataset.value = chap._id;
                     opt.textContent = chap.title;
-                    select.appendChild(opt);
+                    opt.addEventListener("click", () => {
+                        dropdownEl.classList.remove("open");
+                        if (currentChapterId !== chap._id) loadChapter(chap._id);
+                    });
+                    dropdownOptions.appendChild(opt);
                 });
 
                 if (currentChapterId) {
@@ -1189,7 +1309,10 @@
 
                     currentChapterId = chapterId;
                     currentIndex = allChapters.findIndex(c => c._id === chapterId);
-                    select.value = chapterId; 
+                    dropdownSelectedText.innerText = chapter.title;
+                    dropdownOptions.querySelectorAll('.dropdown-option').forEach(opt => {
+                        opt.classList.toggle('active', opt.dataset.value === chapterId);
+                    });
                     titleDisplay.innerText = chapter.title;
 
                     // AUDIO PLAYER SETUP
@@ -1273,7 +1396,7 @@
                     </div>`;
             }
 
-            select.addEventListener("change", () => loadChapter(select.value));
+            // Sự kiện select chương đã được gán trực tiếp vào từng option của custom dropdown
             prevBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex - 1]._id));
             nextBtn.addEventListener("click", () => loadChapter(allChapters[currentIndex + 1]._id));
 
