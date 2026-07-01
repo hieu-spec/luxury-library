@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư Viện | Thư Viện Của Hiếu</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="mobile.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .library-hub {
+            padding: 20px 14px;
+            padding-bottom: 100px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .library-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 24px;
+            text-align: center;
+            background: linear-gradient(90deg, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .lib-card {
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            text-decoration: none;
+            background: linear-gradient(145deg, rgba(30, 30, 46, 0.7), rgba(14, 14, 24, 0.9));
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .lib-card:active {
+            transform: scale(0.97);
+        }
+        .lib-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        .lib-card.china .lib-card-icon {
+            background: rgba(var(--china-accent-rgb), 0.15);
+            color: var(--china-accent);
+            box-shadow: 0 0 15px rgba(var(--china-accent-rgb), 0.3);
+        }
+        .lib-card.korea .lib-card-icon {
+            background: rgba(var(--korea-accent-rgb), 0.15);
+            color: var(--korea-accent);
+            box-shadow: 0 0 15px rgba(var(--korea-accent-rgb), 0.3);
+        }
+        .lib-card.japan .lib-card-icon {
+            background: rgba(var(--japan-accent-rgb), 0.15);
+            color: var(--japan-accent);
+            box-shadow: 0 0 15px rgba(var(--japan-accent-rgb), 0.3);
+        }
+        .lib-card h3 {
+            color: #fff;
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+        .lib-card p {
+            color: var(--text-dim);
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .lib-card-action {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .lib-card.china .lib-card-action { color: var(--china-accent); }
+        .lib-card.korea .lib-card-action { color: var(--korea-accent); }
+        .lib-card.japan .lib-card-action { color: var(--japan-accent); }
+    </style>
+</head>
+<body>
+    <div class="stars-overlay"></div>
+    <div class="mobile-ambient" aria-hidden="true">
+        <div class="water-ring wr-1"></div>
+        <div class="water-ring wr-2"></div>
+        <div class="water-ring wr-3"></div>
+        <div class="wind-line wl-1"></div>
+        <div class="wind-line wl-2"></div>
+        <div class="wind-line wl-3"></div>
+        <div class="wind-dot wd-1"></div>
+        <div class="wind-dot wd-2"></div>
+        <div class="wind-dot wd-3"></div>
+        <div class="wind-dot wd-4"></div>
+        <div class="wind-dot wd-5"></div>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <a href="index.html" class="logo">THƯ VIỆN CỦA HIẾU</a>
+        </div>
+    </header>
+
+    <main class="library-hub">
+        <h1 class="library-title">Khám Phá Thư Viện</h1>
+        
+        <a href="chinese.html" class="lib-card china">
+            <div class="lib-card-icon"><i class="fa-solid fa-scroll"></i></div>
+            <h3>Tiểu Thuyết Trung Quốc</h3>
+            <p>Tiên Hiệp huyền ảo, Kiếm Hiệp tráng lệ, Huyền Huyễn kỳ bí, Đô Thị và Cổ Phong.</p>
+            <span class="lib-card-action">Vào thư viện <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+        
+        <a href="korea.html" class="lib-card korea">
+            <div class="lib-card-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+            <h3>Tiểu Thuyết Hàn Quốc</h3>
+            <p>Kỷ Nguyên Thợ Săn kịch tính, chinh phục Hầm Ngục tối tăm và mở khóa Hệ Thống.</p>
+            <span class="lib-card-action">Vào thư viện <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+        
+        <a href="japan.html" class="lib-card japan">
+            <div class="lib-card-icon"><i class="fa-solid fa-torii-gate"></i></div>
+            <h3>Light Novel Nhật Bản</h3>
+            <p>Isekai Chuyển sinh dị giới, Phép thuật, Rom-com học đường nhẹ nhàng.</p>
+            <span class="lib-card-action">Vào thư viện <i class="fa-solid fa-arrow-right"></i></span>
+        </a>
+    </main>
+
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mob-nav-item">
+            <div class="mob-nav-icon"><i class="fa-solid fa-house"></i></div>
+            <span>Trang chủ</span>
+        </a>
+        <a href="library.html" class="mob-nav-item active">
+            <div class="mob-nav-icon"><i class="fa-solid fa-book-open"></i></div>
+            <span>Thư viện</span>
+        </a>
+        <a href="character-rank.html" class="mob-nav-item">
+            <div class="mob-nav-icon"><i class="fa-solid fa-crown"></i></div>
+            <span>Xếp hạng</span>
+        </a>
+        <a href="review.html" class="mob-nav-item">
+            <div class="mob-nav-icon"><i class="fa-solid fa-trophy"></i></div>
+            <span>Đánh giá</span>
+        </a>
+    </nav>
+</body>
+</html>
+

@@ -1732,6 +1732,11 @@
         box-shadow: 0 0 10px rgba(79, 195, 247, 0.5) !important;
     }
 
+    /* Ẩn thanh CTA thừa thãi gây trùng lặp nút dưới đáy trên trang detail */
+    .mobile-cta-bar {
+        display: none !important;
+    }
+
     /* ===== 2.11: TRANG XẾP HẠNG NHÂN VẬT (CHARACTER-RANK.HTML) ===== */
 
     /* Tab bar horizontal scroll */
