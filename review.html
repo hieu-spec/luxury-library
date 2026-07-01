@@ -4,194 +4,721 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bảng Xếp Hạng & Đánh Giá | Luxury Library</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Hệ thống phân tích và xếp hạng truyện chuyên sâu với tiêu chí đa chiều tại Luxury Library.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --bg-dark: #0a0a0f; --card-bg: #161622; --accent: #4fc3f7; }
-        body { background: var(--bg-dark); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        
-        .nav-header { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .back-home { color: #a0a0a0; text-decoration: none; font-size: 15px; transition: 0.3s; }
-        .back-home:hover { color: var(--accent); }
+        /* ============================================================
+           DESIGN TOKENS & ROOT VARIABLES
+           ============================================================ */
+        :root {
+            --bg-dark: #06060f;
+            --card-bg: rgba(16, 16, 26, 0.85);
+            --card-border: rgba(255, 255, 255, 0.07);
+            --accent: #4fc3f7;
+            --accent-rgb: 79, 195, 247;
+            --accent2: #818cf8;
+            --gold: #f59e0b;
+            --gold-rgb: 245, 158, 11;
+            --green: #10b981;
+            --red: #ef4444;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --text-muted: #475569;
+            --glass: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.08);
+            --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-        /* TABS CONTROL */
-        .tabs-container { display: flex; gap: 15px; margin-bottom: 30px; width: 100%; max-width: 1000px; }
-        .tab-btn { flex: 1; background: #111116; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #a0a0a0; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .tab-btn.active { background: rgba(79, 195, 247, 0.15); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 15px rgba(79, 195, 247, 0.1); }
+        /* ============================================================
+           BASE & AMBIENT EFFECTS
+           ============================================================ */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .view-section { display: none; width: 100%; max-width: 1000px; }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient light orbs */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -20%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(79,195,247,0.07) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: orb1 15s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 700px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(129,140,248,0.06) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            animation: orb2 18s ease-in-out infinite alternate;
+        }
+        @keyframes orb1 {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(5%,5%) scale(1.15); }
+        }
+        @keyframes orb2 {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(-5%,-5%) scale(1.2); }
+        }
+
+        /* Premium scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(79,195,247,0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* Page wrapper */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px 60px;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        /* ============================================================
+           HERO HEADER
+           ============================================================ */
+        .hero-header {
+            width: 100%;
+            padding: 40px 0 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .hero-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+        .hero-eyebrow {
+            font-size: 11px;
+            letter-spacing: 3px;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 12px;
+            opacity: 0.8;
+        }
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(22px, 4vw, 36px);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e0f2fe 0%, #4fc3f7 45%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            line-height: 1.2;
+            position: relative;
+        }
+        .hero-subtitle {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+        .back-home {
+            position: absolute;
+            top: 40px;
+            left: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+        .back-home:hover {
+            color: var(--accent);
+            border-color: rgba(79,195,247,0.4);
+            background: rgba(79,195,247,0.08);
+            transform: translateX(-3px);
+        }
+
+        /* ============================================================
+           TAB NAVIGATION
+           ============================================================ */
+        .tabs-container {
+            display: flex;
+            gap: 12px;
+            margin: 30px 0 28px;
+            width: 100%;
+            background: rgba(10,10,20,0.6);
+            padding: 6px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            color: var(--text-dim);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+        .tab-btn i { font-size: 16px; transition: var(--transition); }
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(79,195,247,0.15), rgba(129,140,248,0.1));
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .tab-btn.active {
+            color: var(--accent);
+            background: rgba(79,195,247,0.1);
+            box-shadow: 0 0 20px rgba(79,195,247,0.12), inset 0 1px 0 rgba(255,255,255,0.08);
+        }
+        .tab-btn.active::before { opacity: 1; }
+        .tab-btn.active i { filter: drop-shadow(0 0 6px var(--accent)); }
+        .tab-btn:hover:not(.active) { color: #fff; background: var(--glass); }
+
+        /* ============================================================
+           VIEW SECTIONS
+           ============================================================ */
+        .view-section { display: none; width: 100%; }
         .view-section.active { display: block; }
 
-        /* DESIGN CHO FORM ĐÁNH GIÁ */
-        .console-box { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 35px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-bottom: 25px; }
-        .section-title { font-size: 18px; color: #ffcc00; border-left: 4px solid #ffcc00; padding-left: 12px; margin: 30px 0 20px 0; font-weight: 700; }
+        /* ============================================================
+           FILTER BAR
+           ============================================================ */
+        .filter-bar {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 14px 20px;
+            border-radius: 14px;
+            backdrop-filter: blur(20px);
+        }
+        .filter-bar span {
+            color: var(--text-dim);
+            font-size: 13px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .filter-bar span i { color: var(--accent); }
+        select {
+            background: rgba(10,10,20,0.8);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: var(--transition);
+            flex: 1;
+        }
+        select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,195,247,0.12); }
+
+        /* ============================================================
+           LEADERBOARD TABLE
+           ============================================================ */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            backdrop-filter: blur(20px);
+        }
+        thead tr {
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--card-border);
+        }
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            vertical-align: middle;
+            transition: var(--transition);
+        }
+        tbody tr {
+            transition: var(--transition);
+            position: relative;
+        }
+        tbody tr:hover { background: rgba(79,195,247,0.04); }
+        tbody tr:hover td { border-color: rgba(79,195,247,0.06); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        /* Rank cells */
+        .rank-cell {
+            font-weight: 900;
+            font-size: 20px;
+            width: 65px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .rank-1 { color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251,191,36,0.5)); }
+        .rank-2 { color: #94a3b8; filter: drop-shadow(0 0 6px rgba(148,163,184,0.3)); }
+        .rank-3 { color: #cd7f32; filter: drop-shadow(0 0 6px rgba(205,127,50,0.3)); }
+        .rank-other { color: var(--text-muted); font-size: 15px; }
+
+        .rank-medal { font-size: 24px; }
+
+        /* Book title cell */
+        .book-title-cell { font-weight: 700; color: var(--text-main); font-size: 16px; line-height: 1.4; }
+        .book-author { font-size: 13px; color: var(--text-muted); margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+        .book-cate-tag {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-left: 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Tier badges */
+        .tier-badge-table {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+        .tier-master {
+            background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));
+            color: #fca5a5;
+            border: 1px solid rgba(239,68,68,0.35);
+            box-shadow: 0 0 12px rgba(239,68,68,0.1);
+            animation: tierGlow 2.5s ease-in-out infinite alternate;
+        }
+        @keyframes tierGlow {
+            from { box-shadow: 0 0 8px rgba(239,68,68,0.1); }
+            to   { box-shadow: 0 0 18px rgba(239,68,68,0.25); }
+        }
+        .tier-recom {
+            background: linear-gradient(135deg, rgba(16,185,129,0.18), rgba(16,185,129,0.05));
+            color: #6ee7b7;
+            border: 1px solid rgba(16,185,129,0.3);
+        }
+        .tier-aver {
+            background: linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05));
+            color: #fcd34d;
+            border: 1px solid rgba(245,158,11,0.3);
+        }
+        .tier-weak {
+            background: rgba(100,116,139,0.1);
+            color: #94a3b8;
+            border: 1px solid rgba(100,116,139,0.2);
+        }
+
+        /* Score cell */
+        .score-cell {
+            text-align: right;
+            font-weight: 800;
+            font-size: 22px;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #4fc3f7, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .score-cell small {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-text-fill-color: var(--text-muted);
+        }
+
+        /* ============================================================
+           REVIEW FORM SECTION
+           ============================================================ */
+        .console-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+        .console-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(79,195,247,0.4), transparent);
+        }
+
+        /* Book selector */
+        .book-select-wrapper {
+            position: relative;
+        }
+        .book-select-wrapper label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+        }
+        #bookSelectToRate {
+            width: 100%;
+            max-width: 560px;
+            font-size: 15px;
+            padding: 14px 18px;
+        }
+
+        /* Section titles */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            margin: 32px 0 20px;
+            text-transform: uppercase;
+        }
         .section-title:first-of-type { margin-top: 0; }
-        
-        .criterion-row { margin-bottom: 22px; }
-        .criterion-info { display: flex; justify-content: space-between; font-size: 15px; color: #d4d4d8; margin-bottom: 8px; }
-        .criterion-info span strong { color: var(--accent); }
-        
-        /* Custom thanh kéo slider slider glowing */
-        .slider-wrapper { display: flex; align-items: center; gap: 15px; }
-        input[type="range"] { flex: 1; -webkit-appearance: none; background: #0f1014; height: 6px; border-radius: 5px; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 10px var(--accent); transition: 0.2s; }
-        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
-        .score-counter { min-width: 45px; text-align: right; font-weight: bold; color: #fff; font-size: 16px; }
+        .section-title-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .si-plot    { background: linear-gradient(135deg,rgba(79,195,247,0.2),rgba(79,195,247,0.05)); color:#4fc3f7; border:1px solid rgba(79,195,247,0.25); }
+        .si-char    { background: linear-gradient(135deg,rgba(167,139,250,0.2),rgba(167,139,250,0.05)); color:#a78bfa; border:1px solid rgba(167,139,250,0.25); }
+        .si-style   { background: linear-gradient(135deg,rgba(52,211,153,0.2),rgba(52,211,153,0.05)); color:#34d399; border:1px solid rgba(34,211,153,0.25); }
+        .si-world   { background: linear-gradient(135deg,rgba(251,146,60,0.2),rgba(251,146,60,0.05)); color:#fb923c; border:1px solid rgba(251,146,60,0.25); }
+        .si-impact  { background: linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05)); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+        .section-title-text { flex: 1; }
+        .section-title-max {
+            font-size: 11px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 3px 10px;
+            border-radius: 20px;
+            color: var(--text-muted);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05), transparent);
+            margin: 0 0 22px;
+        }
 
-        /* Bảng tổng điểm thời gian thực */
-        .live-total-panel { position: sticky; bottom: 20px; background: rgba(15, 16, 22, 0.95); backdrop-filter: blur(10px); border: 1px solid var(--accent); padding: 20px 30px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 10; }
-        .live-score-big { font-size: 32px; font-weight: 800; color: var(--accent); text-shadow: 0 0 10px rgba(79, 195, 247, 0.4); }
-        .live-tier-badge { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 30px; font-size: 14px; font-weight: bold; color: #ffcc00; }
+        /* Criterion rows */
+        .criterion-row {
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 14px 16px;
+            transition: var(--transition);
+        }
+        .criterion-row:hover {
+            background: rgba(79,195,247,0.03);
+            border-color: rgba(79,195,247,0.1);
+        }
+        .criterion-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+        .criterion-name { font-weight: 600; }
+        .criterion-score {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+        }
+        .criterion-score strong {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'Orbitron', sans-serif;
+            min-width: 24px;
+            text-align: center;
+        }
+        .criterion-score span { color: var(--text-muted); }
 
-        /* DESIGN BẢNG XẾP HẠNG */
-        .filter-bar { display: flex; gap: 15px; align-items: center; margin-bottom: 25px; background: #111116; padding: 15px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        select { background: #0f1014; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 10px 15px; border-radius: 8px; font-size: 14px; outline: none; cursor: pointer; font-family: inherit; }
-        
-        .leaderboard-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
-        th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        th { background: rgba(255,255,255,0.02); color: #a0a0a0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .rank-cell { font-weight: 800; font-size: 18px; width: 60px; text-align: center; }
-        .rank-1 { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        .rank-2 { color: #c0c0c0; }
-        .rank-3 { color: #cd7f32; }
-        
-        .book-title-cell { font-weight: 700; color: #fff; font-size: 16px; }
-        .book-cate-tag { background: rgba(255,255,255,0.05); padding: 3px 10px; border-radius: 12px; font-size: 12px; color: #a0a0a0; margin-left: 8px; }
-        .tier-badge-table { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; }
-        .tier-master { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
-        .tier-recom { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
-        .tier-aver { background: rgba(241, 196, 15, 0.15); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.3); }
-        .tier-weak { background: rgba(149, 165, 166, 0.15); color: #95a5a6; border: 1px solid rgba(149, 165, 166, 0.3); }
+        /* Sliders */
+        .slider-wrapper { display: flex; align-items: center; gap: 12px; }
+        input[type="range"] {
+            flex: 1;
+            -webkit-appearance: none;
+            background: rgba(255,255,255,0.06);
+            height: 6px;
+            border-radius: 99px;
+            outline: none;
+            cursor: pointer;
+            position: relative;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4fc3f7, #818cf8);
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(79,195,247,0.5), 0 2px 8px rgba(0,0,0,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+            box-shadow: 0 0 20px rgba(79,195,247,0.7), 0 2px 8px rgba(0,0,0,0.4);
+        }
+        input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.1);
+        }
 
-        .submit-btn { background: var(--accent); color: #000; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.3s; }
-        .submit-btn:hover { background: #29b6f6; box-shadow: 0 0 20px rgba(79, 195, 247, 0.4); }
-        /* ==========================================================================
-   MOBILE-FIRST OPTIMIZATION (Áp dụng cho màn hình < 600px)
-   ========================================================================== */
-@media (max-width: 600px) {
-    body { 
-        padding: 15px 12px; 
-        padding-bottom: 140px; /* Tạo khoảng trống ở đáy để không bị thanh điểm đè lên nội dung */
-    }
+        /* ============================================================
+           LIVE SCORE PANEL
+           ============================================================ */
+        .live-total-panel {
+            position: sticky;
+            bottom: 20px;
+            background: rgba(6,6,18,0.92);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(79,195,247,0.3);
+            padding: 18px 28px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 0 40px rgba(79,195,247,0.1), 0 20px 50px rgba(0,0,0,0.7);
+            z-index: 100;
+            animation: panelPulse 3s ease-in-out infinite alternate;
+        }
+        @keyframes panelPulse {
+            from { box-shadow: 0 0 20px rgba(79,195,247,0.08), 0 20px 50px rgba(0,0,0,0.7); }
+            to   { box-shadow: 0 0 40px rgba(79,195,247,0.18), 0 20px 50px rgba(0,0,0,0.7); }
+        }
+        .live-panel-item { display: flex; flex-direction: column; gap: 4px; }
+        .live-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .live-score-big {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #4fc3f7, #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+        .live-score-max {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-text-fill-color: var(--text-muted);
+        }
+        .live-tier-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 7px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gold);
+            transition: var(--transition);
+        }
 
-    /* Đưa thanh điều hướng về dạng hàng dọc gọn gàng */
-    .nav-header { 
-        flex-direction: column; 
-        align-items: flex-start; 
-        gap: 8px; 
-        margin-bottom: 20px; 
-    }
-    .nav-header h1 { font-size: 20px; }
+        /* Submit button */
+        .submit-btn {
+            background: linear-gradient(135deg, #4fc3f7, #818cf8);
+            color: #06060f;
+            border: none;
+            padding: 13px 28px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -60%;
+            width: 40%;
+            height: 200%;
+            background: rgba(255,255,255,0.2);
+            transform: skewX(-20deg);
+            transition: 0.6s;
+        }
+        .submit-btn:hover::before { left: 120%; }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(79,195,247,0.4), 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .submit-btn:active { transform: translateY(0); }
 
-    /* Thu nhỏ các tab điều khiển */
-    .tabs-container { gap: 8px; margin-bottom: 20px; }
-    .tab-btn { 
-        padding: 12px 8px; 
-        font-size: 14px; 
-        border-radius: 10px; 
-    }
-
-    /* Thu nhỏ khoảng cách trong hộp Console */
-    .console-box { 
-        padding: 20px 15px; 
-        border-radius: 14px; 
-        margin-bottom: 15px; 
-    }
-    .section-title { 
-        font-size: 15px; 
-        margin: 25px 0 15px 0; 
-    }
-
-    /* === TỐI ƯU HÓA KHU VỰC TIÊU CHÍ & SLIDER (NHÂN VẬT, CỐT TRUYỆN...) === */
-    .criterion-row { 
-        margin-bottom: 20px; 
-        background: rgba(255, 255, 255, 0.02);
-        padding: 10px;
-        border-radius: 8px;
-    }
-    .criterion-info { font-size: 14px; }
-    
-    /* Làm thanh slider dày hơn và núm kéo to hơn để ngón tay dễ chạm */
-    input[type="range"] { 
-        height: 8px; 
-    }
-    input[type="range"]::-webkit-slider-thumb { 
-        width: 24px;  /* Tăng kích thước từ 18px lên 24px */
-        height: 24px; 
-        box-shadow: 0 0 12px var(--accent);
-    }
-    .score-counter { font-size: 15px; }
-
-    /* === TÁI CẤU TRÚC THANH TỔNG ĐIỂM ĐÁY MÀN HÌNH (LIVE PANEL) === */
-    .live-total-panel { 
-        position: fixed; /* Chuyển từ sticky sang fixed hẳn dưới đáy màn hình */
-        bottom: 0; 
-        left: 0; 
-        right: 0; 
-        border-radius: 20px 20px 0 0; /* Bo tròn 2 góc trên */
-        border-width: 1px 0 0 0; /* Chỉ giữ lại viền trên */
-        padding: 15px 20px; 
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* Chia làm 2 cột */
-        gap: 12px;
-        box-shadow: 0 -10px 30px rgba(0,0,0,0.7);
-    }
-    
-    .live-score-big { font-size: 28px; }
-    .live-tier-badge { 
-        padding: 4px 10px; 
-        font-size: 12px; 
-        display: inline-block;
-        max-width: 130px;
-        white-size: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    /* Nút bấm kéo dài full màn hình ở hàng dưới */
-    .live-total-panel > div:last-child {
-        grid-column: span 2; /* Chiếm toàn bộ chiều rộng hàng dưới */
-    }
-    .submit-btn { 
-        width: 100%; 
-        padding: 14px; 
-        font-size: 16px; 
-        border-radius: 10px;
-    }
-
-    /* === BẢNG XẾP HẠNG TRÊN MOBILE === */
-    .filter-bar { 
-        flex-direction: column; 
-        align-items: stretch; 
-        gap: 10px; 
-        padding: 12px; 
-    }
-    select { width: 100%; box-sizing: border-box; }
-    
-    /* Ẩn bớt cột không quan trọng trên điện thoại để tránh tràn bảng */
-    th:nth-child(3), td:nth-child(3) { display: none; } 
-    th, td { padding: 12px 10px; }
-    .book-title-cell { font-size: 14px; }
-    .book-cate-tag { display: block; margin-left: 0; margin-top: 4px; width: max-content; }
-}
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 600px) {
+            body { padding-bottom: 0; }
+            .page-wrapper { padding: 0 12px 160px; }
+            .back-home { position: static; margin-bottom: 16px; width: fit-content; }
+            .hero-header { padding: 20px 0 25px; align-items: flex-start; text-align: left; }
+            .hero-header::after { left: 0; transform: none; width: 100%; }
+            .hero-title { font-size: 20px; }
+            .tabs-container { gap: 6px; margin: 20px 0 18px; padding: 5px; }
+            .tab-btn { padding: 12px 8px; font-size: 13px; gap: 6px; flex-direction: column; gap: 4px; border-radius: 10px; }
+            .tab-btn i { font-size: 15px; }
+            .console-box { padding: 20px 16px; border-radius: 16px; margin-bottom: 16px; }
+            .criterion-row { padding: 12px; }
+            .criterion-info { font-size: 13px; }
+            .section-title { font-size: 11px; gap: 8px; }
+            .section-title-icon { width: 30px; height: 30px; font-size: 13px; border-radius: 8px; }
+            th:nth-child(3), td:nth-child(3) { display: none; }
+            th, td { padding: 12px 12px; }
+            .book-title-cell { font-size: 14px; }
+            .score-cell { font-size: 18px; }
+            .live-total-panel {
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                border-radius: 20px 20px 0 0;
+                border: none;
+                border-top: 1px solid rgba(79,195,247,0.3);
+                padding: 14px 16px 18px;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            .live-total-panel > *:last-child { grid-column: span 2; }
+            .submit-btn { width: 100%; justify-content: center; padding: 14px; font-size: 15px; border-radius: 12px; }
+            .live-score-big { font-size: 28px; }
+            .filter-bar { flex-direction: column; align-items: stretch; padding: 12px; }
+            select { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="nav-header">
-        <h1 style="margin:0; font-size: 24px; color: var(--accent); font-family: serif; letter-spacing: 1px;">ANALYTICS CONSOLE</h1>
-        <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+<div class="page-wrapper">
+
+    <!-- ========== HERO HEADER ========== -->
+    <div class="hero-header">
+        <a href="index.html" class="back-home">
+            <i class="fa-solid fa-arrow-left"></i> Trang chủ
+        </a>
+        <div class="hero-eyebrow">Analytics Console</div>
+        <h1 class="hero-title">BẢNG XẾP HẠNG & ĐÁNH GIÁ</h1>
+        <p class="hero-subtitle">Hệ thống phân tích tác phẩm đa tiêu chí chuyên sâu</p>
     </div>
 
+    <!-- ========== TABS ========== -->
     <div class="tabs-container">
-        <button class="tab-btn active" onclick="switchTab('leaderboard-sec', this)"><i class="fa-solid fa-trophy"></i> Bảng Xếp Hạng Truyện</button>
-        <button class="tab-btn" onclick="switchTab('review-form-sec', this)"><i class="fa-solid fa-pen-fancy"></i> Chấm Điểm Tác Phẩm</button>
+        <button class="tab-btn active" id="tab-leaderboard" onclick="switchTab('leaderboard-sec', this)">
+            <i class="fa-solid fa-trophy"></i>
+            <span>Bảng Xếp Hạng Truyện</span>
+        </button>
+        <button class="tab-btn" id="tab-review" onclick="switchTab('review-form-sec', this)">
+            <i class="fa-solid fa-pen-fancy"></i>
+            <span>Chấm Điểm Tác Phẩm</span>
+        </button>
     </div>
 
+    <!-- ========== SECTION: LEADERBOARD ========== -->
     <section id="leaderboard-sec" class="view-section active">
         <div class="filter-bar">
-            <span style="color:#a0a0a0; font-size:14px;"><i class="fa-solid fa-filter"></i> Phân loại xếp hạng:</span>
+            <span><i class="fa-solid fa-filter"></i> Phân loại:</span>
             <select id="leaderboardCateFilter">
                 <option value="all">🏆 Bảng Xếp Hạng Chung (Tất cả thể loại)</option>
             </select>
@@ -199,244 +726,331 @@
         <table class="leaderboard-table">
             <thead>
                 <tr>
-                    <th style="text-align: center;">Hạng</th>
+                    <th style="text-align:center;">Hạng</th>
                     <th>Tác phẩm / Tác giả</th>
-                    <th>Xếp loại cấu trúc</th>
-                    <th style="text-align: right;">Tổng điểm</th>
+                    <th>Xếp loại</th>
+                    <th style="text-align:right; padding-right:24px;">Điểm</th>
                 </tr>
             </thead>
             <tbody id="leaderboardBody"></tbody>
         </table>
     </section>
 
+    <!-- ========== SECTION: REVIEW FORM ========== -->
     <section id="review-form-sec" class="view-section">
+
+        <!-- Chọn truyện -->
         <div class="console-box">
-            <div class="criterion-row" style="margin-bottom: 0;">
-                <label style="display:block; margin-bottom:10px; color:#a0a0a0; font-size:14px;">Chọn tác phẩm bạn muốn tiến hành chấm điểm:</label>
-                <select id="bookSelectToRate" style="width:100%; max-width:500px; font-size:15px; padding:12px; background:#0f1014;"></select>
+            <div class="book-select-wrapper">
+                <label><i class="fa-solid fa-book-open" style="color:var(--accent); margin-right:6px;"></i> Chọn tác phẩm muốn chấm điểm</label>
+                <select id="bookSelectToRate"></select>
             </div>
         </div>
 
-        <div class="console-box" style="padding-bottom: 10px;">
-            <div class="section-title">1. CỐT TRUYỆN VÀ CẤU TRÚC (PLOT & STRUCTURE) — TỐI ĐA 25 ĐIỂM</div>
+        <!-- Form scoring -->
+        <div class="console-box" style="padding-bottom:16px;">
+
+            <!-- 1. CỐT TRUYỆN -->
+            <div class="section-title">
+                <div class="section-title-icon si-plot"><i class="fa-solid fa-diagram-project"></i></div>
+                <div class="section-title-text">1. Cốt Truyện & Cấu Trúc <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(Plot & Structure)</span></div>
+                <span class="section-title-max">Tối đa 25đ</span>
+            </div>
+            <div class="section-divider"></div>
+
             <div class="criterion-row">
-                <div class="criterion-info"><span>Tính logic & Chặt chẽ</span><span><strong id="v_plotLogic">5</strong> / 10đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Tính logic & Chặt chẽ</span>
+                    <div class="criterion-score"><strong id="v_plotLogic">5</strong><span>/ 10đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_plotLogic" min="0" max="10" value="5"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Nhịp độ truyện (Pacing)</span><span><strong id="v_plotPacing">4</strong> / 8đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Nhịp độ truyện (Pacing)</span>
+                    <div class="criterion-score"><strong id="v_plotPacing">4</strong><span>/ 8đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_plotPacing" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Sự sáng tạo & Đột phá (Plot twist)</span><span><strong id="v_plotCreativity">4</strong> / 7đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Sự sáng tạo & Đột phá (Plot twist)</span>
+                    <div class="criterion-score"><strong id="v_plotCreativity">4</strong><span>/ 7đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_plotCreativity" min="0" max="7" value="4"></div>
             </div>
 
-            <div class="section-title">2. XÂY DỰNG NHÂN VẬT (CHARACTER DEVELOPMENT) — TỐI ĐA 25 ĐIỂM</div>
+            <!-- 2. NHÂN VẬT -->
+            <div class="section-title">
+                <div class="section-title-icon si-char"><i class="fa-solid fa-users"></i></div>
+                <div class="section-title-text">2. Xây Dựng Nhân Vật <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(Character Development)</span></div>
+                <span class="section-title-max">Tối đa 25đ</span>
+            </div>
+            <div class="section-divider"></div>
+
             <div class="criterion-row">
-                <div class="criterion-info"><span>Độ sâu tâm lý (Đa chiều)</span><span><strong id="v_charDepth">5</strong> / 10đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Độ sâu tâm lý (Đa chiều)</span>
+                    <div class="criterion-score"><strong id="v_charDepth">5</strong><span>/ 10đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_charDepth" min="0" max="10" value="5"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Hành trình trưởng thành/Biến cố</span><span><strong id="v_charGrowth">4</strong> / 8đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Hành trình trưởng thành / Biến cố</span>
+                    <div class="criterion-score"><strong id="v_charGrowth">4</strong><span>/ 8đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_charGrowth" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Động cơ & Tương tác phản ứng</span><span><strong id="v_charInteraction">4</strong> / 7đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Động cơ & Tương tác phản ứng</span>
+                    <div class="criterion-score"><strong id="v_charInteraction">4</strong><span>/ 7đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_charInteraction" min="0" max="7" value="4"></div>
             </div>
 
-            <div class="section-title">3. VĂN PHONG VÀ NGÔN TỪ (WRITING STYLE) — TỐI ĐA 20 ĐIỂM</div>
+            <!-- 3. VĂN PHONG -->
+            <div class="section-title">
+                <div class="section-title-icon si-style"><i class="fa-solid fa-feather-pointed"></i></div>
+                <div class="section-title-text">3. Văn Phong & Ngôn Từ <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(Writing Style)</span></div>
+                <span class="section-title-max">Tối đa 20đ</span>
+            </div>
+            <div class="section-divider"></div>
+
             <div class="criterion-row">
-                <div class="criterion-info"><span>Kỹ thuật viết & Dùng từ giàu hình ảnh</span><span><strong id="v_styleTechnique">5</strong> / 10đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Kỹ thuật viết & Dùng từ giàu hình ảnh</span>
+                    <div class="criterion-score"><strong id="v_styleTechnique">5</strong><span>/ 10đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_styleTechnique" min="0" max="10" value="5"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Lời thoại tự nhiên, cá tính</span><span><strong id="v_styleDialogue">5</strong> / 10đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Lời thoại tự nhiên, cá tính</span>
+                    <div class="criterion-score"><strong id="v_styleDialogue">5</strong><span>/ 10đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_styleDialogue" min="0" max="10" value="5"></div>
             </div>
 
-            <div class="section-title">4. BỐI CẢNH VÀ THẾ GIỚI (WORLD-BUILDING) — TỐI ĐA 15 ĐIỂM</div>
+            <!-- 4. BỐI CẢNH -->
+            <div class="section-title">
+                <div class="section-title-icon si-world"><i class="fa-solid fa-globe"></i></div>
+                <div class="section-title-text">4. Bối Cảnh & Thế Giới <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(World-Building)</span></div>
+                <span class="section-title-max">Tối đa 15đ</span>
+            </div>
+            <div class="section-divider"></div>
+
             <div class="criterion-row">
-                <div class="criterion-info"><span>Độ chân thực & Sống động</span><span><strong id="v_worldRealism">4</strong> / 8đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Độ chân thực & Sống động</span>
+                    <div class="criterion-score"><strong id="v_worldRealism">4</strong><span>/ 8đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_worldRealism" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Tính đồng nhất của quy luật</span><span><strong id="v_worldConsistency">4</strong> / 7đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Tính đồng nhất của quy luật</span>
+                    <div class="criterion-score"><strong id="v_worldConsistency">4</strong><span>/ 7đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_worldConsistency" min="0" max="7" value="4"></div>
             </div>
 
-            <div class="section-title">5. THÔNG ĐIỆP VÀ ẤN TƯỢNG (THEME & IMPACT) — TỐI ĐA 15 ĐIỂM</div>
+            <!-- 5. ẤN TƯỢNG -->
+            <div class="section-title">
+                <div class="section-title-icon si-impact"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                <div class="section-title-text">5. Thông Điệp & Ấn Tượng <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(Theme & Impact)</span></div>
+                <span class="section-title-max">Tối đa 15đ</span>
+            </div>
+            <div class="section-divider"></div>
+
             <div class="criterion-row">
-                <div class="criterion-info"><span>Giá trị nhân văn / Thông điệp cuộc sống</span><span><strong id="v_impactTheme">4</strong> / 8đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Giá trị nhân văn / Thông điệp cuộc sống</span>
+                    <div class="criterion-score"><strong id="v_impactTheme">4</strong><span>/ 8đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_impactTheme" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Cảm xúc đọng lại (Độ bánh cuốn)</span><span><strong id="v_impactEmotion">4</strong> / 7đ</span></div>
+                <div class="criterion-info">
+                    <span class="criterion-name">Cảm xúc đọng lại (Độ bánh cuốn)</span>
+                    <div class="criterion-score"><strong id="v_impactEmotion">4</strong><span>/ 7đ</span></div>
+                </div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_impactEmotion" min="0" max="7" value="4"></div>
             </div>
+
         </div>
 
+        <!-- LIVE SCORE PANEL -->
         <div class="live-total-panel">
-            <div>
-                <span style="font-size:13px; color:#a0a0a0; display:block; margin-bottom:5px;">DỰ KIẾN XẾP LOẠI</span>
-                <div class="live-tier-badge" id="liveTierDisplay">Tạm ổn / Average</div>
+            <div class="live-panel-item">
+                <div class="live-label">Dự kiến xếp loại</div>
+                <div class="live-tier-badge" id="liveTierDisplay">
+                    <i class="fa-solid fa-star"></i> Tạm ổn / Average
+                </div>
             </div>
-            <div style="text-align: right;">
-                <span style="font-size:13px; color:#a0a0a0; display:block; margin-bottom:5px;">TỔNG ĐIỂM LIVE</span>
-                <div class="live-score-big"><span id="liveTotalScore">52</span> <span style="font-size:16px; color:#666;">/ 100</span></div>
+            <div class="live-panel-item" style="text-align:right;">
+                <div class="live-label">Tổng điểm live</div>
+                <div class="live-score-big">
+                    <span id="liveTotalScore">52</span>
+                    <span class="live-score-max">/ 100</span>
+                </div>
             </div>
             <div>
-                <button class="submit-btn" id="submitReviewBtn"><i class="fa-solid fa-cloud-arrow-up"></i> Khóa điểm & Đăng</button>
+                <button class="submit-btn" id="submitReviewBtn">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Khóa điểm & Đăng
+                </button>
             </div>
         </div>
+
     </section>
 
-    <script>
-        const SERVER_URL = "https://thuvienbackend.onrender.com";
+</div><!-- end .page-wrapper -->
 
-        // Tab Switcher Logic
-        function switchTab(sectionId, btn) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(sectionId).classList.add('active');
-            btn.classList.add('active');
-            if (sectionId === 'leaderboard-sec') loadLeaderboard();
-        }
+<script>
+    const SERVER_URL = "https://thuvienbackend.onrender.com";
 
-        // Thực thi đo điểm số thời gian thực (Live engine calculation)
-        const sliders = document.querySelectorAll('.score-slider');
-        sliders.forEach(slider => {
-            slider.addEventListener('input', (e) => {
-                const targetId = e.target.getAttribute('data-target');
-                document.getElementById(targetId).innerText = e.target.value;
-                calculateLiveTotal();
-            });
+    // Tab Switcher Logic
+    function switchTab(sectionId, btn) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+        btn.classList.add('active');
+        if (sectionId === 'leaderboard-sec') loadLeaderboard();
+    }
+
+    // Thực thi đo điểm số thời gian thực (Live engine calculation)
+    const sliders = document.querySelectorAll('.score-slider');
+    sliders.forEach(slider => {
+        slider.addEventListener('input', (e) => {
+            const targetId = e.target.getAttribute('data-target');
+            document.getElementById(targetId).innerText = e.target.value;
+            calculateLiveTotal();
         });
+    });
 
-        function calculateLiveTotal() {
-            let total = 0;
-            sliders.forEach(s => total += Number(s.value));
-            document.getElementById('liveTotalScore').innerText = total;
+    function calculateLiveTotal() {
+        let total = 0;
+        sliders.forEach(s => total += Number(s.value));
+        document.getElementById('liveTotalScore').innerText = total;
 
-            const badge = document.getElementById('liveTierDisplay');
-            if (total >= 90) { badge.innerText = "Siêu phẩm / Masterpiece"; badge.style.color = "#e74c3c"; }
-            else if (total >= 75) { badge.innerText = "Truyện Hay / Recommended"; badge.style.color = "#2ecc71"; }
-            else if (total >= 50) { badge.innerText = "Tạm ổn / Average"; badge.style.color = "#f1c40f"; }
-            else { badge.innerText = "Yếu / Không khuyến khích"; badge.style.color = "#95a5a6"; }
-        }
+        const badge = document.getElementById('liveTierDisplay');
+        if (total >= 90) { badge.innerHTML = `<i class="fa-solid fa-crown"></i> Siêu phẩm / Masterpiece`; badge.style.color = "#fca5a5"; badge.style.borderColor = "rgba(239,68,68,0.4)"; }
+        else if (total >= 75) { badge.innerHTML = `<i class="fa-solid fa-thumbs-up"></i> Truyện Hay / Recommended`; badge.style.color = "#6ee7b7"; badge.style.borderColor = "rgba(16,185,129,0.4)"; }
+        else if (total >= 50) { badge.innerHTML = `<i class="fa-solid fa-star"></i> Tạm ổn / Average`; badge.style.color = "#fcd34d"; badge.style.borderColor = "rgba(245,158,11,0.4)"; }
+        else { badge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Yếu / Không khuyến khích`; badge.style.color = "#94a3b8"; badge.style.borderColor = "rgba(100,116,139,0.3)"; }
+    }
 
-        // Tải danh sách truyện và sinh bộ lọc thể loại động (Dynamic filters)
-        async function loadReviewCoreData() {
-            try {
-                const res = await fetch(`${SERVER_URL}/api/books`);
-                const books = await res.json();
-                
-                // Đổ vào select chọn truyện để đánh giá
-                const bookSelect = document.getElementById('bookSelectToRate');
-                bookSelect.innerHTML = "";
-                books.forEach(b => {
-                    bookSelect.innerHTML += `<option value="${b._id}">${b.title} [${b.author}]</option>`;
-                });
+    // Tải danh sách truyện và sinh bộ lọc thể loại động (Dynamic filters)
+    async function loadReviewCoreData() {
+        try {
+            const res = await fetch(`${SERVER_URL}/api/books`);
+            const books = await res.json();
+            
+            const bookSelect = document.getElementById('bookSelectToRate');
+            bookSelect.innerHTML = "";
+            books.forEach(b => {
+                bookSelect.innerHTML += `<option value="${b._id}">${b.title} [${b.author}]</option>`;
+            });
 
-                // Đổ các thể loại duy nhất vào select bộ lọc bảng xếp hạng
-                const cateFilter = document.getElementById('leaderboardCateFilter');
-                const uniqueCategories = [...new Set(books.map(b => b.category))];
-                uniqueCategories.forEach(cat => {
-                    cateFilter.innerHTML += `<option value="${cat}">📁 Xếp Hạng Riêng: Thể loại ${cat}</option>`;
-                });
+            const cateFilter = document.getElementById('leaderboardCateFilter');
+            const uniqueCategories = [...new Set(books.map(b => b.category))];
+            uniqueCategories.forEach(cat => {
+                cateFilter.innerHTML += `<option value="${cat}">📁 Xếp Hạng Riêng: Thể loại ${cat}</option>`;
+            });
 
-                loadLeaderboard();
-            } catch(err) { console.error(err); }
-        }
+            loadLeaderboard();
+        } catch(err) { console.error(err); }
+    }
 
-        // Tải danh sách bảng xếp hạng đám mây
-        async function loadLeaderboard() {
-            const filterValue = document.getElementById('leaderboardCateFilter').value;
-            const tbody = document.getElementById('leaderboardBody');
-            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#a0a0a0;">Đang bóc tách dữ liệu xếp hạng đám mây...</td></tr>`;
+    // Tải danh sách bảng xếp hạng đám mây
+    async function loadLeaderboard() {
+        const filterValue = document.getElementById('leaderboardCateFilter').value;
+        const tbody = document.getElementById('leaderboardBody');
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:40px;"><i class="fa-solid fa-spinner fa-spin" style="color:var(--accent);margin-right:8px;"></i>Đang bóc tách dữ liệu xếp hạng đám mây...</td></tr>`;
 
-            try {
-                const res = await fetch(`${SERVER_URL}/api/reviews/leaderboard?category=${filterValue}`);
-                const leaderboard = await res.json();
-                tbody.innerHTML = "";
+        try {
+            const res = await fetch(`${SERVER_URL}/api/reviews/leaderboard?category=${filterValue}`);
+            const leaderboard = await res.json();
+            tbody.innerHTML = "";
 
-                if (leaderboard.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#666;">Chưa có tác phẩm nào thuộc nhóm này được chấm điểm xếp hạng.</td></tr>`;
-                    return;
-                }
-
-                leaderboard.forEach((item, index) => {
-                    if (!item.bookId) return; // Bỏ qua nếu truyện gốc bị xóa
-                    
-                    let rankClass = `rank-cell`;
-                    let rankDisplay = index + 1;
-                    if (index === 0) rankClass += " rank-1";
-                    else if (index === 1) rankClass += " rank-2";
-                    else if (index === 2) rankClass += " rank-3";
-
-                    let badgeClass = "tier-badge-table";
-                    if (item.totalScore >= 90) badgeClass += " tier-master";
-                    else if (item.totalScore >= 75) badgeClass += " tier-recom";
-                    else if (item.totalScore >= 50) badgeClass += " tier-aver";
-                    else badgeClass += " tier-weak";
-
-                    tbody.innerHTML += `
-                        <tr>
-                            <td class="${rankClass}">${rankDisplay}</td>
-                            <td>
-                                <div class="book-title-cell">${item.bookId.title}<span class="book-cate-tag">${item.bookId.category}</span></div>
-                                <div style="font-size:13px; color:#666; margin-top:4px;">✍️ Tác giả: ${item.bookId.author}</div>
-                            </td>
-                            <td><span class="${badgeClass}">${item.tier}</span></td>
-                            <td style="text-align: right; font-weight: bold; font-size: 18px; color: var(--accent);">${item.totalScore}đ</td>
-                        </tr>
-                    `;
-                });
-            } catch(err) {
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#ff4757;">Lỗi đồng bộ bảng xếp hạng!</td></tr>`;
+            if (leaderboard.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:50px;">Chưa có tác phẩm nào thuộc nhóm này được chấm điểm xếp hạng.</td></tr>`;
+                return;
             }
+
+            leaderboard.forEach((item, index) => {
+                if (!item.bookId) return;
+                
+                let rankClass = `rank-cell`;
+                let rankDisplay = `<span class="rank-other">${index + 1}</span>`;
+                if (index === 0) { rankClass += " rank-1"; rankDisplay = `<span class="rank-medal">🥇</span>`; }
+                else if (index === 1) { rankClass += " rank-2"; rankDisplay = `<span class="rank-medal">🥈</span>`; }
+                else if (index === 2) { rankClass += " rank-3"; rankDisplay = `<span class="rank-medal">🥉</span>`; }
+
+                let badgeClass = "tier-badge-table";
+                let badgeIcon = "fa-star";
+                if (item.totalScore >= 90) { badgeClass += " tier-master"; badgeIcon = "fa-crown"; }
+                else if (item.totalScore >= 75) { badgeClass += " tier-recom"; badgeIcon = "fa-thumbs-up"; }
+                else if (item.totalScore >= 50) { badgeClass += " tier-aver"; badgeIcon = "fa-star"; }
+                else { badgeClass += " tier-weak"; badgeIcon = "fa-minus"; }
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="${rankClass}">${rankDisplay}</td>
+                        <td>
+                            <div class="book-title-cell">${item.bookId.title}<span class="book-cate-tag">${item.bookId.category}</span></div>
+                            <div class="book-author"><i class="fa-solid fa-pen-nib" style="font-size:10px;"></i> ${item.bookId.author}</div>
+                        </td>
+                        <td><span class="${badgeClass}"><i class="fa-solid ${badgeIcon}"></i>${item.tier}</span></td>
+                        <td class="score-cell">${item.totalScore}<small>đ</small></td>
+                    </tr>
+                `;
+            });
+        } catch(err) {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#ef4444; padding:40px;"><i class="fa-solid fa-circle-exclamation"></i> Lỗi đồng bộ bảng xếp hạng!</td></tr>`;
         }
+    }
 
-        document.getElementById('leaderboardCateFilter').addEventListener('change', loadLeaderboard);
+    document.getElementById('leaderboardCateFilter').addEventListener('change', loadLeaderboard);
 
-        // Gửi thông tin đánh giá lên lưu trữ đám mây
-        document.getElementById('submitReviewBtn').onclick = async () => {
-            const bookId = document.getElementById('bookSelectToRate').value;
-            if(!bookId) return alert("Vui lòng bổ sung tác phẩm để chấm điểm!");
+    // Gửi thông tin đánh giá lên lưu trữ đám mây
+    document.getElementById('submitReviewBtn').onclick = async () => {
+        const bookId = document.getElementById('bookSelectToRate').value;
+        if(!bookId) return alert("Vui lòng bổ sung tác phẩm để chấm điểm!");
 
-            const scores = {
-                plotLogic: document.querySelector('[data-target="v_plotLogic"]').value,
-                plotPacing: document.querySelector('[data-target="v_plotPacing"]').value,
-                plotCreativity: document.querySelector('[data-target="v_plotCreativity"]').value,
-                charDepth: document.querySelector('[data-target="v_charDepth"]').value,
-                charGrowth: document.querySelector('[data-target="v_charGrowth"]').value,
-                charInteraction: document.querySelector('[data-target="v_charInteraction"]').value,
-                styleTechnique: document.querySelector('[data-target="v_styleTechnique"]').value,
-                styleDialogue: document.querySelector('[data-target="v_styleDialogue"]').value,
-                worldRealism: document.querySelector('[data-target="v_worldRealism"]').value,
-                worldConsistency: document.querySelector('[data-target="v_worldConsistency"]').value,
-                impactTheme: document.querySelector('[data-target="v_impactTheme"]').value,
-                impactEmotion: document.querySelector('[data-target="v_impactEmotion"]').value
-            };
-
-            try {
-                const res = await fetch(`${SERVER_URL}/api/reviews`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ bookId, scores })
-                });
-
-                if (res.ok) {
-                    alert("🎉 Hệ thống đã đồng bộ điểm số và cập nhật thứ hạng đám mây!");
-                    switchTab('leaderboard-sec', document.querySelectorAll('.tab-btn')[0]);
-                } else {
-                    alert("Xử lý đánh giá thất bại!");
-                }
-            } catch (err) { alert("Mất kết nối server!"); }
+        const scores = {
+            plotLogic: document.querySelector('[data-target="v_plotLogic"]').value,
+            plotPacing: document.querySelector('[data-target="v_plotPacing"]').value,
+            plotCreativity: document.querySelector('[data-target="v_plotCreativity"]').value,
+            charDepth: document.querySelector('[data-target="v_charDepth"]').value,
+            charGrowth: document.querySelector('[data-target="v_charGrowth"]').value,
+            charInteraction: document.querySelector('[data-target="v_charInteraction"]').value,
+            styleTechnique: document.querySelector('[data-target="v_styleTechnique"]').value,
+            styleDialogue: document.querySelector('[data-target="v_styleDialogue"]').value,
+            worldRealism: document.querySelector('[data-target="v_worldRealism"]').value,
+            worldConsistency: document.querySelector('[data-target="v_worldConsistency"]').value,
+            impactTheme: document.querySelector('[data-target="v_impactTheme"]').value,
+            impactEmotion: document.querySelector('[data-target="v_impactEmotion"]').value
         };
 
-        document.addEventListener('DOMContentLoaded', loadReviewCoreData);
-    </script>
+        try {
+            const res = await fetch(`${SERVER_URL}/api/reviews`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookId, scores })
+            });
+
+            if (res.ok) {
+                alert("🎉 Hệ thống đã đồng bộ điểm số và cập nhật thứ hạng đám mây!");
+                switchTab('leaderboard-sec', document.querySelectorAll('.tab-btn')[0]);
+            } else {
+                alert("Xử lý đánh giá thất bại!");
+            }
+        } catch (err) { alert("Mất kết nối server!"); }
+    };
+
+    document.addEventListener('DOMContentLoaded', loadReviewCoreData);
+</script>
 </body>
 </html>

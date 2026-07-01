@@ -4,465 +4,985 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Xếp Hạng Nhân Vật | Luxury Library</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="description" content="Bảng xếp hạng nhân vật nam nữ và hệ thống chấm điểm nhân vật tại Luxury Library.">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        :root { --bg-dark: #0a0a0f; --card-bg: #161622; --accent: #ff7675; --accent-blue: #4fc3f7;}
-        body { background: var(--bg-dark); color: #fff; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        
-        .nav-header { width: 100%; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .back-home { color: #a0a0a0; text-decoration: none; font-size: 15px; transition: 0.3s; }
-        .back-home:hover { color: var(--accent-blue); }
+        /* ============================================================
+           DESIGN TOKENS
+           ============================================================ */
+        :root {
+            --bg-dark: #06060f;
+            --card-bg: rgba(14, 14, 24, 0.88);
+            --card-border: rgba(255,255,255,0.07);
+            --blue: #4fc3f7;
+            --blue-rgb: 79,195,247;
+            --pink: #f472b6;
+            --pink-rgb: 244,114,182;
+            --gold: #f59e0b;
+            --gold-rgb: 245,158,11;
+            --purple: #818cf8;
+            --green: #10b981;
+            --red: #ef4444;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --text-muted: #475569;
+            --glass: rgba(255,255,255,0.04);
+            --glass-border: rgba(255,255,255,0.08);
+            --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-        /* TABS CONTROL */
-        .tabs-container { display: flex; gap: 15px; margin-bottom: 30px; width: 100%; max-width: 1000px; }
-        .tab-btn { flex: 1; background: #111116; border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #a0a0a0; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .tab-btn.active.tab-male { background: rgba(79, 195, 247, 0.15); color: #4fc3f7; border-color: #4fc3f7; box-shadow: 0 0 15px rgba(79, 195, 247, 0.1); }
-        .tab-btn.active.tab-female { background: rgba(255, 118, 117, 0.15); color: #ff7675; border-color: #ff7675; box-shadow: 0 0 15px rgba(255, 118, 117, 0.1); }
-        .tab-btn.active.tab-rate { background: rgba(241, 196, 15, 0.15); color: #f1c40f; border-color: #f1c40f; box-shadow: 0 0 15px rgba(241, 196, 15, 0.1); }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
-        .view-section { display: none; width: 100%; max-width: 1000px; }
+        body {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient glows */
+        .ambient-glow {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            filter: blur(80px);
+            opacity: 0.5;
+        }
+        .glow-blue {
+            top: -15%; left: -10%;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(79,195,247,0.12), transparent 70%);
+            animation: glowFloat 14s ease-in-out infinite alternate;
+        }
+        .glow-pink {
+            bottom: -15%; right: -10%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(244,114,182,0.1), transparent 70%);
+            animation: glowFloat 18s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes glowFloat {
+            from { transform: translate(0,0) scale(1); }
+            to   { transform: translate(4%,4%) scale(1.15); }
+        }
+
+        /* Premium scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-dark); }
+        ::-webkit-scrollbar-thumb { background: rgba(129,140,248,0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--purple); }
+
+        /* Page wrapper */
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 20px 60px;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        /* ============================================================
+           HERO HEADER
+           ============================================================ */
+        .hero-header {
+            width: 100%;
+            padding: 40px 0 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .hero-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 240px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--purple), transparent);
+        }
+        .hero-eyebrow {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, var(--blue), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(20px, 4vw, 34px);
+            font-weight: 900;
+            background: linear-gradient(135deg, #e0f2fe 0%, #818cf8 45%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+        .hero-subtitle {
+            margin-top: 10px;
+            font-size: 14px;
+            color: var(--text-dim);
+            font-style: italic;
+        }
+        .back-home {
+            position: absolute;
+            top: 40px; left: 0;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 13px; font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+        .back-home:hover {
+            color: var(--blue);
+            border-color: rgba(79,195,247,0.4);
+            background: rgba(79,195,247,0.08);
+            transform: translateX(-3px);
+        }
+
+        /* ============================================================
+           TAB NAVIGATION
+           ============================================================ */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            margin: 28px 0 24px;
+            width: 100%;
+            background: rgba(10,10,20,0.65);
+            padding: 6px;
+            border-radius: 18px;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+        }
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 14px 16px;
+            border-radius: 13px;
+            color: var(--text-dim);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+        .tab-btn i { font-size: 15px; transition: var(--transition); }
+
+        /* Tab male */
+        .tab-btn.active.tab-male {
+            background: rgba(79,195,247,0.12);
+            color: var(--blue);
+            box-shadow: 0 0 20px rgba(79,195,247,0.15), inset 0 1px 0 rgba(79,195,247,0.15);
+        }
+        .tab-btn.active.tab-male i { filter: drop-shadow(0 0 6px var(--blue)); }
+
+        /* Tab female */
+        .tab-btn.active.tab-female {
+            background: rgba(244,114,182,0.12);
+            color: var(--pink);
+            box-shadow: 0 0 20px rgba(244,114,182,0.15), inset 0 1px 0 rgba(244,114,182,0.15);
+        }
+        .tab-btn.active.tab-female i { filter: drop-shadow(0 0 6px var(--pink)); }
+
+        /* Tab rate */
+        .tab-btn.active.tab-rate {
+            background: rgba(245,158,11,0.12);
+            color: var(--gold);
+            box-shadow: 0 0 20px rgba(245,158,11,0.15), inset 0 1px 0 rgba(245,158,11,0.15);
+        }
+        .tab-btn.active.tab-rate i { filter: drop-shadow(0 0 6px var(--gold)); }
+        .tab-btn:hover:not(.active) { color: #fff; background: var(--glass); }
+
+        /* ============================================================
+           VIEW SECTIONS
+           ============================================================ */
+        .view-section { display: none; width: 100%; }
         .view-section.active { display: block; }
 
-        /* DESIGN CHO LEADERBOARD TABLE */
-        .leaderboard-table { width: 100%; border-collapse: collapse; background: var(--card-bg); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 15px 30px rgba(0,0,0,0.4); }
-        th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.04); }
-        th { background: rgba(255,255,255,0.02); color: #a0a0a0; font-size: 14px; font-weight: 600; text-transform: uppercase; }
-        
-        .rank-cell { font-weight: 800; font-size: 18px; width: 60px; text-align: center; }
-        .rank-1 { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        .rank-2 { color: #c0c0c0; }
-        .rank-3 { color: #cd7f32; }
+        /* ============================================================
+           LEADERBOARD CARDS
+           ============================================================ */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.55);
+            backdrop-filter: blur(20px);
+        }
+        thead tr {
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--card-border);
+        }
+        th {
+            padding: 16px 20px;
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            vertical-align: middle;
+        }
+        tbody tr { transition: var(--transition); }
+        tbody tr:hover { background: rgba(129,140,248,0.04); }
+        tbody tr:last-child td { border-bottom: none; }
 
-        .char-profile { display: flex; align-items: center; gap: 15px; }
-        .char-avatar { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,0.1); background: #000;}
-        .char-name { font-weight: 700; color: #fff; font-size: 16px; }
-        .book-origin-tag { font-size: 13px; color: #666; margin-top: 3px; }
+        /* Rank cell */
+        .rank-cell {
+            font-weight: 900; font-size: 20px;
+            width: 60px; text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .rank-1 { color: #fbbf24; filter: drop-shadow(0 0 8px rgba(251,191,36,0.5)); }
+        .rank-2 { color: #94a3b8; filter: drop-shadow(0 0 6px rgba(148,163,184,0.3)); }
+        .rank-3 { color: #cd7f32; filter: drop-shadow(0 0 6px rgba(205,127,50,0.3)); }
+        .rank-medal { font-size: 26px; }
+        .rank-other { color: var(--text-muted); font-size: 15px; }
 
-        .tier-badge-table { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; }
-        .tier-legend { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
-        .tier-fav { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
-        .tier-aver { background: rgba(241, 196, 15, 0.15); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.3); }
-        .tier-weak { background: rgba(149, 165, 166, 0.15); color: #95a5a6; border: 1px solid rgba(149, 165, 166, 0.3); }
+        /* Character profile */
+        .char-profile { display: flex; align-items: center; gap: 16px; }
+        .char-avatar-wrapper {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .char-avatar {
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            border: 2px solid rgba(255,255,255,0.12);
+            background: rgba(20,20,35,0.8);
+        }
+        .avatar-ring {
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            pointer-events: none;
+        }
+        .ring-legend  { border-color: rgba(239,68,68,0.6); box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+        .ring-fav     { border-color: rgba(16,185,129,0.6); box-shadow: 0 0 10px rgba(16,185,129,0.3); }
+        .ring-aver    { border-color: rgba(245,158,11,0.5); }
+        .ring-weak    { border-color: rgba(100,116,139,0.3); }
+        .char-name { font-weight: 700; color: var(--text-main); font-size: 16px; }
+        .book-origin-tag { font-size: 13px; color: var(--text-muted); margin-top: 4px; display: flex; align-items: center; gap: 5px; }
 
-        /* FORM ĐÁNH GIÁ CHẤM ĐIỂM */
-        .console-box { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 35px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); margin-bottom: 25px; }
-        .form-group-inline { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
-        .input-item { flex: 1; min-width: 220px; display: flex; flex-direction: column; gap: 8px; }
-        
-        label { color: #a0a0a0; font-size: 14px; }
-        input[type="text"], input[type="url"], select { background: #0f1014; color: #fff; border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; font-size: 15px; outline: none; font-family: inherit;}
-        input:focus, select:focus { border-color: var(--accent-blue); }
+        /* Tier badges */
+        .tier-badge-table {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 5px 14px; border-radius: 30px;
+            font-size: 12px; font-weight: 700;
+            white-space: nowrap;
+        }
+        .tier-legend {
+            background: linear-gradient(135deg,rgba(239,68,68,0.2),rgba(239,68,68,0.05));
+            color: #fca5a5; border: 1px solid rgba(239,68,68,0.35);
+            animation: legendPulse 2.5s ease-in-out infinite alternate;
+        }
+        @keyframes legendPulse {
+            from { box-shadow: 0 0 8px rgba(239,68,68,0.1); }
+            to   { box-shadow: 0 0 18px rgba(239,68,68,0.3); }
+        }
+        .tier-fav { background: linear-gradient(135deg,rgba(16,185,129,0.18),rgba(16,185,129,0.05)); color:#6ee7b7; border:1px solid rgba(16,185,129,0.3); }
+        .tier-aver { background: linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05)); color:#fcd34d; border:1px solid rgba(245,158,11,0.3); }
+        .tier-weak { background: rgba(100,116,139,0.1); color:#94a3b8; border:1px solid rgba(100,116,139,0.2); }
 
-        .section-title { font-size: 16px; color: #ffcc00; border-left: 4px solid #ffcc00; padding-left: 12px; margin: 30px 0 20px 0; font-weight: 700; letter-spacing: 0.5px;}
-        .criterion-row { margin-bottom: 20px; }
-        .criterion-info { display: flex; justify-content: space-between; font-size: 15px; color: #d4d4d8; margin-bottom: 8px; }
-        .criterion-info strong { color: var(--accent-blue); }
-        
+        /* Delete button */
+        .delete-char-btn {
+            background: transparent;
+            color: rgba(239,68,68,0.55);
+            border: 1px solid rgba(239,68,68,0.2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
+            margin-left: 10px;
+            transition: var(--transition);
+        }
+        .delete-char-btn:hover { background: rgba(239,68,68,0.12); color: #fca5a5; border-color: rgba(239,68,68,0.4); }
+
+        /* Score cell */
+        .score-cell {
+            text-align: right;
+            font-weight: 800;
+            font-size: 22px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .score-male { background: linear-gradient(135deg, #4fc3f7, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .score-female { background: linear-gradient(135deg, #f472b6, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .score-cell small { font-size: 12px; font-family:'Plus Jakarta Sans',sans-serif; color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); }
+
+        /* ============================================================
+           FORM CHẤM ĐIỂM
+           ============================================================ */
+        .console-box {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 28px 32px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            margin-bottom: 18px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+        .console-box::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(245,158,11,0.5), transparent);
+        }
+
+        /* Info fields */
+        .form-group-inline { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+        .input-item { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+        label {
+            color: var(--text-dim);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+        }
+        input[type="text"], input[type="url"], select {
+            background: rgba(10,10,20,0.8);
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            outline: none;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+        input[type="text"]:focus, input[type="url"]:focus, select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(245,158,11,0.12);
+        }
+
+        /* Avatar preview */
+        .avatar-url-wrapper { display: flex; gap: 12px; align-items: center; }
+        .avatar-preview {
+            width: 48px; height: 48px; border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.1);
+            background: rgba(20,20,35,0.8);
+            flex-shrink: 0;
+            transition: var(--transition);
+        }
+        .avatar-preview.has-image { border-color: rgba(245,158,11,0.5); box-shadow: 0 0 10px rgba(245,158,11,0.2); }
+
+        /* Section titles */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--text-main);
+            margin: 28px 0 18px;
+            text-transform: uppercase;
+        }
+        .section-title:first-of-type { margin-top: 0; }
+        .section-title-icon {
+            width: 34px; height: 34px; border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; flex-shrink: 0;
+        }
+        .si-plot    { background: linear-gradient(135deg,rgba(79,195,247,0.2),rgba(79,195,247,0.05)); color:#4fc3f7; border:1px solid rgba(79,195,247,0.25); }
+        .si-char    { background: linear-gradient(135deg,rgba(167,139,250,0.2),rgba(167,139,250,0.05)); color:#a78bfa; border:1px solid rgba(167,139,250,0.25); }
+        .si-style   { background: linear-gradient(135deg,rgba(52,211,153,0.2),rgba(52,211,153,0.05)); color:#34d399; border:1px solid rgba(34,211,153,0.25); }
+        .si-power   { background: linear-gradient(135deg,rgba(251,146,60,0.2),rgba(251,146,60,0.05)); color:#fb923c; border:1px solid rgba(251,146,60,0.25); }
+        .si-impact  { background: linear-gradient(135deg,rgba(251,191,36,0.2),rgba(251,191,36,0.05)); color:#fbbf24; border:1px solid rgba(251,191,36,0.25); }
+        .section-title-text { flex: 1; line-height: 1.4; }
+        .section-title-max {
+            font-size: 11px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 3px 10px; border-radius: 20px;
+            color: var(--text-muted); font-weight: 600; white-space: nowrap;
+        }
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.05), transparent);
+            margin-bottom: 18px;
+        }
+
+        /* Criterion rows */
+        .criterion-row {
+            margin-bottom: 16px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 12px;
+            padding: 13px 15px;
+            transition: var(--transition);
+        }
+        .criterion-row:hover { background: rgba(245,158,11,0.03); border-color: rgba(245,158,11,0.1); }
+        .criterion-info {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 14px; color: var(--text-dim); margin-bottom: 10px;
+        }
+        .criterion-name { font-weight: 600; }
+        .criterion-score { display: flex; align-items: center; gap: 4px; font-size: 13px; }
+        .criterion-score strong {
+            font-size: 17px; font-weight: 800;
+            color: var(--gold);
+            font-family: 'Orbitron', sans-serif;
+            min-width: 22px; text-align: center;
+        }
+        .criterion-score span { color: var(--text-muted); }
+
+        /* Sliders */
         .slider-wrapper { display: flex; align-items: center; }
-        input[type="range"] { flex: 1; -webkit-appearance: none; background: #0f1014; height: 6px; border-radius: 5px; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent-blue); cursor: pointer; box-shadow: 0 0 8px var(--accent-blue); }
+        input[type="range"] {
+            flex: 1; -webkit-appearance: none;
+            background: rgba(255,255,255,0.06);
+            height: 5px; border-radius: 99px; outline: none; cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 19px; height: 19px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold), #fb923c);
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(245,158,11,0.5), 0 2px 6px rgba(0,0,0,0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 20px rgba(245,158,11,0.7), 0 2px 6px rgba(0,0,0,0.4);
+        }
 
-        /* LIVE BAR CONTROL */
-        .live-total-panel { position: sticky; bottom: 20px; background: rgba(15, 16, 22, 0.95); backdrop-filter: blur(10px); border: 1px solid #ffcc00; padding: 20px 30px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.6); z-index: 10; }
-        .live-score-big { font-size: 32px; font-weight: 800; color: #ffcc00; text-shadow: 0 0 10px rgba(255, 204, 0, 0.2); }
-        .submit-btn { background: #ffcc00; color: #000; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.3s; }
-        .submit-btn:hover { background: #e6b800; box-shadow: 0 0 20px rgba(255, 204, 0, 0.3); }
+        /* ============================================================
+           LIVE SCORE PANEL
+           ============================================================ */
+        .live-total-panel {
+            position: sticky;
+            bottom: 20px;
+            background: rgba(6,6,18,0.93);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(245,158,11,0.3);
+            padding: 18px 28px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 0 40px rgba(245,158,11,0.1), 0 20px 50px rgba(0,0,0,0.7);
+            z-index: 100;
+        }
+        .live-panel-item { display: flex; flex-direction: column; gap: 4px; }
+        .live-label {
+            font-size: 10px; text-transform: uppercase;
+            letter-spacing: 2px; color: var(--text-muted); font-weight: 700;
+        }
+        .live-score-big {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 34px; font-weight: 900;
+            background: linear-gradient(135deg, var(--gold), #fb923c);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; line-height: 1;
+        }
+        .live-score-max { font-size: 13px; color: var(--text-muted); font-family: inherit; -webkit-text-fill-color: var(--text-muted); }
+        #liveTierDisplay {
+            font-weight: 700; color: var(--gold); font-size: 14px;
+            display: flex; align-items: center; gap: 7px;
+            padding: 6px 14px;
+            background: rgba(245,158,11,0.08);
+            border: 1px solid rgba(245,158,11,0.2);
+            border-radius: 30px;
+            transition: var(--transition);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, var(--gold), #fb923c);
+            color: #06060f;
+            border: none; padding: 13px 26px; border-radius: 12px;
+            font-weight: 800; font-size: 14px; cursor: pointer;
+            transition: var(--transition); font-family: inherit;
+            display: flex; align-items: center; gap: 8px;
+            white-space: nowrap; position: relative; overflow: hidden;
+        }
+        .submit-btn::before {
+            content: ''; position: absolute;
+            top: -50%; left: -60%; width: 40%; height: 200%;
+            background: rgba(255,255,255,0.25);
+            transform: skewX(-20deg); transition: 0.6s;
+        }
+        .submit-btn:hover::before { left: 120%; }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(245,158,11,0.45), 0 8px 20px rgba(0,0,0,0.3);
+        }
 
-        /* =========================================================
-           ✨ ENGINE CẤU HÌNH SIÊU ĐẸP CHO GIAO DIỆN MOBILE (RESPONSIVE)
-           ========================================================= */
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
         @media (max-width: 768px) {
-            body { padding: 20px 10px; }
-            .nav-header { flex-direction: column; gap: 8px; text-align: center; margin-bottom: 20px; }
-            .nav-header h1 { font-size: 20px; }
-            
-            /* Thu nhỏ phím Tab điều hướng */
-            .tabs-container { gap: 6px; margin-bottom: 20px; }
-            .tab-btn { padding: 12px 6px; font-size: 12px; flex-direction: column; gap: 4px; border-radius: 10px; }
+            .page-wrapper { padding: 0 12px 160px; }
+            .back-home { position: static; margin-bottom: 16px; width: fit-content; }
+            .hero-header { padding: 20px 0 25px; align-items: flex-start; text-align: left; }
+            .hero-title { font-size: 18px; letter-spacing: 1px; }
+            .tabs-container { gap: 5px; margin: 20px 0 18px; padding: 5px; }
+            .tab-btn { padding: 12px 6px; font-size: 12px; flex-direction: column; gap: 3px; border-radius: 10px; }
             .tab-btn i { font-size: 14px; }
-
-            .console-box { padding: 20px; border-radius: 12px; margin-bottom: 15px; }
+            .console-box { padding: 18px 14px; border-radius: 16px; margin-bottom: 14px; }
             .form-group-inline { flex-direction: column; gap: 12px; }
-            .input-item { width: 100%; min-width: 100%; }
-            .section-title { font-size: 14px; line-height: 1.4; margin: 20px 0 15px 0; }
-            .criterion-info { font-size: 13px; line-height: 1.4; }
+            .input-item { min-width: 100%; }
+            .criterion-info { font-size: 13px; }
 
-            /* 💥 BẺ LẠI CSS: Ép bảng dữ liệu biến thành khối Card Profile di động */
-            .leaderboard-table, .leaderboard-table thead, .leaderboard-table tbody, .leaderboard-table th, .leaderboard-table td, .leaderboard-table tr { 
-                display: block; 
-            }
-            .leaderboard-table thead { display: none; } /* Ẩn dòng tiêu đề cứng nhắc */
+            /* Card-style leaderboard on mobile */
+            .leaderboard-table, .leaderboard-table thead, .leaderboard-table tbody,
+            .leaderboard-table th, .leaderboard-table td, .leaderboard-table tr { display: block; }
+            .leaderboard-table thead { display: none; }
             .leaderboard-table tr {
                 background: var(--card-bg);
-                margin-bottom: 15px;
-                border-radius: 14px;
-                padding: 16px;
-                border: 1px solid rgba(255,255,255,0.06);
-                position: relative;
-                display: flex;
-                flex-direction: column;
-                gap: 8px;
+                margin-bottom: 12px; border-radius: 14px;
+                padding: 16px; border: 1px solid rgba(255,255,255,0.06);
+                position: relative; display: flex; flex-direction: column; gap: 10px;
             }
             .leaderboard-table td { padding: 0; border: none; }
-            
-            /* Đẩy số hạng (Rank) lên góc bên phải thẻ */
-            .rank-cell {
-                position: absolute;
-                top: 16px; right: 16px;
-                width: auto; height: auto;
-                font-size: 22px;
-                text-align: right;
-            }
-            
-            /* Sắp xếp lại thứ tự ưu tiên hiển thị */
-            td:nth-child(2) { order: 1; padding-right: 45px; } /* Khối Tên & Avatar */
-            td:nth-child(3) { order: 2; margin-top: 4px; }     /* Khối Huy hiệu Tier */
-            td:nth-child(4) {                                   /* Khối Điểm số tổng */
-                order: 3; 
-                text-align: left !important; 
-                font-size: 18px; 
-                border-top: 1px solid rgba(255,255,255,0.06);
-                padding-top: 10px;
-                margin-top: 4px;
-            }
+            .rank-cell { position: absolute; top: 14px; right: 14px; width: auto; text-align: right; }
+            td:nth-child(2) { order: 1; padding-right: 50px; }
+            td:nth-child(3) { order: 2; }
+            td:nth-child(4) { order: 3; text-align: left !important; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 10px; }
 
-            /* 💥 BIẾN ĐỔI THANH LIVE ĐIỂM SỐ: Biến thành Dock cố định sát đáy màn hình */
+            /* Fixed dock */
             .live-total-panel {
-                position: fixed;
-                bottom: 0; left: 0;
-                width: 100%; border-radius: 0;
-                border: none; border-top: 1px solid #ffcc00;
-                padding: 12px 15px;
+                position: fixed; bottom: 0; left: 0; right: 0;
+                border-radius: 18px 18px 0 0; border: none;
+                border-top: 1px solid rgba(245,158,11,0.3);
+                padding: 14px 16px 18px;
                 background: #0b0c10;
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
+                display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
                 box-sizing: border-box;
             }
-            .live-total-panel > div:nth-child(1) { grid-column: span 1; }
-            .live-total-panel > div:nth-child(2) { grid-column: span 1; text-align: right; }
             .live-total-panel > div:nth-child(3) { grid-column: span 2; text-align: center; }
-            
+            .submit-btn { width: 100%; justify-content: center; padding: 13px; font-size: 15px; }
             .live-score-big { font-size: 26px; }
-            .live-tier-badge { padding: 4px 10px; font-size: 12px; display: inline-block; }
-            .submit-btn { width: 100%; padding: 12px; font-size: 14px; border-radius: 6px; }
-
-            /* Tạo khoảng trống đệm ở cuối trang khi mở tab Form để không bị thanh Dock che mất chữ */
-            .view-section-spacer { height: 140px; width: 100%; display: block; }
+            .view-section-spacer { height: 150px; width: 100%; display: block; }
         }
     </style>
 </head>
 <body>
 
-    <div class="nav-header">
-        <h1 style="margin:0; font-size: 24px; color: var(--accent-blue); font-family: serif; letter-spacing: 1px;">CHARACTER CENTRAL</h1>
-        <a href="index.html" class="back-home"><i class="fa-solid fa-arrow-left"></i> Quay lại trang chủ</a>
+<!-- Ambient glows -->
+<div class="ambient-glow glow-blue"></div>
+<div class="ambient-glow glow-pink"></div>
+
+<div class="page-wrapper">
+
+    <!-- ========== HERO HEADER ========== -->
+    <div class="hero-header">
+        <a href="index.html" class="back-home">
+            <i class="fa-solid fa-arrow-left"></i> Trang chủ
+        </a>
+        <div class="hero-eyebrow"><i class="fa-solid fa-bolt"></i> Character Central</div>
+        <h1 class="hero-title">XẾP HẠNG NHÂN VẬT</h1>
+        <p class="hero-subtitle">Vinh danh những nhân vật xuất sắc nhất trong các tác phẩm</p>
     </div>
 
+    <!-- ========== TABS ========== -->
     <div class="tabs-container">
-        <button class="tab-btn active tab-male" onclick="switchTab('male-leaderboard', this, 'male')"><i class="fa-solid fa-mars"></i> BXH Nam Nhi</button>
-        <button class="tab-btn tab-female" onclick="switchTab('female-leaderboard', this, 'female')"><i class="fa-solid fa-venus"></i> BXH Nữ Nhi</button>
-        <button class="tab-btn tab-rate" onclick="switchTab('rate-character-sec', this, null)"><i class="fa-solid fa-user-pen"></i> Chấm Điểm</button>
+        <button class="tab-btn active tab-male" onclick="switchTab('male-leaderboard', this, 'male')">
+            <i class="fa-solid fa-mars"></i>
+            <span>BXH Nam Nhi</span>
+        </button>
+        <button class="tab-btn tab-female" onclick="switchTab('female-leaderboard', this, 'female')">
+            <i class="fa-solid fa-venus"></i>
+            <span>BXH Nữ Nhi</span>
+        </button>
+        <button class="tab-btn tab-rate" onclick="switchTab('rate-character-sec', this, null)">
+            <i class="fa-solid fa-user-pen"></i>
+            <span>Chấm Điểm</span>
+        </button>
     </div>
 
+    <!-- ========== LEADERBOARD SECTIONS ========== -->
     <section id="male-leaderboard" class="view-section active"></section>
     <section id="female-leaderboard" class="view-section"></section>
 
+    <!-- ========== FORM CHẤM ĐIỂM ========== -->
     <section id="rate-character-sec" class="view-section">
+
+        <!-- Thông tin nhân vật -->
         <div class="console-box">
             <div class="form-group-inline">
                 <div class="input-item">
-                    <label>Thuộc tác phẩm gốc:</label>
+                    <label><i class="fa-solid fa-book"></i> Thuộc tác phẩm gốc</label>
                     <select id="charBookSelect"></select>
                 </div>
                 <div class="input-item">
-                    <label>Tên nhân vật:</label>
+                    <label><i class="fa-solid fa-user"></i> Tên nhân vật</label>
                     <input type="text" id="charNameInput" placeholder="Ví dụ: Sung Jin-Woo, Nhĩ Căn...">
                 </div>
                 <div class="input-item">
-                    <label>Giới tính:</label>
+                    <label><i class="fa-solid fa-venus-mars"></i> Giới tính</label>
                     <select id="charGenderSelect">
-                        <option value="male">Nam Thần (Male)</option>
-                        <option value="female">Nữ Thần (Female)</option>
+                        <option value="male">♂ Nam Thần (Male)</option>
+                        <option value="female">♀ Nữ Thần (Female)</option>
                     </select>
                 </div>
             </div>
-            <div class="input-item" style="width: 100%;">
-                <label>Đường dẫn ảnh đại diện nhân vật (Avatar URL - Tùy chọn):</label>
-                <input type="url" id="charAvatarInput" placeholder="Dán link ảnh nhân vật vào đây để hiển thị avatar tròn cực đẹp...">
+            <div class="input-item" style="width:100%;">
+                <label><i class="fa-solid fa-image"></i> Avatar URL — Đường dẫn ảnh đại diện (tuỳ chọn)</label>
+                <div class="avatar-url-wrapper">
+                    <img id="avatarPreview" class="avatar-preview" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100" alt="Avatar Preview">
+                    <input type="url" id="charAvatarInput" placeholder="Dán link ảnh nhân vật vào đây để hiển thị avatar...">
+                </div>
             </div>
         </div>
 
-        <div class="console-box" style="padding-bottom: 10px;">
-            <div class="section-title">1. CỐT TRUYỆN VÀ CẤU TRÚC (PLOT & STRUCTURE) — ĐỐI VỚI NHÂN VẬT (TỐI ĐA 25 ĐIỂM)</div>
+        <!-- Scoring sliders -->
+        <div class="console-box" style="padding-bottom:14px;">
+
+            <!-- 1. CỐT TRUYỆN -->
+            <div class="section-title">
+                <div class="section-title-icon si-plot"><i class="fa-solid fa-diagram-project"></i></div>
+                <div class="section-title-text">1. Cốt Truyện & Cấu Trúc <span style="font-size:10px;color:var(--text-muted);font-weight:400;">(đối với nhân vật)</span></div>
+                <span class="section-title-max">Tối đa 25đ</span>
+            </div>
+            <div class="section-divider"></div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Tính logic & Chặt chẽ (Gắn kết mạch truyện)</span><span><strong id="v_plotLogic">5</strong> / 10đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Tính logic & Chặt chẽ (Gắn kết mạch truyện)</span><div class="criterion-score"><strong id="v_plotLogic">5</strong><span>/ 10đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_plotLogic" min="0" max="10" value="5"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Nhịp độ xuất hiện (Pacing & Cao trào nhân vật)</span><span><strong id="v_plotPacing">4</strong> / 8đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Nhịp độ xuất hiện (Pacing & Cao trào nhân vật)</span><div class="criterion-score"><strong id="v_plotPacing">4</strong><span>/ 8đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_plotPacing" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Sự sáng tạo trong thiết kế hình tượng nhân vật</span><span><strong id="v_plotCreativity">4</strong> / 7đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Sự sáng tạo trong thiết kế hình tượng nhân vật</span><div class="criterion-score"><strong id="v_plotCreativity">4</strong><span>/ 7đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_plotCreativity" min="0" max="7" value="4"></div>
             </div>
 
-            <div class="section-title">2. XÂY DỰNG NHÂN VẬT (CHARACTER DEVELOPMENT) — ĐỘ SÂU NỘI TÂM (TỐI ĐA 25 ĐIỂM)</div>
+            <!-- 2. NHÂN VẬT -->
+            <div class="section-title">
+                <div class="section-title-icon si-char"><i class="fa-solid fa-brain"></i></div>
+                <div class="section-title-text">2. Xây Dựng Nhân Vật — Độ sâu nội tâm</div>
+                <span class="section-title-max">Tối đa 25đ</span>
+            </div>
+            <div class="section-divider"></div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Độ sâu tâm lý (Đa chiều tính cách)</span><span><strong id="v_charDepth">5</strong> / 10đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Độ sâu tâm lý (Đa chiều tính cách)</span><div class="criterion-score"><strong id="v_charDepth">5</strong><span>/ 10đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_charDepth" min="0" max="10" value="5"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Hành trình trưởng thành & Thay đổi nhận thức</span><span><strong id="v_charGrowth">4</strong> / 8đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Hành trình trưởng thành & Thay đổi nhận thức</span><div class="criterion-score"><strong id="v_charGrowth">4</strong><span>/ 8đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_charGrowth" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Động cơ hành động & Tương tác mối quan hệ</span><span><strong id="v_charInteraction">4</strong> / 7đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Động cơ hành động & Tương tác mối quan hệ</span><div class="criterion-score"><strong id="v_charInteraction">4</strong><span>/ 7đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_charInteraction" min="0" max="7" value="4"></div>
             </div>
 
-            <div class="section-title">3. VĂN PHONG VÀ NGÔN TỪ (WRITING STYLE) — SỨC HÚT ĐỐI THOẠI (TỐI ĐA 20 ĐIỂM)</div>
+            <!-- 3. VĂN PHONG -->
+            <div class="section-title">
+                <div class="section-title-icon si-style"><i class="fa-solid fa-feather-pointed"></i></div>
+                <div class="section-title-text">3. Văn Phong — Sức hút đối thoại</div>
+                <span class="section-title-max">Tối đa 20đ</span>
+            </div>
+            <div class="section-divider"></div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Hành văn miêu tả phong thái & Kỹ thuật khắc họa</span><span><strong id="v_styleTechnique">5</strong> / 10đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Hành văn miêu tả phong thái & Kỹ thuật khắc họa</span><div class="criterion-score"><strong id="v_styleTechnique">5</strong><span>/ 10đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_styleTechnique" min="0" max="10" value="5"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Lời thoại sắc sảo, tự nhiên thể hiện cá tính</span><span><strong id="v_styleDialogue">5</strong> / 10đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Lời thoại sắc sảo, tự nhiên thể hiện cá tính</span><div class="criterion-score"><strong id="v_styleDialogue">5</strong><span>/ 10đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_styleDialogue" min="0" max="10" value="5"></div>
             </div>
 
-            <div class="section-title">4. SỨC MẠNH VÀ TRÍ TUỆ (POWER & INTELLIGENCE) — ĐẲNG CẤP NĂNG LỰC (TỐI ĐA 15 ĐIỂM)</div>
+            <!-- 4. SỨC MẠNH -->
+            <div class="section-title">
+                <div class="section-title-icon si-power"><i class="fa-solid fa-bolt-lightning"></i></div>
+                <div class="section-title-text">4. Sức Mạnh & Trí Tuệ — Đẳng cấp năng lực</div>
+                <span class="section-title-max">Tối đa 15đ</span>
+            </div>
+            <div class="section-divider"></div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Năng lực & Sức mạnh (Thiết kế chiêu thức, out trình chiến đấu)</span><span><strong id="v_powerAbility">4</strong> / 8đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Năng lực & Sức mạnh (Thiết kế chiêu thức, out trình chiến đấu)</span><div class="criterion-score"><strong id="v_powerAbility">4</strong><span>/ 8đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_powerAbility" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Trí tuệ & Mưu lược (Chỉ số IQ/EQ, bày mưu tính kế bằng đầu lạnh)</span><span><strong id="v_powerIntellect">4</strong> / 7đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Trí tuệ & Mưu lược (Chỉ số IQ/EQ, bày mưu tính kế)</span><div class="criterion-score"><strong id="v_powerIntellect">4</strong><span>/ 7đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_powerIntellect" min="0" max="7" value="4"></div>
             </div>
 
-            <div class="section-title">5. THÔNG ĐIỆP VÀ ẤN TƯỢNG (THEME & IMPACT) — GIÁ TRỊ CỐT LÕI (TỐI ĐA 15 ĐIỂM)</div>
+            <!-- 5. ẤN TƯỢNG -->
+            <div class="section-title">
+                <div class="section-title-icon si-impact"><i class="fa-solid fa-fire-flame-curved"></i></div>
+                <div class="section-title-text">5. Thông Điệp & Ấn Tượng — Giá trị cốt lõi</div>
+                <span class="section-title-max">Tối đa 15đ</span>
+            </div>
+            <div class="section-divider"></div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Thông điệp nhân văn truyền tải qua nhân vật</span><span><strong id="v_impactTheme">4</strong> / 8đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Thông điệp nhân văn truyền tải qua nhân vật</span><div class="criterion-score"><strong id="v_impactTheme">4</strong><span>/ 8đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_impactTheme" min="0" max="8" value="4"></div>
             </div>
             <div class="criterion-row">
-                <div class="criterion-info"><span>Cảm xúc ám ảnh, day dứt đọng lại sau trang cuối</span><span><strong id="v_impactEmotion">4</strong> / 7đ</span></div>
+                <div class="criterion-info"><span class="criterion-name">Cảm xúc ám ảnh, day dứt đọng lại sau trang cuối</span><div class="criterion-score"><strong id="v_impactEmotion">4</strong><span>/ 7đ</span></div></div>
                 <div class="slider-wrapper"><input type="range" class="score-slider" data-target="v_impactEmotion" min="0" max="7" value="4"></div>
             </div>
+
         </div>
 
         <div class="view-section-spacer"></div>
 
+        <!-- LIVE PANEL -->
         <div class="live-total-panel">
-            <div>
-                <span style="font-size:13px; color:#a0a0a0; display:block; margin-bottom:5px;">XẾP LOẠI NHÂN VẬT</span>
-                <div id="liveTierDisplay" style="font-weight:bold; color:#ffcc00; font-size:15px;">Tròn vai / Average</div>
+            <div class="live-panel-item">
+                <div class="live-label">Xếp loại nhân vật</div>
+                <div id="liveTierDisplay"><i class="fa-solid fa-star"></i> Tròn vai / Average</div>
             </div>
-            <div style="text-align: right;">
-                <span style="font-size:13px; color:#a0a0a0; display:block; margin-bottom:5px;">TỔNG ĐIỂM LIVE</span>
-                <div class="live-score-big"><span id="liveTotalScore">52</span> <span style="font-size:16px; color:#666;">/ 100</span></div>
+            <div class="live-panel-item" style="text-align:right;">
+                <div class="live-label">Tổng điểm live</div>
+                <div class="live-score-big"><span id="liveTotalScore">52</span><span class="live-score-max">/ 100</span></div>
             </div>
             <div>
-                <button class="submit-btn" id="submitCharReviewBtn"><i class="fa-solid fa-bolt"></i> Ghim nhân vật lên mây</button>
+                <button class="submit-btn" id="submitCharReviewBtn">
+                    <i class="fa-solid fa-bolt"></i> Ghim nhân vật lên mây
+                </button>
             </div>
         </div>
     </section>
 
-    <script>
-        const SERVER_URL = "https://thuvienbackend.onrender.com";
-        let activeGenderTab = 'male';
+</div><!-- end .page-wrapper -->
 
-        function switchTab(sectionId, btn, gender) {
-            document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            
-            const targetSec = document.getElementById(sectionId);
-            targetSec.style.display = 'block';
-            btn.classList.add('active');
+<script>
+    const SERVER_URL = "https://thuvienbackend.onrender.com";
+    let activeGenderTab = 'male';
 
-            if (gender) {
-                activeGenderTab = gender;
-                loadCharacterLeaderboard(gender, sectionId);
-            }
-        }
+    function switchTab(sectionId, btn, gender) {
+        document.querySelectorAll('.view-section').forEach(s => s.style.display = 'none');
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        
+        const targetSec = document.getElementById(sectionId);
+        targetSec.style.display = 'block';
+        btn.classList.add('active');
 
-        // Live calculation engine
-        const sliders = document.querySelectorAll('.score-slider');
-        sliders.forEach(slider => {
-            slider.addEventListener('input', (e) => {
-                const targetId = e.target.getAttribute('data-target');
-                document.getElementById(targetId).innerText = e.target.value;
-                calculateLiveTotal();
-            });
-        });
-
-        function calculateLiveTotal() {
-            let total = 0;
-            sliders.forEach(s => total += Number(s.value));
-            document.getElementById('liveTotalScore').innerText = total;
-
-            const badge = document.getElementById('liveTierDisplay');
-            if (total >= 90) { badge.innerText = "Nhân vật Huyền thoại / Legend"; badge.style.color = "#e74c3c"; }
-            else if (total >= 75) { badge.innerText = "Nhân vật Yêu thích / Favorite"; badge.style.color = "#2ecc71"; }
-            else if (total >= 50) { badge.innerText = "Tròn vai / Average"; badge.style.color = "#f1c40f"; }
-            else { badge.innerText = "Mờ nhạt / Weak"; badge.style.color = "#95a5a6"; }
-        }
-
-        async function initCoreData() {
-            try {
-                const res = await fetch(`${SERVER_URL}/api/books`);
-                const books = await res.json();
-                
-                const select = document.getElementById('charBookSelect');
-                select.innerHTML = "";
-                books.forEach(b => {
-                    select.innerHTML += `<option value="${b._id}">${b.title}</option>`;
-                });
-
-                loadCharacterLeaderboard('male', 'male-leaderboard');
-            } catch (err) { console.error(err); }
-        }
-
-        async function loadCharacterLeaderboard(gender, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = `<p style="text-align:center; color:#a0a0a0; padding:20px;">Đang truy vấn bảng xếp hạng đám mây...</p>`;
-
-            try {
-                const res = await fetch(`${SERVER_URL}/api/characters/leaderboard?gender=${gender}`);
-                const data = await res.json();
-
-                if (data.length === 0) {
-                    container.innerHTML = `<p style="text-align:center; color:#666; padding:40px;">Chưa có nhân vật nào thuộc bảng xếp hạng này được chấm điểm.</p>`;
-                    return;
-                }
-
-                let html = `
-                    <table class="leaderboard-table">
-                        <thead>
-                            <tr>
-                                <th style="text-align:center;">Hạng</th>
-                                <th>Nhân vật / Tác phẩm gốc</th>
-                                <th>Xếp loại hình tượng</th>
-                                <th style="text-align:right;">Tổng điểm</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                `;
-
-                // Vòng lặp duyệt qua từng nhân vật
-                data.forEach((item, index) => {
-                    if (!item.bookId) return;
-
-                    let rankClass = "rank-cell";
-                    let rankDisplay = index + 1;
-                    if (index === 0) rankClass += " rank-1";
-                    else if (index === 1) rankClass += " rank-2";
-                    else if (index === 2) rankClass += " rank-3";
-
-                    let badgeClass = "tier-badge-table";
-                    if (item.totalScore >= 90) badgeClass += " tier-legend";
-                    else if (item.totalScore >= 75) badgeClass += " tier-fav";
-                    else if (item.totalScore >= 50) badgeClass += " tier-aver";
-                    else badgeClass += " tier-weak";
-
-                    const avatar = item.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100";
-
-                    // Đưa nút Xóa vào đúng vị trí bên trong vòng lặp để áp dụng cho TỪNG nhân vật
-                    html += `
-                        <tr>
-                            <td class="${rankClass}">${rankDisplay}</td>
-                            <td>
-                                <div class="char-profile">
-                                    <img src="${avatar}" class="char-avatar">
-                                    <div>
-                                        <div class="char-name">${item.name}</div>
-                                        <div class="book-origin-tag"><i class="fa-solid fa-book" style="font-size:11px;"></i> Truyện: ${item.bookId.title}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="${badgeClass}">${item.tier}</span>
-                                <button onclick="deleteCharacter('${item._id}', '${item.name}')" style="background:transparent; color:#ff4757; border:none; cursor:pointer; font-size:12px; font-weight:600; margin-left:12px; font-family:inherit; opacity:0.6; transition:0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">
-                                    <i class="fa-solid fa-trash-can"></i> Xóa
-                                </button>
-                            </td>
-                            <td style="text-align:right; font-weight:bold; font-size:18px; color:#4fc3f7;">${item.totalScore}đ</td>
-                        </tr>
-                    `;
-                });
-
-                html += `</tbody></table>`; // Thêm thẻ đóng để bảng không bị lỗi hiển thị
-                container.innerHTML = html;
-            } catch (err) {
-                container.innerHTML = `<p style="text-align:center; color:#ff4757;">Lỗi không tải được dữ liệu đồng bộ!</p>`;
-            }
-        }
-
-        document.getElementById('submitCharReviewBtn').onclick = async () => {
-            const bookId = document.getElementById('charBookSelect').value;
-            const name = document.getElementById('charNameInput').value.trim();
-            const gender = document.getElementById('charGenderSelect').value;
-            const avatarUrl = document.getElementById('charAvatarInput').value.trim();
-
-            if (!name) return alert("Vui lòng nhập tên nhân vật cần đánh giá!");
-
-            const scores = {
-                plotLogic: document.querySelectorAll('.score-slider')[0].value,
-                plotPacing: document.querySelectorAll('.score-slider')[1].value,
-                plotCreativity: document.querySelectorAll('.score-slider')[2].value,
-                charDepth: document.querySelectorAll('.score-slider')[3].value,
-                charGrowth: document.querySelectorAll('.score-slider')[4].value,
-                charInteraction: document.querySelectorAll('.score-slider')[5].value,
-                styleTechnique: document.querySelectorAll('.score-slider')[6].value,
-                styleDialogue: document.querySelectorAll('.score-slider')[7].value,
-                powerAbility: document.querySelectorAll('.score-slider')[8].value,
-                powerIntellect: document.querySelectorAll('.score-slider')[9].value,
-                impactTheme: document.querySelectorAll('.score-slider')[10].value,
-                impactEmotion: document.querySelectorAll('.score-slider')[11].value
-            };
-
-            try {
-                const res = await fetch(`${SERVER_URL}/api/characters`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ bookId, name, gender, avatarUrl, scores })
-                });
-
-                if (res.ok) {
-                    alert(`🎉 Đã ghim nhân vật "${name}" lên bảng xếp hạng đám mây thành công!`);
-                    document.getElementById('charNameInput').value = "";
-                    document.getElementById('charAvatarInput').value = "";
-                    const targetTabId = gender === 'male' ? 'male-leaderboard' : 'female-leaderboard';
-                    const targetBtn = gender === 'male' ? document.querySelector('.tab-male') : document.querySelector('.tab-female');
-                    switchTab(targetTabId, targetBtn, gender);
-                } else {
-                    alert("Lỗi xử lý dữ liệu chấm điểm!");
-                }
-            } catch (err) { alert("Lỗi kết nối Backend!"); }
-        };
-        // Hàm gọi API xóa nhân vật vĩnh viễn khỏi Database đám mây
-async function deleteCharacter(id, name) {
-    if (confirm(`⚠️ Bạn có chắc chắn muốn xóa nhân vật "${name}" khỏi bảng xếp hạng không?`)) {
-        try {
-            const res = await fetch(`${SERVER_URL}/api/characters/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                alert(`🗑️ Đã xóa nhân vật "${name}" thành công!`);
-                // Tự động tải lại bảng xếp hạng hiện tại để cập nhật giao diện
-                loadCharacterLeaderboard(activeGenderTab, activeGenderTab === 'male' ? 'male-leaderboard' : 'female-leaderboard');
-            } else {
-                alert("❌ Server từ chối lệnh xóa nhân vật!");
-            }
-        } catch (err) {
-            alert("❌ Lỗi kết nối đến Server Backend!");
+        if (gender) {
+            activeGenderTab = gender;
+            loadCharacterLeaderboard(gender, sectionId);
         }
     }
-}
-        document.addEventListener('DOMContentLoaded', initCoreData);
-    </script>
+
+    // Live calculation engine
+    const sliders = document.querySelectorAll('.score-slider');
+    sliders.forEach(slider => {
+        slider.addEventListener('input', (e) => {
+            const targetId = e.target.getAttribute('data-target');
+            document.getElementById(targetId).innerText = e.target.value;
+            calculateLiveTotal();
+        });
+    });
+
+    function calculateLiveTotal() {
+        let total = 0;
+        sliders.forEach(s => total += Number(s.value));
+        document.getElementById('liveTotalScore').innerText = total;
+
+        const badge = document.getElementById('liveTierDisplay');
+        if (total >= 90) { badge.innerHTML = `<i class="fa-solid fa-crown"></i> Nhân vật Huyền thoại / Legend`; badge.style.color = "#fca5a5"; badge.style.borderColor = "rgba(239,68,68,0.4)"; }
+        else if (total >= 75) { badge.innerHTML = `<i class="fa-solid fa-heart"></i> Nhân vật Yêu thích / Favorite`; badge.style.color = "#6ee7b7"; badge.style.borderColor = "rgba(16,185,129,0.4)"; }
+        else if (total >= 50) { badge.innerHTML = `<i class="fa-solid fa-star"></i> Tròn vai / Average`; badge.style.color = "#fcd34d"; badge.style.borderColor = "rgba(245,158,11,0.4)"; }
+        else { badge.innerHTML = `<i class="fa-solid fa-ghost"></i> Mờ nhạt / Weak`; badge.style.color = "#94a3b8"; badge.style.borderColor = "rgba(100,116,139,0.3)"; }
+    }
+
+    async function initCoreData() {
+        try {
+            const res = await fetch(`${SERVER_URL}/api/books`);
+            const books = await res.json();
+            
+            const select = document.getElementById('charBookSelect');
+            select.innerHTML = "";
+            books.forEach(b => {
+                select.innerHTML += `<option value="${b._id}">${b.title}</option>`;
+            });
+
+            loadCharacterLeaderboard('male', 'male-leaderboard');
+        } catch (err) { console.error(err); }
+    }
+
+    async function loadCharacterLeaderboard(gender, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:40px;"><i class="fa-solid fa-spinner fa-spin" style="color:var(--${gender === 'male' ? 'blue' : 'pink'});margin-right:8px;"></i>Đang truy vấn bảng xếp hạng đám mây...</p>`;
+
+        try {
+            const res = await fetch(`${SERVER_URL}/api/characters/leaderboard?gender=${gender}`);
+            const data = await res.json();
+
+            if (data.length === 0) {
+                container.innerHTML = `<div style="text-align:center; padding:60px 20px; color:var(--text-muted);"><i class="fa-solid fa-inbox" style="font-size:40px; opacity:0.3; display:block; margin-bottom:12px;"></i>Chưa có nhân vật nào thuộc bảng xếp hạng này.</div>`;
+                return;
+            }
+
+            const scoreClass = gender === 'male' ? 'score-male' : 'score-female';
+
+            let html = `
+                <table class="leaderboard-table">
+                    <thead><tr>
+                        <th style="text-align:center;">Hạng</th>
+                        <th>Nhân vật / Tác phẩm gốc</th>
+                        <th>Xếp loại hình tượng</th>
+                        <th style="text-align:right; padding-right:24px;">Điểm</th>
+                    </tr></thead>
+                    <tbody>
+            `;
+
+            data.forEach((item, index) => {
+                if (!item.bookId) return;
+
+                let rankClass = "rank-cell";
+                let rankDisplay = `<span class="rank-other">${index+1}</span>`;
+                if (index === 0) { rankClass += " rank-1"; rankDisplay = `<span class="rank-medal">🥇</span>`; }
+                else if (index === 1) { rankClass += " rank-2"; rankDisplay = `<span class="rank-medal">🥈</span>`; }
+                else if (index === 2) { rankClass += " rank-3"; rankDisplay = `<span class="rank-medal">🥉</span>`; }
+
+                let badgeClass = "tier-badge-table";
+                let badgeIcon = "fa-star";
+                let ringClass = "ring-weak";
+                if (item.totalScore >= 90) { badgeClass += " tier-legend"; badgeIcon = "fa-crown"; ringClass = "ring-legend"; }
+                else if (item.totalScore >= 75) { badgeClass += " tier-fav"; badgeIcon = "fa-heart"; ringClass = "ring-fav"; }
+                else if (item.totalScore >= 50) { badgeClass += " tier-aver"; badgeIcon = "fa-star"; ringClass = "ring-aver"; }
+                else { badgeClass += " tier-weak"; badgeIcon = "fa-minus"; }
+
+                const avatar = item.avatarUrl || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100";
+
+                html += `
+                    <tr>
+                        <td class="${rankClass}">${rankDisplay}</td>
+                        <td>
+                            <div class="char-profile">
+                                <div class="char-avatar-wrapper">
+                                    <img src="${avatar}" class="char-avatar" onerror="this.src='https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100'">
+                                    <div class="avatar-ring ${ringClass}"></div>
+                                </div>
+                                <div>
+                                    <div class="char-name">${item.name}</div>
+                                    <div class="book-origin-tag"><i class="fa-solid fa-book" style="font-size:10px;"></i> ${item.bookId.title}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="${badgeClass}"><i class="fa-solid ${badgeIcon}"></i>${item.tier}</span>
+                            <button onclick="deleteCharacter('${item._id}', '${item.name}')" class="delete-char-btn">
+                                <i class="fa-solid fa-trash-can"></i> Xóa
+                            </button>
+                        </td>
+                        <td class="score-cell ${scoreClass}" style="text-align:right; padding-right:24px;">${item.totalScore}<small>đ</small></td>
+                    </tr>
+                `;
+            });
+
+            html += `</tbody></table>`;
+            container.innerHTML = html;
+        } catch (err) {
+            container.innerHTML = `<p style="text-align:center; color:#ef4444; padding:40px;"><i class="fa-solid fa-circle-exclamation"></i> Lỗi không tải được dữ liệu đồng bộ!</p>`;
+        }
+    }
+
+    document.getElementById('submitCharReviewBtn').onclick = async () => {
+        const bookId = document.getElementById('charBookSelect').value;
+        const name = document.getElementById('charNameInput').value.trim();
+        const gender = document.getElementById('charGenderSelect').value;
+        const avatarUrl = document.getElementById('charAvatarInput').value.trim();
+
+        if (!name) return alert("Vui lòng nhập tên nhân vật cần đánh giá!");
+
+        const scores = {
+            plotLogic: document.querySelectorAll('.score-slider')[0].value,
+            plotPacing: document.querySelectorAll('.score-slider')[1].value,
+            plotCreativity: document.querySelectorAll('.score-slider')[2].value,
+            charDepth: document.querySelectorAll('.score-slider')[3].value,
+            charGrowth: document.querySelectorAll('.score-slider')[4].value,
+            charInteraction: document.querySelectorAll('.score-slider')[5].value,
+            styleTechnique: document.querySelectorAll('.score-slider')[6].value,
+            styleDialogue: document.querySelectorAll('.score-slider')[7].value,
+            powerAbility: document.querySelectorAll('.score-slider')[8].value,
+            powerIntellect: document.querySelectorAll('.score-slider')[9].value,
+            impactTheme: document.querySelectorAll('.score-slider')[10].value,
+            impactEmotion: document.querySelectorAll('.score-slider')[11].value
+        };
+
+        try {
+            const res = await fetch(`${SERVER_URL}/api/characters`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ bookId, name, gender, avatarUrl, scores })
+            });
+
+            if (res.ok) {
+                alert(`🎉 Đã ghim nhân vật "${name}" lên bảng xếp hạng đám mây thành công!`);
+                document.getElementById('charNameInput').value = "";
+                document.getElementById('charAvatarInput').value = "";
+                document.getElementById('avatarPreview').src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100";
+                const targetTabId = gender === 'male' ? 'male-leaderboard' : 'female-leaderboard';
+                const targetBtn = gender === 'male' ? document.querySelector('.tab-male') : document.querySelector('.tab-female');
+                switchTab(targetTabId, targetBtn, gender);
+            } else {
+                alert("Lỗi xử lý dữ liệu chấm điểm!");
+            }
+        } catch (err) { alert("Lỗi kết nối Backend!"); }
+    };
+
+    async function deleteCharacter(id, name) {
+        if (confirm(`⚠️ Bạn có chắc chắn muốn xóa nhân vật "${name}" khỏi bảng xếp hạng không?`)) {
+            try {
+                const res = await fetch(`${SERVER_URL}/api/characters/${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    alert(`🗑️ Đã xóa nhân vật "${name}" thành công!`);
+                    loadCharacterLeaderboard(activeGenderTab, activeGenderTab === 'male' ? 'male-leaderboard' : 'female-leaderboard');
+                } else {
+                    alert("❌ Server từ chối lệnh xóa nhân vật!");
+                }
+            } catch (err) {
+                alert("❌ Lỗi kết nối đến Server Backend!");
+            }
+        }
+    }
+
+    // Live avatar preview
+    document.getElementById('charAvatarInput').addEventListener('input', (e) => {
+        const url = e.target.value.trim();
+        const preview = document.getElementById('avatarPreview');
+        if (url) {
+            preview.src = url;
+            preview.classList.add('has-image');
+        } else {
+            preview.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=100";
+            preview.classList.remove('has-image');
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', initCoreData);
+</script>
 </body>
 </html>
-
-```
