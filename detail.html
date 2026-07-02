@@ -596,6 +596,35 @@
             .chapter-container {
                 grid-template-columns: 1fr;
                 gap: 10px;
+                max-height: 65vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+                padding-right: 2px;
+            }
+
+            /* Scrollbar gọn trong khung chapter */
+            .chapter-container::-webkit-scrollbar { width: 3px; }
+            .chapter-container::-webkit-scrollbar-track { background: transparent; }
+            .chapter-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+
+            /* Khi chưa load xong — tránh khung bị rỗng trơn */
+            .chapter-container:empty {
+                min-height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .chapter-container:empty::after {
+                content: 'Đang tải danh sách chương...';
+                color: rgba(255,255,255,0.25);
+                font-size: 13px;
+                font-weight: 600;
+                animation: pulse 1.5s ease-in-out infinite;
+            }
+            @keyframes pulse {
+                0%, 100% { opacity: 0.25; }
+                50% { opacity: 0.6; }
             }
         }
     </style>
@@ -946,7 +975,7 @@
                 let activeChapters = [...chapters]; 
                 let isReversed = false;             
                 let chapCurrentPage = 1;            
-                const chapRowsPerPage = 50;         
+                const chapRowsPerPage = window.matchMedia('(max-width: 768px)').matches ? 20 : 50;
 
                 function renderChapterPage() {
                     const chapterContainer = document.getElementById("chapterContainer");
