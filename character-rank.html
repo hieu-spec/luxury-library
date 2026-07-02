@@ -591,6 +591,7 @@
             .view-section-spacer { height: 150px; width: 100%; display: block; }
         }
     </style>
+    <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
 
@@ -984,5 +985,21 @@
 
     document.addEventListener('DOMContentLoaded', initCoreData);
 </script>
+
+<!-- MOBILE: Thanh điều hướng dưới cùng -->
+<nav class="mobile-bottom-nav" id="mobileBottomNav">
+    <a href="index.html" class="mob-nav-item" data-page="home">
+        <div class="mob-nav-icon"><i class="fa-solid fa-house"></i></div>
+        <span>Trang chủ</span>
+    </a>
+    <a href="character-rank.html" class="mob-nav-item active" data-page="rank">
+        <div class="mob-nav-icon"><i class="fa-solid fa-crown"></i></div>
+        <span>Xếp hạng</span>
+    </a>
+    <a href="review.html" class="mob-nav-item" data-page="review">
+        <div class="mob-nav-icon"><i class="fa-solid fa-trophy"></i></div>
+        <span>Đánh giá</span>
+    </a>
+</nav>
 </body>
 </html>

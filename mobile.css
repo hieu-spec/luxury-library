@@ -367,16 +367,16 @@
         gap: 4px;
         text-decoration: none;
         color: rgba(255, 255, 255, 0.32);
-        font-size: 9.5px;
+        font-size: 10px;
         font-weight: 600;
-        padding: 6px 8px;
+        padding: 6px 10px;
         border-radius: 14px;
         transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
         position: relative;
         letter-spacing: 0.2px;
-        min-width: 58px;
+        min-width: 70px;
         flex: 1;
-        max-width: 80px;
+        max-width: 110px;
     }
 
     .mob-nav-icon {
@@ -1570,3 +1570,420 @@
         display: none !important;
     }
 }
+
+
+/* =========================================================
+   PHẦN 4: MOBILE CSS ĐẶC BIỆT CHO REVIEW & CHARACTER-RANK
+   (Các trang này dùng CSS nội tuyến riêng)
+   ========================================================= */
+@media (max-width: 768px) {
+
+    /* ===================================================
+       4.1 — BOTTOM NAV CHO TRANG ĐỘC LẬP (review, char-rank)
+       Các trang này cần padding-bottom để tránh bị nav che
+       =================================================== */
+
+    body:has(.page-wrapper) {
+        padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+
+    /* Mobile bottom nav cho các trang dùng CSS riêng */
+    .mobile-bottom-nav {
+        display: flex !important;
+    }
+
+
+    /* ===================================================
+       4.2 — BACK HOME BUTTON (Nút quay lại)
+       =================================================== */
+
+    .back-home {
+        position: static !important;
+        margin-bottom: 12px !important;
+        width: fit-content !important;
+        font-size: 12px !important;
+        padding: 8px 13px !important;
+        border-radius: 10px !important;
+    }
+
+
+    /* ===================================================
+       4.3 — HERO HEADER (Cả review & char-rank)
+       =================================================== */
+
+    .hero-header {
+        padding: 16px 0 20px !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+    }
+
+    .hero-header::after {
+        left: 0 !important;
+        transform: none !important;
+        width: 100px !important;
+    }
+
+    .hero-title {
+        font-size: 19px !important;
+        letter-spacing: 1px !important;
+        line-height: 1.25 !important;
+    }
+
+    .hero-eyebrow {
+        font-size: 10px !important;
+        letter-spacing: 2px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .hero-subtitle {
+        font-size: 12px !important;
+        margin-top: 6px !important;
+    }
+
+
+    /* ===================================================
+       4.4 — PAGE WRAPPER
+       =================================================== */
+
+    .page-wrapper {
+        padding: 0 14px calc(72px + env(safe-area-inset-bottom, 0px) + 16px) !important;
+    }
+
+
+    /* ===================================================
+       4.5 — TAB BUTTONS (Cả review & char-rank)
+       =================================================== */
+
+    .tabs-container {
+        gap: 5px !important;
+        margin: 16px 0 14px !important;
+        padding: 5px !important;
+        border-radius: 14px !important;
+    }
+
+    .tab-btn {
+        padding: 11px 6px !important;
+        font-size: 11.5px !important;
+        flex-direction: column !important;
+        gap: 4px !important;
+        border-radius: 10px !important;
+        min-height: 56px !important;
+    }
+
+    .tab-btn i {
+        font-size: 15px !important;
+    }
+
+    .tab-btn span {
+        font-size: 11px !important;
+        line-height: 1.2 !important;
+        text-align: center !important;
+    }
+
+
+    /* ===================================================
+       4.6 — LEADERBOARD TABLE → CARD LAYOUT
+       (Dùng chung cho cả review & char-rank)
+       =================================================== */
+
+    .leaderboard-table,
+    .leaderboard-table thead,
+    .leaderboard-table tbody,
+    .leaderboard-table th,
+    .leaderboard-table td,
+    .leaderboard-table tr {
+        display: block !important;
+    }
+
+    .leaderboard-table thead { display: none !important; }
+
+    .leaderboard-table tbody {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .leaderboard-table tr {
+        background: rgba(14, 14, 26, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.065) !important;
+        border-radius: 14px !important;
+        padding: 14px !important;
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        overflow: hidden !important;
+        transition: transform 0.18s ease !important;
+    }
+
+    .leaderboard-table tr:active {
+        transform: scale(0.97) !important;
+    }
+
+    /* Shimmer effect */
+    .leaderboard-table tr::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 50%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+        transform: skewX(-22deg);
+        animation: cardShimmer 7s infinite;
+    }
+
+    /* TOP 1, 2, 3 highlights */
+    .leaderboard-table tr:has(.rank-1) {
+        border-color: rgba(251, 191, 36, 0.45) !important;
+        background: linear-gradient(145deg, rgba(28, 22, 8, 0.9), rgba(10, 10, 18, 0.95)) !important;
+    }
+    .leaderboard-table tr:has(.rank-2) {
+        border-color: rgba(148, 163, 184, 0.35) !important;
+    }
+    .leaderboard-table tr:has(.rank-3) {
+        border-color: rgba(205, 127, 50, 0.35) !important;
+    }
+
+    .leaderboard-table td {
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    /* Rank số — góc phải */
+    .rank-cell {
+        position: absolute !important;
+        top: 12px !important; right: 14px !important;
+        width: auto !important;
+        text-align: right !important;
+        font-size: 18px !important;
+    }
+
+    /* Cột tiêu đề / nhân vật — đặt padding để tránh rank number */
+    .leaderboard-table td:nth-child(2) {
+        padding-right: 48px !important;
+        order: 1 !important;
+    }
+
+    /* Cột ngày / tier — ẩn hoặc hiện nhỏ */
+    .leaderboard-table td:nth-child(3) {
+        order: 2 !important;
+    }
+
+    /* Cột điểm — xuống dưới với border top */
+    .leaderboard-table td:nth-child(4) {
+        order: 3 !important;
+        text-align: left !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.055) !important;
+        padding-top: 8px !important;
+    }
+
+    /* Text trong card */
+    .book-title-cell {
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        white-space: normal !important;
+        font-weight: 700 !important;
+    }
+
+    .book-author { font-size: 12px !important; }
+
+    .char-name { font-size: 14.5px !important; }
+    .book-origin-tag { font-size: 11.5px !important; }
+
+    .score-cell {
+        font-size: 20px !important;
+        text-align: left !important;
+    }
+
+    .tier-badge-table {
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+    }
+
+    /* Character profile trong card */
+    .char-profile { gap: 12px !important; }
+    .char-avatar  { width: 44px !important; height: 44px !important; }
+
+
+    /* ===================================================
+       4.7 — FILTER BAR
+       =================================================== */
+
+    .filter-bar {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 12px 14px !important;
+        gap: 10px !important;
+        border-radius: 12px !important;
+    }
+
+    .filter-bar span {
+        font-size: 12px !important;
+    }
+
+    .filter-bar select,
+    select {
+        width: 100% !important;
+        font-size: 14px !important;
+        padding: 11px 14px !important;
+        border-radius: 10px !important;
+    }
+
+
+    /* ===================================================
+       4.8 — CONSOLE BOX (Form chấm điểm)
+       =================================================== */
+
+    .console-box {
+        padding: 16px 14px !important;
+        border-radius: 15px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .form-group-inline {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .input-item {
+        min-width: 100% !important;
+    }
+
+    label {
+        font-size: 11px !important;
+    }
+
+    input[type="text"],
+    input[type="url"] {
+        font-size: 15px !important;
+        padding: 12px 14px !important;
+        border-radius: 10px !important;
+    }
+
+    .avatar-url-wrapper {
+        flex-direction: row !important;
+        gap: 10px !important;
+        align-items: center !important;
+    }
+
+    /* Section titles trong form */
+    .section-title {
+        font-size: 11px !important;
+        gap: 8px !important;
+        margin: 20px 0 14px !important;
+    }
+
+    .section-title-icon {
+        width: 30px !important; height: 30px !important;
+        font-size: 13px !important;
+        border-radius: 8px !important;
+    }
+
+    /* Criterion rows */
+    .criterion-row {
+        padding: 12px !important;
+        border-radius: 11px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .criterion-info {
+        font-size: 13px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .criterion-name  { font-weight: 600 !important; }
+
+    .criterion-score strong {
+        font-size: 16px !important;
+    }
+
+    /* Slider */
+    input[type="range"] {
+        height: 6px !important;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        width: 22px !important;
+        height: 22px !important;
+    }
+
+    .slider-wrapper { gap: 10px !important; }
+
+
+    /* ===================================================
+       4.9 — LIVE SCORE PANEL (sticky bottom dock)
+       =================================================== */
+
+    .live-total-panel {
+        position: fixed !important;
+        bottom: calc(64px + env(safe-area-inset-bottom, 0px)) !important;
+        left: 0 !important; right: 0 !important;
+        border-radius: 18px 18px 0 0 !important;
+        border: none !important;
+        border-top: 1px solid rgba(79, 195, 247, 0.25) !important;
+        padding: 12px 16px 14px !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        z-index: 8998 !important;
+        margin: 0 !important;
+    }
+
+    /* Character rank: gold border */
+    .live-total-panel:has(#liveTierDisplay) {
+        border-top-color: rgba(245, 158, 11, 0.3) !important;
+    }
+
+    .live-total-panel > *:last-child {
+        grid-column: span 2 !important;
+    }
+
+    .live-total-panel > div:nth-child(3) {
+        grid-column: span 2 !important;
+        text-align: center !important;
+    }
+
+    .live-score-big {
+        font-size: 26px !important;
+        line-height: 1 !important;
+    }
+
+    .live-label  { font-size: 9px !important; }
+    .live-score-max { font-size: 12px !important; }
+
+    .live-tier-badge {
+        padding: 6px 13px !important;
+        font-size: 12px !important;
+    }
+
+    #liveTierDisplay {
+        font-size: 13px !important;
+        padding: 5px 12px !important;
+    }
+
+    /* Submit button */
+    .submit-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        padding: 13px 0 !important;
+        font-size: 14.5px !important;
+        border-radius: 11px !important;
+    }
+
+    /* Spacer để nội dung không bị live panel che */
+    .view-section-spacer {
+        height: 160px !important;
+        display: block !important;
+    }
+
+    /* Nếu không có spacer, thêm padding-bottom cho section */
+    .view-section.active {
+        padding-bottom: 160px !important;
+    }
+
+    /* Book select dropdown */
+    #bookSelectToRate {
+        max-width: 100% !important;
+        font-size: 14px !important;
+    }
+}
+
