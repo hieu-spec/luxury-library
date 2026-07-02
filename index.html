@@ -239,6 +239,11 @@
             .nav-card p {
                 margin-bottom: 15px;
             }
+
+            /* Ẩn text label trong header buttons — chỉ giữ icon */
+            .btn-label {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -252,12 +257,12 @@
                 <span>Chào Hiếu, hôm nay đọc gì?</span>
                 <i class="fa-solid fa-user-ninja"></i>
                 
-                <a href="character-rank.html" class="view-all-btn" style="border-color: var(--japan-accent); color: var(--japan-accent); background: rgba(255, 71, 87, 0.05);">
-                    <i class="fa-solid fa-crown fa-bounce"></i> Xếp Hạng Nhân Vật
+                <a href="character-rank.html" class="view-all-btn" title="Xếp Hạng Nhân Vật" style="border-color: var(--japan-accent); color: var(--japan-accent); background: rgba(255, 71, 87, 0.05);">
+                    <i class="fa-solid fa-crown"></i> <span class="btn-label">Xếp Hạng Nhân Vật</span>
                 </a>
                 
-                <a href="review.html" class="view-all-btn" style="border-color: var(--china-accent); color: var(--china-accent); background: rgba(212, 175, 55, 0.05);">
-                    <i class="fa-solid fa-trophy"></i> Hội Đồng Đánh Giá
+                <a href="review.html" class="view-all-btn" title="Hội Đồng Đánh Giá" style="border-color: var(--china-accent); color: var(--china-accent); background: rgba(212, 175, 55, 0.05);">
+                    <i class="fa-solid fa-trophy"></i> <span class="btn-label">Hội Đồng Đánh Giá</span>
                 </a>
             </div>
         </div>
@@ -362,7 +367,7 @@
         </a>
         <a href="chinese.html" class="mob-nav-item" data-page="library">
             <div class="mob-nav-icon"><i class="fa-solid fa-book-open"></i></div>
-            <span>Thư viện</span>
+            <span>Thư Viện</span>
         </a>
         <a href="character-rank.html" class="mob-nav-item" data-page="rank">
             <div class="mob-nav-icon"><i class="fa-solid fa-crown"></i></div>
